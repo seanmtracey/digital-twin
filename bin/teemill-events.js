@@ -44,7 +44,6 @@ module.exports.initialise = function(httpServer){
 
     WebSocketServer.on('listening', function(){
         debug('WebSocket server is listening');
-        throw err;
     });
 
     WebSocketServer.on('connection', function connection(ws) {
