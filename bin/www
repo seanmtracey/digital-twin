@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+require('dotenv').config({ silent : process.env.NODE_ENV === 'production' })
 const app = require('../app');
 const debug = require('debug')('digital-twin:server');
 const http = require('http');
@@ -8,6 +8,9 @@ const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 const server = http.createServer(app);
+const teemillEventsServer = require(`${__dirname}/teemill-events`);
+
+teemillEventsServer.initialise(server);
 
 server.listen(port);
 server.on('error', onError);
