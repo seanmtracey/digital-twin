@@ -1,8 +1,100 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+html, body {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
 }
 
-a {
-  color: #00B7FF;
+body{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+main{
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.1);
+    display: flex;
+    max-width: 1280px;
+    max-height: 800px;
+    flex-direction: column;
+}
+
+main #top{
+	width: 100%;
+    height: 50%;
+    background: rgba(0,00,0,0.1);
+    flex-direction: row;
+    display: flex;
+}
+
+main #top #pack{
+	height: 100%;
+    background: blue;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+main #top #pack div{
+	width: 100%;
+    flex-grow: 1;
+    background: orange;
+    margin-bottom: 1em;
+}
+
+main #top #shelves{
+	height: 100%;
+    background: red;
+    margin: 0;
+    flex-grow: 9;
+    display: flex;
+    margin-left: 2em;
+}
+
+main #top #shelves div{
+	flex-grow: 1;
+    height: 100%;
+    background: darkgreen;
+    margin-left: 1em;
+}
+
+main #bottom{
+	width: 100%;
+    display: flex;
+    background: orange;
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+main #bottom #racks{
+	display: flex;
+    background: blueviolet;
+	flex-grow: 2;
+	flex-direction: column;
+}
+
+main #bottom #racks .top, main #bottom #racks .bottom{
+	display: flex;
+    flex-grow: 1;
+}
+
+main #bottom #racks .top{
+	background: darkseagreen;
+}
+
+main #bottom #racks .bottom{
+	background: red;
+}
+
+main #bottom #racks .top span {
+    background: grey;
+}
+
+main #bottom #printarea{
+	display: flex;
+    background: greenyellow;
+    flex-grow: 3;
 }
