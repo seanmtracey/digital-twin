@@ -62,18 +62,19 @@ main #top #shelves div{
 }
 
 main #bottom{
-	width: 100%;
+    width: 100%;
     display: flex;
     background: orange;
     flex-grow: 1;
     flex-direction: column;
+    margin-top: 1em;
 }
 
 main #bottom #racks{
-	display: flex;
+    display: flex;
     background: blueviolet;
-	flex-grow: 2;
-	flex-direction: column;
+    flex-grow: 1;
+    flex-direction: column;
 }
 
 main #bottom #racks .top, main #bottom #racks .bottom{
@@ -85,16 +86,104 @@ main #bottom #racks .top{
 	background: darkseagreen;
 }
 
-main #bottom #racks .bottom{
-	background: red;
+main #bottom #racks .bottom .left, main #bottom #racks .bottom .right {
+	flex-grow: 1;
 }
 
 main #bottom #racks .top span {
     background: grey;
+    flex-grow: 1;
+    width: 100%;
+    margin-bottom: 0.5em;
+}
+
+main #bottom #racks .top *[data-id]{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+main #bottom #racks .bottom{
+	background: red;
+}
+
+main #bottom #racks .bottom .left, main #bottom #racks .bottom .right{
+    display: flex;
+    flex-direction: column;
+}
+
+main #bottom #racks .bottom .left{
+    margin-right: 0.5em;
+}
+
+main #bottom #racks .bottom .right{
+    margin-left: 0.5em;
+}
+
+main #bottom #racks .bottom .left div, main #bottom #racks .bottom .right div{
+    flex-grow: 1;
+    background: grey;
+    margin-bottom: 0.5em;
+}
+
+main #bottom #racks .bottom .right div{
+    flex-grow: 0.5;
+    margin-bottom: 1em;
 }
 
 main #bottom #printarea{
 	display: flex;
     background: greenyellow;
     flex-grow: 3;
+}
+
+main #bottom #printarea .left{
+    background: yellow;
+    flex-grow: 1;
+}
+
+main #bottom #printarea .right{
+    display: flex;
+    max-width: 75%;
+    justify-content: space-around;
+}
+
+main #bottom #printarea .right .column{
+    background: orange;
+    width: 25%;
+    max-width: 20%;
+}
+
+main #bottom #printarea .right .column div[data-id]{
+    background: red;
+    width: 50px;
+    height: 50px;
+    margin: 0 1em 1em 0;
+    display: inherit;
+    float: right;
+}
+
+#eventDataOverlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+}
+
+#eventDataOverlay #eventDataDialog{
+    /* position: fixed; */
+    width: 350px;
+    height: 200px;
+    background: white;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.5)
+}
+
+body[data-displaying-info="false"] #eventDataOverlay{
+    display: none !important;
+}
+
+*[data-focus="true"]{
+    z-index: 100;
 }

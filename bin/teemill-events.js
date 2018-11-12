@@ -39,7 +39,7 @@ mqttClient.on('message', function (topic, message) {
 module.exports.initialise = function(httpServer){
 
     // Bind the websocket serve so that it lives happily alongside our
-    // HTTP server. NO FIGHTING YOU TOO!
+    // HTTP server. NO FIGHTING YOU TWO!
     WebSocketServer = new ws.Server( { server : httpServer } );
 
     WebSocketServer.on('listening', function(){
