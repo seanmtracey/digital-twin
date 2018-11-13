@@ -15,9 +15,8 @@ body{
 main{
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.1);
     display: flex;
-    max-width: 1280px;
+    max-width: 990px;
     max-height: 800px;
     flex-direction: column;
 }
@@ -25,14 +24,12 @@ main{
 main #top{
 	width: 100%;
     height: 50%;
-    background: rgba(0,00,0,0.1);
     flex-direction: row;
     display: flex;
 }
 
 main #top #pack{
 	height: 100%;
-    background: blue;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -41,13 +38,12 @@ main #top #pack{
 main #top #pack div{
 	width: 100%;
     flex-grow: 1;
-    background: orange;
+    background: #e6e6e6;
     margin-bottom: 1em;
 }
 
 main #top #shelves{
 	height: 100%;
-    background: red;
     margin: 0;
     flex-grow: 9;
     display: flex;
@@ -57,14 +53,13 @@ main #top #shelves{
 main #top #shelves div{
 	flex-grow: 1;
     height: 100%;
-    background: darkgreen;
+    background: #e6e6e6;
     margin-left: 1em;
 }
 
 main #bottom{
     width: 100%;
     display: flex;
-    background: orange;
     flex-grow: 1;
     flex-direction: column;
     margin-top: 1em;
@@ -72,9 +67,9 @@ main #bottom{
 
 main #bottom #racks{
     display: flex;
-    background: blueviolet;
-    flex-grow: 1;
+    flex-grow: 5;
     flex-direction: column;
+    margin-bottom: 1em;
 }
 
 main #bottom #racks .top, main #bottom #racks .bottom{
@@ -82,16 +77,12 @@ main #bottom #racks .top, main #bottom #racks .bottom{
     flex-grow: 1;
 }
 
-main #bottom #racks .top{
-	background: darkseagreen;
-}
-
 main #bottom #racks .bottom .left, main #bottom #racks .bottom .right {
 	flex-grow: 1;
 }
 
 main #bottom #racks .top span {
-    background: grey;
+    background: #e6e6e6;
     flex-grow: 1;
     width: 100%;
     margin-bottom: 0.5em;
@@ -101,10 +92,6 @@ main #bottom #racks .top *[data-id]{
     display: flex;
     flex-direction: column;
     width: 100%;
-}
-
-main #bottom #racks .bottom{
-	background: red;
 }
 
 main #bottom #racks .bottom .left, main #bottom #racks .bottom .right{
@@ -122,7 +109,7 @@ main #bottom #racks .bottom .right{
 
 main #bottom #racks .bottom .left div, main #bottom #racks .bottom .right div{
     flex-grow: 1;
-    background: grey;
+    background: #e6e6e6;
     margin-bottom: 0.5em;
 }
 
@@ -132,13 +119,11 @@ main #bottom #racks .bottom .right div{
 }
 
 main #bottom #printarea{
-	display: flex;
-    background: greenyellow;
-    flex-grow: 3;
+    display: flex;
+    flex-grow: 1;
 }
 
 main #bottom #printarea .left{
-    background: yellow;
     flex-grow: 1;
 }
 
@@ -149,13 +134,12 @@ main #bottom #printarea .right{
 }
 
 main #bottom #printarea .right .column{
-    background: orange;
     width: 25%;
     max-width: 20%;
 }
 
 main #bottom #printarea .right .column div[data-id]{
-    background: red;
+    background: #e6e6e6;
     width: 50px;
     height: 50px;
     margin: 0 1em 1em 0;
@@ -170,18 +154,20 @@ main #bottom #printarea .right .column div[data-id]{
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.8);
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    -webkit-transition: opacity 0.5s ease-in-out;
 }
 
 #eventDataOverlay #eventDataDialog{
-    /* position: fixed; */
     width: 350px;
     height: 200px;
     background: white;
-    box-shadow: 0 3px 5px rgba(0,0,0,0.5)
+    box-shadow: 0 3px 5px rgba(0,0,0,0.5);
 }
 
-body[data-displaying-info="false"] #eventDataOverlay{
-    display: none !important;
+body[data-displaying-info="true"] #eventDataOverlay{
+    opacity: 1;
 }
 
 *[data-focus="true"]{

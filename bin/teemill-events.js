@@ -36,6 +36,10 @@ mqttClient.on('message', function (topic, message) {
 
 });
 
+mqttClient.on('error', err => {
+    console.log('MQTT err:', err);
+})
+
 module.exports.initialise = function(httpServer){
 
     // Bind the websocket serve so that it lives happily alongside our

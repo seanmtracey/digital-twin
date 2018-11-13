@@ -108,3 +108,92 @@
 <div id="eventDataOverlay">
 	<div id="eventDataDialog">
 </div>
+
+<script>
+
+	(function(){
+		'use strict';
+
+		console.log('Hello!');
+		
+		function highlightElement(element, duration){
+			document.body.setAttribute('data-displaying-info', 'true');
+			element.dataset.focus = "true";
+
+			setTimeout(function(){
+				document.body.setAttribute('data-displaying-info', 'false');
+				element.dataset.focus = "false";
+			}, 3000);
+			
+		}
+
+		const shelves = document.querySelector('#top #shelves');
+
+		const ws = new WebSocket(`ws://${window.location.host}/`);
+
+		ws.addEventListener('connected', function(e){
+			console.log('WebSocket connected:', e);
+		}, false);
+
+		ws.addEventListener('message', function(e){
+			//console.log('WebSocket message', e);
+
+			const MESSAGE_DATA = JSON.parse(e.data);
+
+			let DATA;
+
+			try{
+				DATA = JSON.parse(MESSAGE_DATA.data);
+			} catch (err) {
+				return;
+			}
+
+			//const DATA = MESSAGE_DATA.data ? JSON.parse(MESSAGE_DATA.data) : undefined;
+			
+			console.log(MESSAGE_DATA);
+			// console.log(DATA);
+
+			if(DATA.label_id){
+				console.log('>>>>>>>>', DATA);
+
+				/*{
+					label_id: "1539041"
+					label_options: {Colour: "White", Size: "XL"}
+					order_id: "402096"
+					pickface_location: " 6 Wb 12"
+					picks_remaining: 56
+					product_name: "Bella Freud Peace And Love T-shirt"
+				}*/
+				
+				//debugger;
+
+				switch(MESSAGE_DATA.topic){
+					case "teemill/factory/picking/out":
+						const location = DATA.pickface_location.split(' ').slice(1, DATA.pickface_location.split(' ').length);
+
+						const packingLocation = shelves.querySelector(`[data-id="${ location[0] }"]`);
+
+						if(packingLocation){
+							highlightElement(packingLocation, 3000);
+						}
+
+					default:
+						break;
+
+				}
+
+
+
+
+
+			}
+
+		}, false);
+
+		ws.addEventListener('error', function(err){
+			console.log('WebSocket error:', err);
+		}, false);
+
+	}());
+
+</script>
