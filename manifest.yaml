@@ -3,4 +3,5 @@ applications:
 - name: sean-tracey-london-teemill-visualisation
   memory: 256M
   instances: 1
-  no-route: true
+  routes:
+  - route: teemill-visualisation.eu-gb.mybluemix.net

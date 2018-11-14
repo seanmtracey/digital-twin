@@ -103,6 +103,17 @@
 			
 		</div>
 
+	</div>
+
+	<div id="lights">
+		<div data-id="1"></div>
+		<div data-id="2"></div>
+		<div data-id="3"></div>
+		<!--<div data-id="4"></div>-->
+		<div data-id="5"></div>
+		<div data-id="6"></div>
+	</div>
+
 </main>
 
 <div id="eventDataOverlay">
@@ -140,7 +151,7 @@
 		}, false);
 
 		ws.addEventListener('message', function(e){
-
+			return;
 			const MESSAGE_DATA = JSON.parse(e.data);
 
 			let DATA;
@@ -233,6 +244,16 @@
 
 			if (MESSAGE_DATA.topic.indexOf('teemill/factory/signals/lights/') > -1){
 				console.log('>>>>>>>>>>>>>>>>', "WE'VE GOT LIGHTS!");
+
+				const light = MESSAGE_DATA.topic.slice(MESSAGE_DATA.topic.length - 1, MESSAGE_DATA.topic.length);
+				const isOn = MESSAGE_DATA.on;
+
+				if(isOn){
+					
+					//const element = document.querySelector('LIGHT');
+
+				}
+
 			}
 
 		}, false);
