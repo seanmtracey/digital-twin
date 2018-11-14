@@ -131,7 +131,9 @@
 		const shelves = document.querySelector('#top #shelves');
 		const items = {};
 
-		const ws = new WebSocket(`ws://${window.location.host}/`);
+		const WebSocketProtocol = window.location.protocol === "https:" ? 'wss' : 'ws';
+
+		const ws = new WebSocket(`${WebSocketProtocol}://${window.location.host}/`);
 
 		ws.addEventListener('connected', function(e){
 			console.log('WebSocket connected:', e);
