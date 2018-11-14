@@ -127,7 +127,9 @@
 			
 		}
 
+		const dialogBox = document.querySelector('#eventDataDialog');
 		const shelves = document.querySelector('#top #shelves');
+		const items = {};
 
 		const ws = new WebSocket(`ws://${window.location.host}/`);
 
@@ -136,7 +138,6 @@
 		}, false);
 
 		ws.addEventListener('message', function(e){
-			//console.log('WebSocket message', e);
 
 			const MESSAGE_DATA = JSON.parse(e.data);
 
@@ -156,36 +157,80 @@
 			if(DATA.label_id){
 				console.log('>>>>>>>>', DATA);
 
-				/*{
-					label_id: "1539041"
-					label_options: {Colour: "White", Size: "XL"}
-					order_id: "402096"
-					pickface_location: " 6 Wb 12"
-					picks_remaining: 56
-					product_name: "Bella Freud Peace And Love T-shirt"
-				}*/
+				if(MESSAGE_DATA.topic === "teemill/factory/picking/out"){
+
+					/*{
+						"label_id":"11001100",
+						"order_id":"00110011",
+						"label_options":{
+							"Colour":"White",
+							"Size":"S"
+						},
+						"label_destination":"F",
+						"user_id":"215",
+						"picker_photo_path":"\/path\/to\/defaultpic.jpg",
+						"picker_name":"Bobby D.",
+						"label_fruens":0.00000000000000000000000001,
+						"picks_remaining":268,
+						"pick_time_seconds":24,
+						"pick_speed_metres_per_second":0.00000000000000000000000001,
+						"pickface_id":"2508",
+						"pickface_distance_metres":0.00000000000000000000000000,
+						"pickface_location":" 4 Eb 35",
+						"bulk":0
+					}*/
+
+					items[DATA.label_id] = DATA;
+					const location = DATA.pickface_location.split(' ').slice(1, DATA.pickface_location.split(' ').length);
+
+					const packingLocation = shelves.querySelector(`[data-id="${ location[0] }"]`);
+
+					if(packingLocation){
+						dialogBox.innerHTML = "";
+
+						/*<h3>New Item needs picking!</h3>
+						<ul>
+							<li>Label ID: <span>144432</span></li>
+							<li>Order ID: <span>288864</span></li>
+						</ul>*/
+
+						const frag = document.createDocumentFragment();
+
+						const title = document.createElement('h3');
+						const info = document.createElement('ul');
+						const labelID = document.createElement('li');
+						const orderID = document.createElement('li');
+						
+						title.textContent = "New item needs picking";
+						
+						labelID.innerHTML = `label ID: <span>${DATA.label_id}</span>`;
+						orderID.innerHTML = `Order ID: <span>${DATA.order_id}</span>`;
+
+						frag.appendChild(title);
+
+						info.appendChild(labelID);
+						info.appendChild(orderID);
+
+						frag.appendChild(info);
+						
+						dialogBox.appendChild(frag);
+
+						const packingLocationBounds = packingLocation.getBoundingClientRect();
+
+						dialogBox.style.left = packingLocationBounds.x - (dialogBox.offsetWidth + 50) + "px";
+						dialogBox.style.top = packingLocationBounds.y + 20 + "px";
+
+						highlightElement(packingLocation, 3000);
+
+					}
+					
+				} 
 				
-				//debugger;
 
-				switch(MESSAGE_DATA.topic){
-					case "teemill/factory/picking/out":
-						const location = DATA.pickface_location.split(' ').slice(1, DATA.pickface_location.split(' ').length);
+			}
 
-						const packingLocation = shelves.querySelector(`[data-id="${ location[0] }"]`);
-
-						if(packingLocation){
-							highlightElement(packingLocation, 3000);
-						}
-
-					default:
-						break;
-
-				}
-
-
-
-
-
+			if (MESSAGE_DATA.topic.indexOf('teemill/factory/signals/lights/') > -1){
+				console.log('>>>>>>>>>>>>>>>>', "WE'VE GOT LIGHTS!");
 			}
 
 		}, false);
