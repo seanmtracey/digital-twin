@@ -310,6 +310,8 @@
 
 				const XDiff = e.clientX - START_COORDS.x;
 				const YDiff = e.clientY - START_COORDS.y;
+				elementBeingMoved.dataset.x = XDiff;
+				elementBeingMoved.dataset.y = YDiff;
 				elementBeingMoved.style.transform = `translate( ${XDiff}px, ${YDiff}px )`;
 
 			}
@@ -321,7 +323,10 @@
 			element.addEventListener('mousedown', function(e){
 				console.log(this);
 
-				START_COORDS = { x: e.clientX, y: e.clientY };
+				START_COORDS = { 
+					x: e.clientX/* + (Number(this.dataset.x) || 0)*/,
+					y: e.clientY/* + (Number(this.dataset.y) || 0)*/
+				};
 				movingElement = true;
 				elementBeingMoved = this;
 
