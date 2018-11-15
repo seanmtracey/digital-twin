@@ -140,6 +140,7 @@
 
 		const dialogBox = document.querySelector('#eventDataDialog');
 		const shelves = document.querySelector('#top #shelves');
+		const lights = document.querySelector('#lights');
 		const items = {};
 
 		const WebSocketProtocol = window.location.protocol === "https:" ? 'wss' : 'ws';
@@ -151,7 +152,7 @@
 		}, false);
 
 		ws.addEventListener('message', function(e){
-			return;
+
 			const MESSAGE_DATA = JSON.parse(e.data);
 
 			let DATA;
@@ -245,12 +246,13 @@
 			if (MESSAGE_DATA.topic.indexOf('teemill/factory/signals/lights/') > -1){
 				console.log('>>>>>>>>>>>>>>>>', "WE'VE GOT LIGHTS!");
 
-				const light = MESSAGE_DATA.topic.slice(MESSAGE_DATA.topic.length - 1, MESSAGE_DATA.topic.length);
-				const isOn = MESSAGE_DATA.on;
+				const lightNumber = MESSAGE_DATA.topic.slice(MESSAGE_DATA.topic.length - 1, MESSAGE_DATA.topic.length);
+				const isOn = DATA.on;
 
 				if(isOn){
 					
-					//const element = document.querySelector('LIGHT');
+					const element = lights.querySelector(`[data-id="${lightNumber}"]`);
+					element.style.backgroundColor = `rgba(${DATA.red}, ${DATA.green}, ${DATA.blue}, 0.5)`;
 
 				}
 
