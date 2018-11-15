@@ -106,12 +106,12 @@
 	</div>
 
 	<div id="lights">
-		<div data-id="1"></div>
-		<div data-id="2"></div>
-		<div data-id="3"></div>
-		<!--<div data-id="4"></div>-->
-		<div data-id="5"></div>
-		<div data-id="6"></div>
+		<div data-id="1"><span></span></div>
+		<div data-id="2"><span></span></div>
+		<div data-id="3"><span></span></div>
+		<!--<div data-id="4"><span></span></div>-->
+		<div data-id="5"><span></span></div>
+		<div data-id="6"><span></span></div>
 	</div>
 
 </main>
@@ -128,14 +128,29 @@
 		console.log('Hello!');
 		
 		function highlightElement(element, duration){
+
+			duration = duration || 3000;
+
 			document.body.setAttribute('data-displaying-info', 'true');
 			element.dataset.focus = "true";
 
 			setTimeout(function(){
 				document.body.setAttribute('data-displaying-info', 'false');
 				element.dataset.focus = "false";
-			}, 3000);
+			}, duration);
 			
+		}
+
+		function flashElement(element, duration){
+
+			duration = duration || 3000;
+		
+			element.dataset.flash = "true";
+
+			setTimeout(function(){
+				element.dataset.flash = "false";
+			}, duration);
+
 		}
 
 		const dialogBox = document.querySelector('#eventDataDialog');
@@ -251,8 +266,13 @@
 
 				if(isOn){
 					
-					const element = lights.querySelector(`[data-id="${lightNumber}"]`);
-					element.style.backgroundColor = `rgba(${DATA.red}, ${DATA.green}, ${DATA.blue}, 0.5)`;
+					const element = lights.querySelector(`[data-id="${lightNumber}"] span`);
+
+					if(element){
+						element.style.backgroundColor = `rgba(${DATA.red}, ${DATA.green}, ${DATA.blue}, 0.5)`;
+						flashElement(element);
+					}
+
 
 				}
 

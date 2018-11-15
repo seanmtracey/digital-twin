@@ -179,6 +179,7 @@ main #lights div{
     background: #e6e6e6;
     border-radius: 100%;
     border: 1px solid #cacaca;
+    overflow: hidden;
 }
 
 main #lights div[data-id="1"]{
@@ -203,6 +204,12 @@ main #lights div[data-id="5"]{
 
 main #lights div[data-id="6"]{
     left: -5%;
+}
+
+main #lights div span{
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 #eventDataOverlay{
@@ -253,4 +260,35 @@ body[data-displaying-info="true"] #eventDataOverlay{
 
 *[data-focus="true"]{
     z-index: 100;
+}
+
+*[data-flash="true"]{
+	animation: flashAnimation 1s infinite;
+	-moz-animation: flashAnimation 1s infinite;
+	-webkit-animation: flashAnimation 1s infinite;
+	-o-animation: flashAnimation 1s infinite;
+}
+
+@keyframes flashAnimation{
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@-moz-keyframes flashAnimation{
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+	
+@-webkit-keyframes flashAnimation{
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+	
+@-o-keyframes flashAnimation{
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
 }
