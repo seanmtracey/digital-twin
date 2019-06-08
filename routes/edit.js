@@ -3,7 +3,10 @@ const router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('edit', { title: 'Teemill Visualisation' });
+	res.render('edit', { 
+		title: 'Digital Twin Editor',
+		stylesheet : "edit.css"
+	});
 });
 
 module.exports = router;
