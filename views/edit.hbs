@@ -16,6 +16,9 @@
 
             function createNode(x, y, width, height){
 
+                width = width < 0 ? -width : width;
+                height = height < 0 ? -height : height;
+
                 const div = document.createElement('div');
                 
                 div.dataset.left = x;
@@ -24,8 +27,25 @@
                 div.dataset.height = height;
 
                 div.classList.add('node');
-
                 div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
+
+                div.addEventListener('mousedown', (e) => {
+                    
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+
+                }, true);
+
+                div.addEventListener('mouseup', (e) => {
+                    
+                    if(!CREATING){
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                    }
+
+                    console.log("Click");
+
+                }, true);
 
                 return div;
 
@@ -55,7 +75,6 @@
             }, false);
 
             nodesHolder.addEventListener('mousemove', (e) => {
-                console.log('mousemove');
 
                 if(CREATING){
 
@@ -79,7 +98,10 @@
                 const elementWidth = e.clientX - startCoords.x;
                 const elementHeight = e.clientY - startCoords.y
 
-                const node = createNode(startCoords.x, startCoords.y, elementWidth, elementHeight);
+                const positionX = e.clientX < startCoords.x ? e.clientX : startCoords.x;
+                const positionY = e.clientY < startCoords.y ? e.clientY : startCoords.y;
+
+                const node = createNode(positionX, positionY, elementWidth, elementHeight);
 
                 nodesHolder.appendChild(node);
 
