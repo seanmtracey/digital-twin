@@ -12,7 +12,24 @@
     cursor: crosshair;
 }
 
-.node{
+#nodes .node{
     position: fixed;
     cursor: pointer;
+}
+
+#configurePanel{
+    position: fixed;
+    left: 100%;
+    top: 0;
+    width: 350px;
+    height: 100%;
+    background: white;
+    box-shadow: 0 -10px 10px rgba(0, 0, 0, 0.6);
+    padding: 1em;
+    box-sizing: border-box;
+    overflow: scroll;
+}
+
+#configurePanel[dataset-active="true"]{
+    transform: translateX(-100%);
 }
