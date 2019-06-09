@@ -10,6 +10,7 @@
 
     <div id="configurePanel" data-active="false">
         <h2>Configure Node</h2>
+        <div id="closePanelBtn">x</div>
     </div>
 
     <script>
@@ -30,19 +31,24 @@
                         
                 }
 
-                function hideConfigurationPanel(){
+                function hideConfigurationPanel(saveChanges = true){
 
+                    console.log('save changes?', saveChanges);
                     currentNodeBeingConfigured = undefined;
                     configurationPanelElement.dataset.active = "false";
 
                 }
+
+                configurationPanelElement.querySelector('#closePanelBtn').addEventListener('click', e => {
+                    hideConfigurationPanel(false);
+                }, false);
 
                 return {
                     show : showConfigurationPanel,
                     hide : hideConfigurationPanel
                 }
 
-            })();
+            }());
 
             function startCreationHandler(e){
                 console.log('MOUSEDOWN');
