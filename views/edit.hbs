@@ -8,7 +8,7 @@
 
     </div>
 
-    <div id="configurePanel" dataset-active="true">
+    <div id="configurePanel" data-active="false">
         <h2>Configure Node</h2>
     </div>
 
@@ -18,56 +18,33 @@
 
             'use strict';
 
-            function createNode(x, y, width, height){
-
-                width = width < 0 ? -width : width;
-                height = height < 0 ? -height : height;
-
-                const div = document.createElement('div');
+            const configurationPanel = (function(){
                 
-                div.dataset.left = x;
-                div.dataset.top = y;
-                div.dataset.width = width;
-                div.dataset.height = height;
+                const configurationPanelElement = document.querySelector('#configurePanel');
+                let currentNodeBeingConfigured = undefined;
 
-                div.classList.add('node');
-                div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
+                function showConfigurationPanel(node){
+                    console.log("ShowPanel")
+                    currentNodeBeingConfigured = node;
+                    configurationPanelElement.dataset.active = "true";
+                        
+                }
 
-                div.addEventListener('mousedown', (e) => {
-                    
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
+                function hideConfigurationPanel(){
 
-                }, true);
+                    currentNodeBeingConfigured = undefined;
+                    configurationPanelElement.dataset.active = "false";
 
-                div.addEventListener('mouseup', (e) => {
-                    
-                    if(!CREATING){
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                    }
+                }
 
-                    console.log("Click");
+                return {
+                    show : showConfigurationPanel,
+                    hide : hideConfigurationPanel
+                }
 
-                }, true);
+            })();
 
-                return div;
-
-            }
-
-            const nodesHolder = document.querySelector('#nodes');
-            const creationCanvas = document.querySelector('canvas#creationCanvas');
-            const creationCtx = creationCanvas.getContext('2d');
-
-            creationCanvas.width = window.innerWidth;
-            creationCanvas.height = window.innerHeight;
-
-            creationCtx.strokeStyle = "1px #333333";
-
-            let CREATING = false;
-            let startCoords = undefined;
-
-            nodesHolder.addEventListener('mousedown', (e) => {
+            function startCreationHandler(e){
                 console.log('MOUSEDOWN');
                 
                 CREATING = true;
@@ -76,10 +53,10 @@
                     y : e.clientY
                 };
 
-            }, false);
+            }
 
-            nodesHolder.addEventListener('mousemove', (e) => {
-
+            function inProgressCreationHandler(e){
+                
                 if(CREATING){
 
                     const selectionWidth = e.clientX - startCoords.x;
@@ -91,10 +68,10 @@
 
                 }
 
-            }, false);
+            }
 
-            nodesHolder.addEventListener('mouseup', (e) => {
-                
+            function endCreationHandler(e){
+
                 console.log('MOUSEUP');
                 
                 creationCtx.clearRect(0, 0, creationCanvas.width, creationCanvas.height);
@@ -112,7 +89,59 @@
                 CREATING = false;
                 startCoords = undefined;
 
-            }, false);
+            }
+
+            function createNode(x, y, width, height){
+
+                width = width < 0 ? -width : width;
+                height = height < 0 ? -height : height;
+
+                const div = document.createElement('div');
+                
+                div.dataset.left = x;
+                div.dataset.top = y;
+                div.dataset.width = width;
+                div.dataset.height = height;
+
+                div.classList.add('node');
+                div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
+
+                div.addEventListener('mouseup', function(e){
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+
+                    console.log('NODE CLICK');
+
+                    if(CREATING){
+                        endCreationHandler(e);
+                    } else {
+                        configurationPanel.show(this);
+                    }
+
+                }, false);
+
+                div.addEventListener('mousemove', inProgressCreationHandler, false);
+                div.addEventListener('mouseup', endCreationHandler, false);
+
+                return div;
+
+            }
+
+            const nodesHolder = document.querySelector('#nodes');
+            const creationCanvas = document.querySelector('canvas#creationCanvas');
+            const creationCtx = creationCanvas.getContext('2d');
+
+            creationCanvas.width = window.innerWidth;
+            creationCanvas.height = window.innerHeight;
+
+            creationCtx.strokeStyle = "1px #333333";
+
+            let CREATING = false;
+            let startCoords = undefined;
+
+            creationCanvas.addEventListener('mousedown', startCreationHandler, false);
+            creationCanvas.addEventListener('mousemove', inProgressCreationHandler, false);
+            creationCanvas.addEventListener('mouseup', endCreationHandler, false);
 
             window.addEventListener('resize', (e) => {
                 creationCanvas.width = window.innerWidth;
