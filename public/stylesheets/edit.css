@@ -50,6 +50,10 @@
     align-items: center;
     border-radius: 100%;
     cursor: pointer;
+    background-image: url('/images/closeBtnIcon.png');
+    background-size: 50%;
+    background-position: 50%;
+    background-repeat: no-repeat;
 }
 
 #configurePanel #closePanelBtn:hover{
