@@ -156,8 +156,12 @@
             let selectedTool = toolBox.querySelector('li[data-selected="true"]').dataset.toolname;
 
             creationCanvas.addEventListener('mousedown', startCreationHandler, false);
+            
             creationCanvas.addEventListener('mousemove', inProgressCreationHandler, false);
+            toolBox.addEventListener('mousemove', inProgressCreationHandler, false);
+            
             creationCanvas.addEventListener('mouseup', endCreationHandler, false);
+            toolBox.addEventListener('mouseup', endCreationHandler, false);
 
             Array.from(toolBox.querySelectorAll('li')).map(tool => {
 
