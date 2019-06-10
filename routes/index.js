@@ -10,6 +10,8 @@ router.get('/', function(req, res, next) {
 	twins.list()
 		.then(twins => {
 
+			debug("Stored Twins", JSON.stringify(twins));
+
 			res.render('index', { 
 				title: 'Digital Twin Selector',
 				stylesheet : "selection.css",

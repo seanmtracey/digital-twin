@@ -1,5 +1,6 @@
 const debug = require('debug')('bin:lib:twins');
 const database = require(`${__dirname}/database`);
+const sanitizeDocuments = require(`${__dirname}/sanitize_documents`);
 
 function getAnExistingTwinWithAnID(UUID){
     return Promise.resolve();
@@ -22,9 +23,23 @@ function deleteAnExistingTwinWithAGivenID(UUID){
 }
 
 function getAListOfAllOfTheAvailableTwins(){
-    return new Promise( (resolve, reject) => {
-        resolve();
-    } );
+    
+    const scanParameters = {
+        "selector": {
+            "UUID": {
+                "$exists": true
+            }
+        }
+    };
+    
+    return database.scan(scanParameters)
+        .then(documents => {
+            return sanitizeDocuments(documents, ['owner', 'nodes', 'settings', 'UUID', 'name'])
+        })
+        .catch(err => {
+            debug("Database scan error:", err);
+        })
+    ;
 }
 
 module.exports = {

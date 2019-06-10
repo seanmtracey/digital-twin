@@ -5,9 +5,28 @@
     </header>
 	
     <ul id="twins">
-        {{twins}}
+        {{#each twins}}
+
+            <li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
+                <div class="viewOptions">
+                    <a href="/view/{{UUID}}">View</a>
+                    <a href="/edit/{{UUID}}">Edit</a>
+                </div>
+                <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
+                <ul class="subOptions" data-visible="false">
+                    <li>Duplicate</li>
+                    <li>Delete</li>
+                </ul>
+                <div class="details">
+                    <h3>{{name}}</h3>
+                    <p>Created by {{owner}}</p>
+                </div>
+            </li>
+
+
+        {{/each}}
         
-        <li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
+        <!--<li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
             <div class="viewOptions">
                 <a href="/view">View</a>
                 <a href="/edit">Edit</a>
@@ -21,71 +40,7 @@
                 <h3>First Twin</h3>
                 <p>Created by Sean M. Tracey</p>
             </div>
-        </li>
-
-        <li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
-            <div class="viewOptions">
-                <a href="/view">View</a>
-                <a href="/edit">Edit</a>
-            </div>
-            <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
-            <ul class="subOptions" data-visible="false">
-                <li>Duplicate</li>
-                <li>Delete</li>
-            </ul>
-            <div class="details">
-                <h3>First Twin</h3>
-                <p>Created by Sean M. Tracey</p>
-            </div>
-        </li>
-
-        <li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
-            <div class="viewOptions">
-                <a href="/view">View</a>
-                <a href="/edit">Edit</a>
-            </div>
-            <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
-            <ul class="subOptions" data-visible="false">
-                <li>Duplicate</li>
-                <li>Delete</li>
-            </ul>
-            <div class="details">
-                <h3>First Twin</h3>
-                <p>Created by Sean M. Tracey</p>
-            </div>
-        </li>
-
-        <li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
-            <div class="viewOptions">
-                <a href="/view">View</a>
-                <a href="/edit">Edit</a>
-            </div>
-            <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
-            <ul class="subOptions" data-visible="false">
-                <li>Duplicate</li>
-                <li>Delete</li>
-            </ul>
-            <div class="details">
-                <h3>First Twin</h3>
-                <p>Created by Sean M. Tracey</p>
-            </div>
-        </li>
-
-        <li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
-            <div class="viewOptions">
-                <a href="/view">View</a>
-                <a href="/edit">Edit</a>
-            </div>
-            <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
-            <ul class="subOptions" data-visible="false">
-                <li>Duplicate</li>
-                <li>Delete</li>
-            </ul>
-            <div class="details">
-                <h3>First Twin</h3>
-                <p>Created by Sean M. Tracey</p>
-            </div>
-        </li>
+        </li>-->
 
         <li class="item" id="createNew">
 
