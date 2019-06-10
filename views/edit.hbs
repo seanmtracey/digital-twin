@@ -88,24 +88,28 @@
 
                 console.log('MOUSEUP');
                 
-                creationCtx.clearRect(0, 0, creationCanvas.width, creationCanvas.height);
+                if(CREATING){
+
+                    creationCtx.clearRect(0, 0, creationCanvas.width, creationCanvas.height);
+                    
+                    const elementWidth = e.clientX - startCoords.x;
+                    const elementHeight = e.clientY - startCoords.y
+
+                    const positionX = e.clientX < startCoords.x ? e.clientX : startCoords.x;
+                    const positionY = e.clientY < startCoords.y ? e.clientY : startCoords.y;
+
+                    const node = createNode(positionX, positionY, elementWidth, elementHeight);
+
+                    nodesHolder.appendChild(node);
                 
-                const elementWidth = e.clientX - startCoords.x;
-                const elementHeight = e.clientY - startCoords.y
-
-                const positionX = e.clientX < startCoords.x ? e.clientX : startCoords.x;
-                const positionY = e.clientY < startCoords.y ? e.clientY : startCoords.y;
-
-                const node = createNode(positionX, positionY, elementWidth, elementHeight);
-
-                nodesHolder.appendChild(node);
+                }
 
                 CREATING = false;
                 startCoords = undefined;
 
             }
 
-            function createNode(x, y, width, height){
+            function createNode(x, y, width, height, type = selectedTool){
 
                 width = width < 0 ? -width : width;
                 height = height < 0 ? -height : height;
