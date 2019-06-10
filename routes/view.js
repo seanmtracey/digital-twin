@@ -1,3 +1,4 @@
+const debug = require('debug')('routes:view');
 const express = require('express');
 const router = express.Router();
 

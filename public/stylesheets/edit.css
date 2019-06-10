@@ -1,3 +1,7 @@
+main{
+    padding-top: 0;
+}
+
 #creationCanvas{
     background-color: #f5f5f5;
     cursor: crosshair;

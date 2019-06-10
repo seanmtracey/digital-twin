@@ -11,14 +11,24 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+if(process.env.NODE_ENV !== "production"){
+
+    app.use('*', (req, res, next) => {
+        res.locals.w3id_userid = process.env.TEST_USER;
+        next();
+    });
+
+}
 
 app.use('/', require('./routes/index'));
 app.use('/edit', require('./routes/edit'));
 app.use('/view', require('./routes/view'));
+app.use('/twins', require('./routes/twins'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,3 +1,6 @@
+const debug = require('debug')('bin:lib:twins');
+const database = require(`${__dirname}/database`);
+
 function getAnExistingTwinWithAnID(UUID){
     return Promise.resolve();
 }
