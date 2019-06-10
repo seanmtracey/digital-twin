@@ -1,5 +1,5 @@
 #creationCanvas{
-    background-color: rgb(245,245,245);
+    background-color: #f5f5f5;
     cursor: crosshair;
 }
 
@@ -15,6 +15,11 @@
 #nodes .node{
     position: fixed;
     cursor: pointer;
+    box-sizing: border-box;
+}
+
+#nodes .node[data-selected="true"]{
+    border: 3px solid #689fe2;
 }
 
 #configurePanel{
@@ -28,7 +33,7 @@
     padding: 1em;
     box-sizing: border-box;
     overflow: scroll;
-    transition: transform 0.3s ease-out;
+    transition: transform 0.1s linear;
 }
 
 #configurePanel[data-active="true"]{
@@ -110,4 +115,22 @@
 
 #toolBox #selectionTool{
     background-image: url('/images/selectionTool.png');
+}
+
+#colorSelect{
+    position: fixed;
+    bottom: 1em;
+    right: 1em;
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 0.3em 0.3em;
+    margin: 0;
+    border-radius: 3px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px;
+}
+
+#colorSelect p{
+    margin-left: 0.5em;
 }
