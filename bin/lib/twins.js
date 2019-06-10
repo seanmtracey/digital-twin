@@ -2,8 +2,24 @@ const debug = require('debug')('bin:lib:twins');
 const database = require(`${__dirname}/database`);
 const sanitizeDocuments = require(`${__dirname}/sanitize_documents`);
 
+const twinsWhitelistProperties = ['owner', 'nodes', 'settings', 'UUID', 'name'];
+
 function getAnExistingTwinWithAnID(UUID){
-    return Promise.resolve();
+
+    return database.read({
+            selector : {
+                "UUID" : UUID
+            }    
+        })
+        .then(document => {
+            return sanitizeDocuments([document], twinsWhitelistProperties);
+        })
+        .catch(err => {
+            debug('Database get error:', err);
+            throw err;
+        })
+    ;
+
 }
 
 function updateAnExistingTwinWithAGivenID(UUID, data){
@@ -34,10 +50,11 @@ function getAListOfAllOfTheAvailableTwins(){
     
     return database.scan(scanParameters)
         .then(documents => {
-            return sanitizeDocuments(documents, ['owner', 'nodes', 'settings', 'UUID', 'name'])
+            return sanitizeDocuments(documents, twinsWhitelistProperties);
         })
         .catch(err => {
             debug("Database scan error:", err);
+            throw err;
         })
     ;
 }
