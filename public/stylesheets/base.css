@@ -1,0 +1,43 @@
+html, body {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, p{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+#teemillLogo{
+    height: 50px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    margin: 1em;
+}
+
+#ibmLogo{
+    height: 35px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    margin: 1em;
+}
+
+main{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+}

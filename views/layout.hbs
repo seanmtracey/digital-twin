@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>{{title}}</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body data-displaying-info="false">
+	<head>
+		<title>{{title}}</title>
+		<link rel='stylesheet' href='/stylesheets/base.css' />
+		{{#if stylesheet}}
+		<link rel='stylesheet' href='/stylesheets/{{stylesheet}}' />
+		{{/if}}
+	</head>
+	<body data-displaying-info="false">
 
-    <img id="teemillLogo" src="/images/teemill.png" alt="Teemill logo"/>
-    <img id="ibmLogo" src="/images/ibm_black.png" alt="IBM logo"/>
+		<img id="teemillLogo" src="/images/teemill.png" alt="Teemill logo"/>
+		<img id="ibmLogo" src="/images/ibm_black.png" alt="IBM logo"/>
 
-    {{{body}}}
-  </body>
+		{{{body}}}
+		
+	</body>
 </html>

@@ -1,0 +1,230 @@
+<main>
+
+	<canvas id="creationCanvas"></canvas>
+
+    <div id="nodes">
+
+        <!-- The output are where nodes are persisted -->
+
+    </div>
+
+    <div id="configurePanel" data-active="false">
+        <h2>Configure Node</h2>
+        <div id="closePanelBtn"></div>
+    </div>
+
+    <ul id="toolBox">
+
+        <li data-selected="true" data-toolname="square" id="squareCreationTool"></li>
+        <li data-selected="false" data-toolname="ellipse" id="ellipseCreationTool"></li>
+        <li data-selected="false" data-toolname="select" id="selectionTool"></li>
+
+    </ul>
+
+    <div id="colorSelect">
+        <input type="color" id="head" name="head" value="#f5f5f5">
+        <p> <strong> #F5F5F5 </strong> </p>
+    </div>
+
+    <script>
+
+        (function(){
+
+            'use strict';
+
+            const configurationPanel = (function(){
+                
+                const configurationPanelElement = document.querySelector('#configurePanel');
+                let currentNodeBeingConfigured = undefined;
+
+                function showConfigurationPanel(node){
+                    console.log("ShowPanel")
+                    currentNodeBeingConfigured = node;
+                    configurationPanelElement.dataset.active = "true";
+                        
+                }
+
+                function hideConfigurationPanel(saveChanges = true){
+
+                    console.log('save changes?', saveChanges);
+                    currentNodeBeingConfigured = undefined;
+                    configurationPanelElement.dataset.active = "false";
+
+                    Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
+                        node.dataset.selected = "false";
+                    });
+
+                }
+
+                function checkIfConfigurationPanelIsShowing(){
+                    return configurationPanelElement.dataset.active === "true";
+                }
+
+                configurationPanelElement.querySelector('#closePanelBtn').addEventListener('click', e => {
+                    hideConfigurationPanel(false);
+                }, false);
+
+                return {
+                    show : showConfigurationPanel,
+                    hide : hideConfigurationPanel,
+                    isVisible : checkIfConfigurationPanelIsShowing
+                };
+
+            }());
+
+            function startCreationHandler(e){
+                console.log('MOUSEDOWN');
+                
+                CREATING = true;
+                startCoords = {
+                    x : e.clientX,
+                    y : e.clientY
+                };
+
+            }
+
+            function inProgressCreationHandler(e){
+                
+                if(CREATING){
+
+                    const selectionWidth = e.clientX - startCoords.x;
+                    const selectionHeight = e.clientY - startCoords.y;
+
+                    creationCtx.clearRect(0,0, creationCanvas.width, creationCanvas.height);
+                    creationCtx.strokeRect(startCoords.x, startCoords.y, selectionWidth, selectionHeight);
+                    creationCtx.stroke();
+
+                }
+
+            }
+
+            function endCreationHandler(e){
+
+                console.log('MOUSEUP');
+                
+                if(CREATING){
+
+                    creationCtx.clearRect(0, 0, creationCanvas.width, creationCanvas.height);
+                    
+                    const elementWidth = e.clientX - startCoords.x;
+                    const elementHeight = e.clientY - startCoords.y
+
+                    const positionX = e.clientX < startCoords.x ? e.clientX : startCoords.x;
+                    const positionY = e.clientY < startCoords.y ? e.clientY : startCoords.y;
+
+                    const node = createNode(positionX, positionY, elementWidth, elementHeight);
+
+                    nodesHolder.appendChild(node);
+                
+                }
+
+                CREATING = false;
+                startCoords = undefined;
+
+            }
+
+            function createNode(x, y, width, height, type = selectedTool){
+
+                width = width < 0 ? -width : width;
+                height = height < 0 ? -height : height;
+
+                const div = document.createElement('div');
+                
+                div.dataset.left = x;
+                div.dataset.top = y;
+                div.dataset.width = width;
+                div.dataset.height = height;
+                div.dataset.selected = "false";
+
+                div.classList.add('node');
+                div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
+
+                div.addEventListener('mouseup', function(e){
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+
+                    console.log('NODE CLICK');
+
+                    if(CREATING){
+                        endCreationHandler(e);
+                    } else {
+                        configurationPanel.show(this);
+                        
+                        Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
+                            node.dataset.selected = "false";
+                        });
+
+                        this.dataset.selected = "true";
+
+                    }
+
+                }, false);
+
+                div.addEventListener('mousemove', inProgressCreationHandler, false);
+                div.addEventListener('mouseup', endCreationHandler, false);
+
+                return div;
+
+            }
+
+            const nodesHolder = document.querySelector('#nodes');
+            const toolBox = document.querySelector('#toolBox');
+            const colorSelectorHolder = document.querySelector('#colorSelect');
+            const colorSelector = colorSelectorHolder.querySelector('input[type="color"]');
+            const colorSelectorOutput = colorSelectorHolder.querySelector('p');
+            const creationCanvas = document.querySelector('canvas#creationCanvas');
+            const creationCtx = creationCanvas.getContext('2d');
+
+            creationCanvas.width = window.innerWidth;
+            creationCanvas.height = window.innerHeight;
+
+            creationCtx.strokeStyle = "1px #333333";
+
+            let CREATING = false;
+            let startCoords = undefined;
+            let selectedTool = toolBox.querySelector('li[data-selected="true"]').dataset.toolname;
+
+            creationCanvas.addEventListener('mousedown', startCreationHandler, false);
+            
+            creationCanvas.addEventListener('mousemove', inProgressCreationHandler, false);
+            toolBox.addEventListener('mousemove', inProgressCreationHandler, false);
+            
+            creationCanvas.addEventListener('mouseup', endCreationHandler, false);
+            toolBox.addEventListener('mouseup', endCreationHandler, false);
+
+            Array.from(toolBox.querySelectorAll('li')).map(tool => {
+
+                tool.addEventListener('click', function(){
+
+                    Array.from(toolBox.querySelectorAll('li')).forEach(tool => {
+
+                        tool.dataset.selected = "false";
+
+                    }, false);
+
+                    this.dataset.selected = "true";
+                    selectedTool = this.dataset.toolname;
+
+                }, false);
+
+            }, false);
+
+            colorSelector.addEventListener('change', function(e){
+
+                console.log("change", this.value);
+                creationCanvas.style.backgroundColor = this.value;
+                colorSelectorOutput.textContent = this.value.toUpperCase();
+                //debugger;
+
+            }, false);
+
+            window.addEventListener('resize', (e) => {
+                creationCanvas.width = window.innerWidth;
+                creationCanvas.height = window.innerHeight;
+            }, false);
+
+        }());
+
+    </script>
+
+</main>
