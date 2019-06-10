@@ -1,5 +1,97 @@
 <main>
 
+    <h2>Digital Twins</h2>
 	
+    <ul id="twins">
+        {{twins}}
+        
+        <li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
+            <div class="viewOptions">
+                <a href="/view">View</a>
+                <a href="/edit">Edit</a>
+            </div>
+            <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
+            <ul class="subOptions" data-visible="false">
+                <li>Duplicate</li>
+                <li>Delete</li>
+            </ul>
+        </li>
+
+        <li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
+            <div class="viewOptions">
+                <a href="/view">View</a>
+                <a href="/edit">Edit</a>
+            </div>
+            <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
+            <ul class="subOptions" data-visible="false">
+                <li>Duplicate</li>
+                <li>Delete</li>
+            </ul>
+        </li>
+
+        <li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
+            <div class="viewOptions">
+                <a href="/view">View</a>
+                <a href="/edit">Edit</a>
+            </div>
+            <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
+            <ul class="subOptions" data-visible="false">
+                <li>Duplicate</li>
+                <li>Delete</li>
+            </ul>
+        </li>
+
+        <li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
+            <div class="viewOptions">
+                <a href="/view">View</a>
+                <a href="/edit">Edit</a>
+            </div>
+            <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
+            <ul class="subOptions" data-visible="false">
+                <li>Duplicate</li>
+                <li>Delete</li>
+            </ul>
+        </li>
+
+        <li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
+            <div class="viewOptions">
+                <a href="/view">View</a>
+                <a href="/edit">Edit</a>
+            </div>
+            <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
+            <ul class="subOptions" data-visible="false">
+                <li>Duplicate</li>
+                <li>Delete</li>
+            </ul>
+        </li>
+
+        <li class="item" id="createNew"></li>
+    </ul>
 
 </main>
+
+<script>
+
+    (function(){
+
+        'use strict';
+
+        Array.from( document.querySelectorAll('#twins .item .subOptionsToggle') ).forEach(subOptionsToggle => {
+
+            subOptionsToggle.addEventListener('click', function(e){
+
+                const options = this.parentNode.querySelector('.subOptions');
+
+                if(options.dataset.visible === "false"){
+                    options.dataset.visible = "true";
+                } else {
+                    options.dataset.visible = "false";
+                }
+
+            }, false);
+
+        });
+
+    }());
+
+</script>

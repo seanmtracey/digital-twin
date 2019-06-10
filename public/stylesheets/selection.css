@@ -1,0 +1,76 @@
+ul{
+    list-style-type: none;
+}
+
+ul#twins{
+    margin: 0;
+    padding: 0;
+    display: flex;
+    width: 100%;
+    height: auto;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    max-width: 1280px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+ul#twins li.item {
+    height: 250px;
+    width: 30%;
+    border: 1px solid #b9b8b8;
+    margin: 0.5em;
+    border-radius: 3px;
+    position: relative;
+    background-size: cover;
+    background-position: 50%;
+}
+
+ul#twins li.item a.subOptionsToggle {
+    position: absolute;
+    right: 0.1em;
+    top: 0.1em;
+    cursor: pointer;
+    display: flex;
+    height: 1em;
+    align-items: center;
+    padding: 0.5em;
+}
+
+ul#twins li.item a.subOptionsToggle img{
+    width: 20px;
+}
+
+ul#twins li.item .viewOptions {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    height: 100%;
+    justify-content: space-evenly;
+    /* opacity: 0; */
+    background: rgba(255,255,255,0.5);
+}
+
+ul#twins li.item .viewOptions:hover{
+    opacity: 1;
+}
+
+ul#twins li.item .viewOptions a {
+    padding: 0.5em 1em;
+    background: #000000;
+    color: white;
+    font-weight: 800;
+    text-decoration: none;
+    border-radius: 3px;
+    border: 1px solid #ffffff;
+    text-shadow: 0 1px 1px black;
+    box-shadow: 0 2px 3px #7d7d7d;
+}
+
+ul#twins li.item .viewOptions a:hover{
+    background-color: #333333;
+}
