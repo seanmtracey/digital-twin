@@ -1,4 +1,5 @@
 const debug = require('debug')('bin:lib:twins');
+const uuid = require('uuid').v4;
 const database = require(`${__dirname}/database`);
 const sanitizeDocuments = require(`${__dirname}/sanitize_documents`);
 
@@ -31,7 +32,25 @@ function duplicateAnExistingTwinWithAGivenID(UUID, data){
 }
 
 function createANewTwin(data){
-    return Promise.resolve();
+
+    const newTwin = {
+        UUID : uuid(),
+        name : data.name,
+        owner : data.owner,
+        nodes : [],
+        settings : [],
+        created: Date.now() * 1
+    };
+
+    return database.write(newTwin)
+        .then(result => {
+            debug("Twin creation result:", result);
+            return newTwin;
+        })
+        .catch(err => {
+            debug("createANewTwinError:", err);
+        })
+    ;
 }
 
 function deleteAnExistingTwinWithAGivenID(UUID){
@@ -50,7 +69,13 @@ function getAListOfAllOfTheAvailableTwins(){
     
     return database.scan(scanParameters)
         .then(documents => {
-            return sanitizeDocuments(documents, twinsWhitelistProperties);
+
+            if(documents.length > 0){
+                return sanitizeDocuments(documents, twinsWhitelistProperties);
+            } else {
+                return [];
+            }
+
         })
         .catch(err => {
             debug("Database scan error:", err);

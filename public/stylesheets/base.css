@@ -1,5 +1,5 @@
 *[data-visible="false"]{
-    display: none;
+    display: none !important;
 }
 
 html, body {
@@ -45,4 +45,29 @@ main header{
 main header h2{
     font-size: 1em;
     color: white;
+}
+
+.closeDialogBtn{
+    position: absolute;
+    right: 0.8em;
+    top: 0.8em;
+    font-size: 1em;
+    width: 1.2em;
+    height: 1.2em;
+    background: #d8d8d8;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    border-radius: 100%;
+    cursor: pointer;
+    background-image: url("/images/closeBtnIcon.png");
+    background-size: 50%;
+    background-position: 50%;
+    background-repeat: no-repeat;
+}
+
+#configurePanel #closePanelBtn:hover{
+    background-color: #9e9e9e;
 }

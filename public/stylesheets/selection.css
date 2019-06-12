@@ -90,7 +90,7 @@ ul#twins li.item .viewOptions:hover{
     opacity: 1;
 }
 
-ul#twins li.item .viewOptions a {
+ul#twins li.item .viewOptions a, form input[type="submit"] {
     padding: 0.5em 1em;
     background: #000000;
     color: white;
@@ -128,6 +128,49 @@ ul#twins li.item .details{
     width: 100%;
     box-sizing: border-box;
     border-top: 1px solid #bfbfbf;
+}
+
+#createTwinDialog{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.9);
+    z-index: 20;
+}
+
+#createTwinDialog div.wrapper{
+    padding: 1em;
+    border: 1px solid #b9b8b8;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 3px;
+    position: relative;
+    background: white;
+}
+
+#createTwinDialog div.wrapper form{
+    display: flex;
+    flex-direction: column;
+    margin: 1em 0;
+}
+
+#createTwinDialog div.wrapper form input[type="text"]{
+    font-size: 1em;
+    border: 0px solid transparent;
+    border-bottom: 1px solid black;
+    padding: 0 0 0.4em;
+    margin-bottom: 1em;
+    outline: transparent;
+}
+
+#createTwinDialog div.wrapper form input[type="submit"]{
+    width: 100%;
+    max-width: 150px;
 }
 
 @media all and (max-width: 768px){

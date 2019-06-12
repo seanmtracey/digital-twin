@@ -14,6 +14,7 @@
                 </div>
                 <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
                 <ul class="subOptions" data-visible="false">
+                    <li>Rename</li>
                     <li>Duplicate</li>
                     <li>Delete</li>
                 </ul>
@@ -42,8 +43,19 @@
             </div>
         </li>-->
 
-        <li class="item" id="createNew"> </li>
+        <li class="item" id="createNew" data-active="false"> </li>
     </ul>
+
+    <div id="createTwinDialog" data-visible="false">
+        <div class="wrapper">
+            <div id="closeCreationDialog" class="closeDialogBtn"></div>
+            <h3>Create new Digital Twin</h3>
+            <form>
+                <input type="text" name="twinname" placeholder="Enter Digital Twin name" />
+                <input type="submit" value="Create Twin" />
+            </form>
+        </div>
+    </div>
 
 </main>
 
@@ -68,6 +80,58 @@
             }, false);
 
         });
+
+        const createTwinBtn = document.querySelector("#createNew");
+        const createTwinDialog = document.querySelector('#createTwinDialog');
+        const closeCreateDialogBtn = createTwinDialog.querySelector('.closeDialogBtn');
+        const createTwinForm = createTwinDialog.querySelector('form');
+
+        createTwinForm.addEventListener('submit', function(e){
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            fetch(`/twins/create`, {
+                    method : "POST",
+                    headers : {
+                        "Content-Type" : "application/json"
+                    },
+                    body : JSON.stringify({
+                        name : this[0].value
+                    })
+                })
+                .then(response => {
+                    if(response.ok){
+                        return response.json();
+                    } else {
+                        throw response;
+                    }
+                })
+                .then(response => {
+                    console.log(response);
+                    window.location = `/edit/${response.data.UUID}`;
+                })
+                .catch(err => {
+                    console.log("Create twin err:", err);
+                })
+            ;
+
+        }, false);
+
+        createTwinBtn.addEventListener('click', function(e){
+            e.preventDefault();
+
+            createTwinForm.reset();
+            createTwinDialog.dataset.visible = "true";
+
+        }, false);
+
+        closeCreateDialogBtn.addEventListener('click', function(e){
+            
+            createTwinDialog.dataset.visible = "false";
+            createTwinForm.reset();
+
+        }, false);
 
     }());
 
