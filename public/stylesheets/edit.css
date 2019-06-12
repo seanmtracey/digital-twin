@@ -38,6 +38,7 @@ main{
     box-sizing: border-box;
     overflow: scroll;
     transition: transform 0.1s linear;
+    transform: translateX(10%);
 }
 
 #configurePanel[data-active="true"]{
@@ -137,4 +138,10 @@ main{
 
 #colorSelect p{
     margin-left: 0.5em;
+}
+
+#twinDetails{
+    position: fixed;
+    bottom: 1em;
+    left: 1em;
 }
