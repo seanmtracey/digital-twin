@@ -11,7 +11,9 @@ router.get(`/:UUID(${UUIDRegex})`, function(req, res, next) {
 	twins.get(req.params.UUID)
 		.then(twin => {
 			
-			debug("gettwin:", twin);
+			debug("gettwin:", twin[0]);
+			
+			twin[0].nodes = JSON.stringify(twin[0].nodes);
 
 			res.render('edit', { 
 				title: 'Digital Twin Editor',

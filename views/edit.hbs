@@ -79,12 +79,17 @@
 
             function startCreationHandler(e){
                 console.log('MOUSEDOWN');
+
+                if(selectedTool !== "select"){
+
+                    CREATING = true;
+                    startCoords = {
+                        x : e.clientX,
+                        y : e.clientY
+                    };
+
+                }
                 
-                CREATING = true;
-                startCoords = {
-                    x : e.clientX,
-                    y : e.clientY
-                };
 
             }
 
@@ -140,6 +145,7 @@
                 div.dataset.width = width;
                 div.dataset.height = height;
                 div.dataset.selected = "false";
+                div.dataset.type = type;
 
                 div.classList.add('node');
                 div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
@@ -213,6 +219,22 @@
                 }, false);
 
             }, false);
+
+            // Reconstruct pre-existing nodes
+            const existingNodes = JSON.parse(`{{{ twinData.nodes }}}`);
+
+            existingNodes.forEach(savedNode => {
+                // x, y, width, height, type = selectedTool
+                const recreatedNode = createNode(savedNode.x, savedNode.y, savedNode.width, savedNode.height, savedNode.type);
+                nodesHolder.appendChild(recreatedNode);
+
+            });
+
+            const nodeMutationObserer = {
+                childList: true,
+                attributes: true,
+                subtree: true //Omit or set to false to observe only changes to the parent node.
+            };
 
             colorSelector.addEventListener('change', function(e){
 
