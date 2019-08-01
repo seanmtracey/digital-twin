@@ -49,10 +49,31 @@ router.post(`/update/:UUID(${UUIDRegex})`, function(req, res, next) {
 
     debug(req.body);
 
-	res.json({
-        status : "ok",
-        message : "Twin successfully updated."
-    });
+    console.log(`Updating twin ${req.params.UUID}`);
+
+    twins.update(req.params.UUID, req.body.data)
+        .then(result => {
+            debug(result);
+            
+            res.json({
+                status : "ok",
+                message : "Twin successfully updated."
+            });
+
+        })
+        .catch(err => {
+
+            debug(`Error updating twin ${req.params.UUID}`. err);
+            
+            res.status(500);
+            res.json({
+                status : 'err',
+                message : 'An internal error occured preventing your twins configuration from being saved'
+            });
+        
+        })
+    ;
+
 });
 
 router.post(`/duplicate/:UUID(${UUIDRegex})`, function(req, res, next) {

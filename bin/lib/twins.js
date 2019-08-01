@@ -24,6 +24,16 @@ function getAnExistingTwinWithAnID(UUID){
 }
 
 function updateAnExistingTwinWithAGivenID(UUID, data){
+
+    if(!UUID){
+        return Promise.reject('No UUID was passed');
+    }
+
+    if(!data){
+        return Promise.reject(`No data was passed for the twin ${UUID}. The data passed was ${data}.`);
+    }
+
+    debug(`Updating twin with UUID ${UUID}`, data);
     return Promise.resolve();
 }
 

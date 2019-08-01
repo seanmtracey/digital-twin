@@ -115,7 +115,31 @@
 
                 console.log(nodeData);
                 console.log(`Posting update to ${window.location.origin}/twins/update/${twinUUID}`);
-                // fetch(`${window.location.origin}/twins/update/${twinUUID}`);
+                fetch(`${window.location.origin}/twins/update/${twinUUID}`, {
+                        method : "POST",
+                        headers : {
+                            "Content-Type" : "application/json"
+                        },
+                        credentials : 'same-origin',
+                        body : JSON.stringify( { data : nodeData } )
+                    })
+                    .then(res => {
+                        if(!res.ok){
+                            throw res;
+                        } else {
+                            return res.json()
+                        }
+                    })
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .catch(err => {
+
+                        console.log(`Error saving Digital Twin updates:`, err);
+
+                    })
+                
+                ;
 
             }
 
