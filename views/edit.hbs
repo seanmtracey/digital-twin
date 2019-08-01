@@ -77,6 +77,24 @@
 
             }());
 
+            function generateRandomID(length = 8){
+
+                const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_-abcdefghijklmnopqrstuvwxyz0123456789";
+                const code = [];
+                let remainingCharacters = length;
+
+                while(remainingCharacters > 0){
+
+                    code.push( characters[ Math.random() * characters.length | 0 ] );
+
+                    remainingCharacters -= 1;
+
+                }
+
+                return code.join('');
+
+            }
+
             function startCreationHandler(e){
                 console.log('MOUSEDOWN');
                 
@@ -128,7 +146,7 @@
 
             }
 
-            function createNode(x, y, width, height, type = selectedTool){
+            function createNode(x, y, width, height, type = selectedTool, name){
 
                 width = width < 0 ? -width : width;
                 height = height < 0 ? -height : height;
@@ -140,6 +158,7 @@
                 div.dataset.width = width;
                 div.dataset.height = height;
                 div.dataset.selected = "false";
+                div.dataset.name = name || generateRandomID();
 
                 div.classList.add('node');
                 div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
