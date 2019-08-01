@@ -95,6 +95,28 @@
 
             }
 
+            function updateNodesRecord(){
+
+                const nodes = Array.from( nodesHolder.querySelectorAll('div.node') );
+
+                const nodeData = nodes.map(node => {
+
+                    return {
+                        left : node.dataset.left,
+                        top : node.dataset.top,
+                        width : node.dataset.width,
+                        height : node.dataset.height,
+                        selected : node.dataset.selected,
+                        type : node.dataset.type,
+                        name : node.dataset.name
+                    };
+
+                });
+
+                console.log(nodeData);
+
+            }
+
             function startCreationHandler(e){
                 console.log('MOUSEDOWN');
 
@@ -249,11 +271,21 @@
 
             });
 
-            const nodeMutationObserer = {
+            const nodeMutationObsererOptions = {
                 childList: true,
                 attributes: true,
                 subtree: true //Omit or set to false to observe only changes to the parent node.
             };
+
+            const NodeMutationObserver = new MutationObserver(function(mutations) {
+                /*mutations.forEach(function(mutation) {
+                    console.log(mutation.type);
+                });*/
+                console.log(mutations);
+                updateNodesRecord();
+            });
+
+            NodeMutationObserver.observe(nodesHolder, nodeMutationObsererOptions);       
 
             colorSelector.addEventListener('change', function(e){
 
