@@ -46,6 +46,9 @@ router.post(`/create`, function(req, res, next) {
 });
 
 router.post(`/update/:UUID(${UUIDRegex})`, function(req, res, next) {
+
+    debug(req.body);
+
 	res.json({
         status : "ok",
         message : "Twin successfully updated."

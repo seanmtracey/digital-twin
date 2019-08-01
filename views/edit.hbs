@@ -114,6 +114,8 @@
                 });
 
                 console.log(nodeData);
+                console.log(`Posting update to ${window.location.origin}/twins/update/${twinUUID}`);
+                // fetch(`${window.location.origin}/twins/update/${twinUUID}`);
 
             }
 
@@ -219,6 +221,7 @@
 
             }
 
+            const twinUUID = "{{twinData.UUID}}";
             const nodesHolder = document.querySelector('#nodes');
             const toolBox = document.querySelector('#toolBox');
             const colorSelectorHolder = document.querySelector('#colorSelect');
@@ -278,11 +281,10 @@
             };
 
             const NodeMutationObserver = new MutationObserver(function(mutations) {
-                /*mutations.forEach(function(mutation) {
-                    console.log(mutation.type);
-                });*/
+ 
                 console.log(mutations);
                 updateNodesRecord();
+ 
             });
 
             NodeMutationObserver.observe(nodesHolder, nodeMutationObsererOptions);       
