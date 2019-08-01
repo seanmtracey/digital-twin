@@ -24,6 +24,7 @@ main{
 
 #nodes .node[data-selected="true"]{
     border: 3px solid #689fe2;
+    z-index: 1000;
 }
 
 #configurePanel{
