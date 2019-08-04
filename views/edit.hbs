@@ -121,7 +121,7 @@
                             "Content-Type" : "application/json"
                         },
                         credentials : 'same-origin',
-                        body : JSON.stringify( { data : nodeData } )
+                        body : JSON.stringify( { data : { nodes: nodeData } }
                     })
                     .then(res => {
                         if(!res.ok){

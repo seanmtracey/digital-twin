@@ -21,7 +21,7 @@ router.get('/', function(req, res, next) {
 		})
 		.catch(err => {
 			debug("List Twins err:", err);
-			res.status = 500;
+			res.status(500);
 			res.error = err;
 			next(res);
 		})

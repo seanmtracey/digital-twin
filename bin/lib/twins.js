@@ -34,7 +34,39 @@ function updateAnExistingTwinWithAGivenID(UUID, data){
     }
 
     debug(`Updating twin with UUID ${UUID}`, data);
-    return Promise.resolve();
+    
+    return database.read({
+            "selector": {
+                "UUID": UUID
+            },
+            "limit" : 1
+        })
+        .then(result => {
+            debug('RESULT!', result);
+
+            if(!result){
+                throw(`Twin with ${UUID} does not exist`);
+            } else {
+                debug('Twin:', result);
+                //return Promise.resolve();
+
+                Object.keys(data).forEach(key => {
+                    result[key] = data[key];
+                });
+
+                return database.update(result);
+
+            }
+
+        })
+       .catch(err => {
+            debug(err);
+            throw err;
+        })
+    ;
+
+    //return Promise.resolve();
+
 }
 
 function duplicateAnExistingTwinWithAGivenID(UUID, data){
