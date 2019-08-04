@@ -51,7 +51,7 @@ router.post(`/update/:UUID(${UUIDRegex})`, function(req, res, next) {
 
     console.log(`Updating twin ${req.params.UUID}`);
 
-    twins.update(req.params.UUID, req.body.data)
+    twins.update(req.params.UUID, req.body.data, res.locals.w3id_userid)
         .then(result => {
             debug(result);
             

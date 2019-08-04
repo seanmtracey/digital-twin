@@ -23,7 +23,7 @@ function getAnExistingTwinWithAnID(UUID){
 
 }
 
-function updateAnExistingTwinWithAGivenID(UUID, data){
+function updateAnExistingTwinWithAGivenID(UUID, data, user){
 
     if(!UUID){
         return Promise.reject('No UUID was passed');
@@ -46,7 +46,9 @@ function updateAnExistingTwinWithAGivenID(UUID, data){
 
             if(!result){
                 throw(`Twin with ${UUID} does not exist`);
-            } else {
+            } else if(user !== result.owner){
+                throw "User is not able to make edits to this twin.";
+            } else { 
                 debug('Twin:', result);
                 //return Promise.resolve();
 
