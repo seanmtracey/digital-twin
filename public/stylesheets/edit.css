@@ -1,3 +1,7 @@
+main{
+    padding-top: 0;
+}
+
 #creationCanvas{
     background-color: #f5f5f5;
     cursor: crosshair;
@@ -20,6 +24,7 @@
 
 #nodes .node[data-selected="true"]{
     border: 3px solid #689fe2;
+    z-index: 1000;
 }
 
 #configurePanel{
@@ -34,6 +39,7 @@
     box-sizing: border-box;
     overflow: scroll;
     transition: transform 0.1s linear;
+    transform: translateX(10%);
 }
 
 #configurePanel[data-active="true"]{
@@ -133,4 +139,10 @@
 
 #colorSelect p{
     margin-left: 0.5em;
+}
+
+#twinDetails{
+    position: fixed;
+    bottom: 1em;
+    left: 1em;
 }
