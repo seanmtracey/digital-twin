@@ -131,10 +131,32 @@ function updateItemInDatabase(document, database = DEFAULT_DB_NAME){
 
 }
 
+function deleteAnItemInTheDatabase(document, database = DEFAULT_DB_NAME){
+
+    const db = cloudant.db.use(database);
+
+    debug(`DELETING DOCUMENT:`, document);
+
+    return new Promise( (resolve, reject) => {
+
+        db.destroy(document._id, document._rev, (err, body, header) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(`Document ${document._id} successfully deleted`);
+            }
+        });
+
+    });
+
+
+}
+
 module.exports = {
     write    : writeToDatabase,
 	read     : readFromDatabase,
 	scan     : scanDatabase,
 	query    : queryItemsInDatabase,
-	update   : updateItemInDatabase
+    update   : updateItemInDatabase,
+    delete   : deleteAnItemInTheDatabase
 };

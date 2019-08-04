@@ -4,8 +4,6 @@ const router = express.Router();
 
 const twins = require(`${__dirname}/../bin/lib/twins`);
 
-/* GET home page. */
-
 const UUIDRegex = `[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}`;
 
 router.post(`/create`, function(req, res, next) {
@@ -76,18 +74,38 @@ router.post(`/update/:UUID(${UUIDRegex})`, function(req, res, next) {
 
 });
 
-router.post(`/duplicate/:UUID(${UUIDRegex})`, function(req, res, next) {
+router.post(`/duplicate/:UUID(${UUIDRegex})`, function(req, res) {
 	res.json({
         status : "ok",
         message : "Twin successfully duplicated."
     });
 });
 
-router.post(`/delete/:UUID(${UUIDRegex})`, function(req, res, next) {
-	res.json({
-        status : "ok",
-        message : "Twin successfully deleted."
-    });
+router.post(`/delete/:UUID(${UUIDRegex})`, function(req, res) {
+
+    twins.delete(req.params.UUID, res.locals.w3id_userid)
+        .then(result => {
+            debug(result);
+
+            res.json({
+                status : "ok",
+                message : "Twin successfully deleted."
+            });
+
+        })
+        .catch(err => {
+
+            debug(`Error deleting twin ${req.params.UUID}`. err);
+            
+            res.status(500);
+            res.json({
+                status : 'err',
+                message : 'An internal error occured preventing your twins configuration from being saved'
+            });
+
+        })
+    ;
+
 });
 
 module.exports = router;

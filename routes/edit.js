@@ -8,7 +8,7 @@ const UUIDRegex = `[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}`
 	
 router.get(`/:UUID(${UUIDRegex})`, function(req, res, next) {
 
-	twins.get(req.params.UUID)
+	twins.get(req.params.UUID, res.locals.w3id_userid)
 		.then(twin => {
 			
 			debug("gettwin:", twin[0]);
