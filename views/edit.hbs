@@ -121,7 +121,7 @@
                             "Content-Type" : "application/json"
                         },
                         credentials : 'same-origin',
-                        body : JSON.stringify( { data : { nodes: nodeData } }
+                        body : JSON.stringify( { data : { nodes: nodeData } } )
                     })
                     .then(res => {
                         if(!res.ok){
@@ -293,7 +293,7 @@
 
             existingNodes.forEach(savedNode => {
                 // x, y, width, height, type = selectedTool
-                const recreatedNode = createNode(savedNode.x, savedNode.y, savedNode.width, savedNode.height, savedNode.type);
+                const recreatedNode = createNode(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type);
                 nodesHolder.appendChild(recreatedNode);
 
             });
