@@ -16,7 +16,7 @@ const twinNodes = (function(){
         div.dataset.type = type;
         div.dataset.name = name;
         div.dataset.topic = topic || '';
-        div.dataset.rules = rules || [];
+        div.dataset.rules = JSON.stringify(rules) || [];
 
         div.classList.add('node');
         div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
@@ -37,12 +37,13 @@ const twinNodes = (function(){
                 selected : node.dataset.selected,
                 type : node.dataset.type,
                 name : node.dataset.name,
-                topic : node.dataset.topic
+                topic : node.dataset.topic,
+                rules : node.dataset.rules !== "" ? JSON.parse(node.dataset.rules) : []
             };
 
         });
 
-        console.log(nodeData);
+        console.log('Node records to be updated:', nodeData);
         console.log(`Posting update to ${window.location.origin}/twins/update/${twinUUID}`);
         fetch(`${window.location.origin}/twins/update/${twinUUID}`, {
                 method : "POST",

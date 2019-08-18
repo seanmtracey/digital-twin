@@ -82,11 +82,14 @@
                     newRule.classList.add('rule');
                     
                     nameInput.setAttribute('type', 'text');
-                    nameInput.setAttribute('name', name || 'rule_name');
+                    nameInput.setAttribute('name', 'rule_name');
                     nameInput.setAttribute('placeholder', 'Rule Name');
 
                     ruleContent.setAttribute('name', 'rule_content');
                     ruleContent.setAttribute('rows', '8');
+
+                    nameInput.value = name || "";
+                    ruleContent.value = content || "";
 
                     newRule.appendChild(nameInput);
                     newRule.appendChild(ruleContent);
@@ -112,8 +115,15 @@
 
                     currentNodeBeingConfigured = node;
                     
-                    configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic
+                    configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic;
                     
+                    const existingRules = currentNodeBeingConfigured.dataset.rules !== "" ? JSON.parse(currentNodeBeingConfigured.dataset.rules) : [];
+
+                    existingRules.forEach(rule => {
+                        const ruleToDisplay = createRule(rule.name, rule.content);
+                        storedRules.appendChild(ruleToDisplay);
+                    });
+
                     configurationPanelElement.dataset.active = "true";                    
 
                 }
@@ -122,11 +132,31 @@
 
                     console.log('save changes?', saveChanges);
 
-                    currentNodeBeingConfigured.dataset.topic = configurationPanelElement.querySelector('input[name="topic"]').value;
+                    // if(saveChanges){
+
+                        currentNodeBeingConfigured.dataset.topic = configurationPanelElement.querySelector('input[name="topic"]').value;
+
+                        const rules = Array.from(storedRules.querySelectorAll('.rule')).map(rule => {
+                            return {
+                                name : rule.querySelector('input[name="rule_name"]').value,
+                                content : rule.querySelector('textarea').value
+                            }
+                        });
+
+                        console.log(rules);
+
+                        currentNodeBeingConfigured.dataset.rules = JSON.stringify(rules);
+
+                    // }
+
                     
                     currentNodeBeingConfigured = undefined;
                     configurationPanelElement.dataset.active = "false";
 
+                    Array.from(storedRules.querySelectorAll('.rule')).forEach(storedRule => {
+                        storedRule.parentNode.removeChild(storedRule);
+                    });
+                    
                     Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
                         node.dataset.selected = "false";
                     });
@@ -282,8 +312,9 @@
             const existingNodes = JSON.parse(`{{{ twinData.nodes }}}`);
 
             existingNodes.forEach(savedNode => {
+
                 // x, y, width, height, type = selectedTool
-                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic);
+                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules);
                 
                 bindCreationHandlersToNode(recreatedNode);
 

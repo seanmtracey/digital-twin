@@ -127,6 +127,7 @@ main{
     border-radius: 3px;
     box-sizing: border-box;
     padding: 1em;
+    font-family: monospace;
 }
 
 #toolBox{
