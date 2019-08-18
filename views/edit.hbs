@@ -17,10 +17,20 @@
             <input type="text" name="topic" />
 
             <label>Rules</label>
-
-            <!--<ol>
-                <li></li>
-            </ol>-->
+            
+            <div id="nodeRules">
+                
+                <ol id="storedRules">
+                
+                    <!--<li class="rule">
+                        <input type="text" name="rule_name" placeholder="Rule Name"/>
+                        <textarea name="rule_content" rows="8"></textarea>
+                    </li>-->
+                
+                </ol>
+                
+                <button id="newRule" >+ Add new rule</button>
+            </div>
 
         </form>
 
@@ -56,6 +66,46 @@
                 
                 const configurationPanelElement = document.querySelector('#configurePanel');
                 let currentNodeBeingConfigured = undefined;
+
+                const rulesContainer = configurationPanelElement.querySelector('#nodeRules');
+                const storedRules = rulesContainer.querySelector('#storedRules');
+                const newRulesButton = configurationPanelElement.querySelector('#newRule');
+
+                function createRule(name, content){
+
+                    const ruleFragment = document.createDocumentFragment();
+                    
+                    const newRule = document.createElement('li');
+                    const nameInput = document.createElement('input');
+                    const ruleContent = document.createElement('textarea');
+
+                    newRule.classList.add('rule');
+                    
+                    nameInput.setAttribute('type', 'text');
+                    nameInput.setAttribute('name', name || 'rule_name');
+                    nameInput.setAttribute('placeholder', 'Rule Name');
+
+                    ruleContent.setAttribute('name', 'rule_content');
+                    ruleContent.setAttribute('rows', '8');
+
+                    newRule.appendChild(nameInput);
+                    newRule.appendChild(ruleContent);
+
+                    ruleFragment.appendChild(newRule);
+
+                    return ruleFragment;
+
+                }
+
+                newRulesButton.addEventListener('click', function(e){
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    const newRule = createRule();
+                    
+                    storedRules.appendChild(newRule);
+
+                }, false);
 
                 function showConfigurationPanel(node){
                     console.log("ShowPanel");
@@ -268,21 +318,6 @@
                 creationCanvas.width = window.innerWidth;
                 creationCanvas.height = window.innerHeight;
             }, false);
-
-            window.addEventListener('keyup', (e) => {
-                console.log(e);
-
-                // If the backspace key is pressed, and a node is selected, but the none of the input
-                // fields in the configuration panel are being edited, delete the selected node.
-                if(e.keyCode === 8){
-                    const selectedNode = nodesHolder.querySelector('.node[data-selected="true"]');
-
-                    selectedNode.parentNode.removeChild(selectedNode);
-                    configurationPanel.hide();
-
-                }
-
-            });
 
         }());
 

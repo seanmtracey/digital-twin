@@ -1,7 +1,7 @@
 const twinNodes = (function(){
     'use strict';
 
-    function createNode(x, y, width, height, type, name, topic){
+    function createNode(x, y, width, height, type, name, topic, rules){
 
         width = width < 0 ? -width : width;
         height = height < 0 ? -height : height;
@@ -15,7 +15,8 @@ const twinNodes = (function(){
         div.dataset.selected = "false";
         div.dataset.type = type;
         div.dataset.name = name;
-        div.dataset.topic = topic || ''
+        div.dataset.topic = topic || '';
+        div.dataset.rules = rules || [];
 
         div.classList.add('node');
         div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
