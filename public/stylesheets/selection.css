@@ -151,6 +151,7 @@ ul#twins li.item .details{
     border-radius: 3px;
     position: relative;
     background: white;
+    box-shadow: 0 2px 3px #00000014;
 }
 
 #createTwinDialog div.wrapper form{

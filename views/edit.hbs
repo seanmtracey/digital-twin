@@ -11,6 +11,19 @@
     <div id="configurePanel" data-active="false">
         <h2>Configure Node</h2>
         <div id="closePanelBtn"></div>
+
+        <form>
+            <label>Topic</label>
+            <input type="text" name="topic" />
+
+            <label>Rules</label>
+
+            <!--<ol>
+                <li></li>
+            </ol>-->
+
+        </form>
+
     </div>
 
     <ul id="toolBox">
@@ -31,6 +44,8 @@
         <p>Created by {{twinData.owner}}</p>
     </div>
 
+    <script src="/scripts/utilities.js"></script>
+    <script src="/scripts/twin_nodes.js"></script>
     <script>
 
         (function(){
@@ -43,15 +58,22 @@
                 let currentNodeBeingConfigured = undefined;
 
                 function showConfigurationPanel(node){
-                    console.log("ShowPanel")
+                    console.log("ShowPanel");
+
                     currentNodeBeingConfigured = node;
-                    configurationPanelElement.dataset.active = "true";
-                        
+                    
+                    configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic
+                    
+                    configurationPanelElement.dataset.active = "true";                    
+
                 }
 
                 function hideConfigurationPanel(saveChanges = true){
 
                     console.log('save changes?', saveChanges);
+
+                    currentNodeBeingConfigured.dataset.topic = configurationPanelElement.querySelector('input[name="topic"]').value;
+                    
                     currentNodeBeingConfigured = undefined;
                     configurationPanelElement.dataset.active = "false";
 
@@ -77,70 +99,32 @@
 
             }());
 
-            function generateRandomID(length = 8){
-
-                const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_-abcdefghijklmnopqrstuvwxyz0123456789";
-                const code = [];
-                let remainingCharacters = length;
-
-                while(remainingCharacters > 0){
-
-                    code.push( characters[ Math.random() * characters.length | 0 ] );
-
-                    remainingCharacters -= 1;
-
-                }
-
-                return code.join('');
-
-            }
-
-            function updateNodesRecord(){
-
-                const nodes = Array.from( nodesHolder.querySelectorAll('div.node') );
-
-                const nodeData = nodes.map(node => {
-
-                    return {
-                        left : node.dataset.left,
-                        top : node.dataset.top,
-                        width : node.dataset.width,
-                        height : node.dataset.height,
-                        selected : node.dataset.selected,
-                        type : node.dataset.type,
-                        name : node.dataset.name
-                    };
-
-                });
-
-                console.log(nodeData);
-                console.log(`Posting update to ${window.location.origin}/twins/update/${twinUUID}`);
-                fetch(`${window.location.origin}/twins/update/${twinUUID}`, {
-                        method : "POST",
-                        headers : {
-                            "Content-Type" : "application/json"
-                        },
-                        credentials : 'same-origin',
-                        body : JSON.stringify( { data : { nodes: nodeData } } )
-                    })
-                    .then(res => {
-                        if(!res.ok){
-                            throw res;
-                        } else {
-                            return res.json()
-                        }
-                    })
-                    .then(data => {
-                        console.log(data);
-                    })
-                    .catch(err => {
-
-                        console.log(`Error saving Digital Twin updates:`, err);
-
-                    })
+            function bindCreationHandlersToNode(node){
                 
-                ;
+                node.addEventListener('mouseup', function(e){
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
 
+                    console.log('NODE CLICK');
+
+                    if(CREATING){
+                        endCreationHandler(e);
+                    } else {
+                        configurationPanel.show(this);
+                        
+                        Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
+                            node.dataset.selected = "false";
+                        });
+
+                        this.dataset.selected = "true";
+
+                    }
+
+                }, false);
+
+                node.addEventListener('mousemove', inProgressCreationHandler, false);
+                node.addEventListener('mouseup', endCreationHandler, false);
+                
             }
 
             function startCreationHandler(e){
@@ -188,7 +172,9 @@
                     const positionX = e.clientX < startCoords.x ? e.clientX : startCoords.x;
                     const positionY = e.clientY < startCoords.y ? e.clientY : startCoords.y;
 
-                    const node = createNode(positionX, positionY, elementWidth, elementHeight);
+                    const node = twinNodes.create(positionX, positionY, elementWidth, elementHeight, selectedTool, utilities.uuid());
+
+                    bindCreationHandlersToNode(node);
 
                     nodesHolder.appendChild(node);
                 
@@ -196,52 +182,6 @@
 
                 CREATING = false;
                 startCoords = undefined;
-
-            }
-
-            function createNode(x, y, width, height, type = selectedTool, name){
-
-                width = width < 0 ? -width : width;
-                height = height < 0 ? -height : height;
-
-                const div = document.createElement('div');
-                
-                div.dataset.left = x;
-                div.dataset.top = y;
-                div.dataset.width = width;
-                div.dataset.height = height;
-                div.dataset.selected = "false";
-                div.dataset.type = type;
-                div.dataset.name = name || generateRandomID();
-
-                div.classList.add('node');
-                div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
-
-                div.addEventListener('mouseup', function(e){
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-
-                    console.log('NODE CLICK');
-
-                    if(CREATING){
-                        endCreationHandler(e);
-                    } else {
-                        configurationPanel.show(this);
-                        
-                        Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
-                            node.dataset.selected = "false";
-                        });
-
-                        this.dataset.selected = "true";
-
-                    }
-
-                }, false);
-
-                div.addEventListener('mousemove', inProgressCreationHandler, false);
-                div.addEventListener('mouseup', endCreationHandler, false);
-
-                return div;
 
             }
 
@@ -293,7 +233,10 @@
 
             existingNodes.forEach(savedNode => {
                 // x, y, width, height, type = selectedTool
-                const recreatedNode = createNode(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type);
+                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic);
+                
+                bindCreationHandlersToNode(recreatedNode);
+
                 nodesHolder.appendChild(recreatedNode);
 
             });
@@ -301,13 +244,13 @@
             const nodeMutationObsererOptions = {
                 childList: true,
                 attributes: true,
-                subtree: true //Omit or set to false to observe only changes to the parent node.
+                subtree: true
             };
 
             const NodeMutationObserver = new MutationObserver(function(mutations) {
  
                 console.log(mutations);
-                updateNodesRecord();
+                twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
  
             });
 
@@ -318,7 +261,6 @@
                 console.log("change", this.value);
                 creationCanvas.style.backgroundColor = this.value;
                 colorSelectorOutput.textContent = this.value.toUpperCase();
-                //debugger;
 
             }, false);
 
