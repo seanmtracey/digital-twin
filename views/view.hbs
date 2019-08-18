@@ -12,6 +12,24 @@
 
             'use strict';
 
+            function generateRandomID(length = 8){
+
+                const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_-abcdefghijklmnopqrstuvwxyz0123456789";
+                const code = [];
+                let remainingCharacters = length;
+
+                while(remainingCharacters > 0){
+
+                    code.push( characters[ Math.random() * characters.length | 0 ] );
+
+                    remainingCharacters -= 1;
+
+                }
+
+                return code.join('');
+
+            }
+
             function createNode(x, y, width, height, type = selectedTool, name){
 
                 width = width < 0 ? -width : width;
@@ -45,6 +63,56 @@
                 const recreatedNode = createNode(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type);
                 nodesHolder.appendChild(recreatedNode);
 
+            });
+
+            const ws = new WebSocket(`ws://${window.location.host}`);
+
+            ws.addEventListener('open', function(e){
+               console.log(`Websocket connection opened`, e); 
+               ws.send(JSON.stringify({
+                    type : 'connect',
+                    data : {
+                        connectionDetails : {
+                            broker : 'mqtt://mqtt.eclipse.org',
+                            port : 1883
+                        }
+                    }
+                }));
+                
+            });
+            
+            ws.addEventListener('message', function(e){
+                console.log(e);
+                const payload = JSON.parse(e.data);
+                console.log('Parsed data:', payload);
+
+                if(payload.status === 'ok'){
+
+                    if(payload.type === 'connectionStatus'){
+
+                        if(payload.data === 'connected'){
+
+                            ws.send(JSON.stringify({
+                                type : 'subscribe',
+                                data : {
+                                    topic : '#'
+                                }
+                            }));
+
+                        }
+
+                    }
+
+                    if(payload.type === 'data'){
+                        console.log('BROKER DATA:', payload.data);
+                    }
+
+                }
+
+            });
+            
+            ws.addEventListener('error', function(err){
+                console.log('Websocket connection error:', err);
             });
 
         }());
