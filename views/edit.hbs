@@ -327,6 +327,21 @@
                 creationCanvas.height = window.innerHeight;
             }, false);
 
+            window.addEventListener('keyup', (e) => {
+                console.log(e);
+
+                // If the backspace key is pressed, and a node is selected, but the none of the input
+                // fields in the configuration panel are being edited, delete the selected node.
+                if(e.keyCode === 8){
+                    const selectedNode = nodesHolder.querySelector('.node[data-selected="true"]');
+
+                    selectedNode.parentNode.removeChild(selectedNode);
+                    configurationPanel.hide();
+
+                }
+
+            });
+
         }());
 
     </script>

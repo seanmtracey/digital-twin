@@ -31,15 +31,16 @@ main{
     position: fixed;
     left: 100%;
     top: 0;
-    width: 350px;
+    width: 400px;
     height: 100%;
     background: white;
     box-shadow: 0 -10px 10px rgba(0, 0, 0, 0.6);
     padding: 1em;
     box-sizing: border-box;
     overflow: scroll;
-    transition: transform 0.1s linear;
+    transition: transform 0.25s ease-in-out;
     transform: translateX(10%);
+    z-index: 10;
 }
 
 #configurePanel[data-active="true"]{

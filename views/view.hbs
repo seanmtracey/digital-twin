@@ -1,5 +1,54 @@
 <main>
 
-	
+    <div id="nodes">
+
+        <!-- The output are where nodes are persisted -->
+
+    </div>
+
+    <script>
+
+        (function(){
+
+            'use strict';
+
+            function createNode(x, y, width, height, type = selectedTool, name){
+
+                width = width < 0 ? -width : width;
+                height = height < 0 ? -height : height;
+
+                const div = document.createElement('div');
+                
+                div.dataset.left = x;
+                div.dataset.top = y;
+                div.dataset.width = width;
+                div.dataset.height = height;
+                div.dataset.selected = "false";
+                div.dataset.type = type;
+                div.dataset.name = name;
+
+                div.classList.add('node');
+                div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
+
+                return div;
+
+            }
+
+            const twinUUID = "{{twinData.UUID}}";
+            const nodesHolder = document.querySelector('#nodes');
+
+            // Reconstruct pre-existing nodes
+            const existingNodes = JSON.parse(`{{{ twinData.nodes }}}`);
+
+            existingNodes.forEach(savedNode => {
+                // x, y, width, height, type = selectedTool
+                const recreatedNode = createNode(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type);
+                nodesHolder.appendChild(recreatedNode);
+
+            });
+
+        }());
+
+    </script>
 
 </main>
