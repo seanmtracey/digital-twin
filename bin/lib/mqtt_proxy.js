@@ -70,8 +70,6 @@ function bindEventsForClient(socket){
 
 						mqttClient.on('message', function (topic, data) {
 
-							debug(topic, data.toString());
-
 							socket.send(JSON.stringify({
 								status : 'ok',
 								type : 'data',
