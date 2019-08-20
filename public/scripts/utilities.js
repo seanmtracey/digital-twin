@@ -18,8 +18,15 @@ const utilities = (function(){
 
     }
 
+    function getPropertyFromObjectWithStringOfDotNotation(str, obj){
+
+        return str.split('.').reduce((obj,i) => { return obj[i]; }, obj);
+
+    }
+
     return {
-        uuid : generateRandomID
+        uuid : generateRandomID,
+        getProperty : getPropertyFromObjectWithStringOfDotNotation
     }
     
 })();

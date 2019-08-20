@@ -4,11 +4,11 @@
 
     <div id="nodes">
 
-        <!-- The output are where nodes are persisted -->
+        <!-- The output is where our nodes are persisted -->
 
     </div>
 
-    <div id="configurePanel" data-active="true">
+    <div id="configurePanel" data-active="false">
         <h2>Configure Node</h2>
         <div id="closePanelBtn"></div>
 
@@ -22,7 +22,7 @@
                 
                 <ol id="storedRules">
                 
-                    <li class="rule">
+                    <!--<li class="rule">
                         <div class="ruleDetails">
                             <input type="text" name="rule_name" placeholder="Rule Name"/>
                             <div class="ruleCondition">
@@ -30,15 +30,12 @@
                             </div>
 
                             <div class="ruleAction">
-                                <!--<select id="actionToUndertake">
-                                    <option value="setColor">Set Color</option>
-                                </select>-->
                                 <strong>SET COLOR</strong> <input type="color" id="head" name="head" value="#f5f5f5" class="userInput">
                             </div>
 
                         </div>
                         <div class="deleteRuleButton"></div>
-                    </li>
+                    </li>-->
                 
                 </ol>
                 
@@ -84,17 +81,21 @@
                 const storedRules = rulesContainer.querySelector('#storedRules');
                 const newRulesButton = configurationPanelElement.querySelector('#newRule');
 
-                function createRule(name, content){
+                function createRule(name, conditionProperty, conditionValue, actionValue){
 
                     const ruleFragment = document.createDocumentFragment();
                     
                     const newRule = document.createElement('li');
                     const ruleDetailsContainer = document.createElement('div');
+                    const ruleConditionContainer = document.createElement('div');
+                    const ruleActionContainer = document.createElement('div');
                     const deleteRuleButton = document.createElement('div');
                     const nameInput = document.createElement('input');
 
                     newRule.classList.add('rule');
                     ruleDetailsContainer.classList.add('ruleDetails');
+                    ruleConditionContainer.classList.add('ruleCondition');
+                    ruleActionContainer.classList.add('ruleCondition');
                     deleteRuleButton.classList.add('deleteRuleButton');
 
                     nameInput.setAttribute('type', 'text');
@@ -102,6 +103,8 @@
                     nameInput.setAttribute('placeholder', 'Rule Name');
 
                     nameInput.value = name || "";
+                    ruleConditionContainer.innerHTML = `<strong>IF</strong> <input type="text" class="userInput" name="property" placeholder="property" value="${conditionProperty}" /> &#61;&#61;&#61; <input type="text" class="userInput" name="value" placeholder="value" value="${conditionValue}"/><br/>`;
+                    ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="color" id="head" name="head" value="${actionValue}" class="userInput">`
 
                     deleteRuleButton.addEventListener('click', function(){
                         
@@ -110,12 +113,13 @@
                     }, false);
 
                     ruleDetailsContainer.appendChild(nameInput);
+                    ruleDetailsContainer.appendChild(ruleConditionContainer);
+                    ruleDetailsContainer.appendChild(ruleActionContainer);
 
                     newRule.appendChild(ruleDetailsContainer);
                     newRule.appendChild(deleteRuleButton);
 
                     ruleFragment.appendChild(newRule);
-
 
                     return ruleFragment;
 
@@ -137,6 +141,14 @@
                     currentNodeBeingConfigured = node;
                     
                     configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic;
+                    const rules = JSON.parse(currentNodeBeingConfigured.dataset.rules);
+
+                    rules.forEach(rule => {
+
+                        const existingRule = createRule(rule.name, rule.property, rule.value, rule.action);
+                        storedRules.appendChild(existingRule);
+
+                    });
 
                     configurationPanelElement.dataset.active = "true";                    
 
@@ -146,7 +158,28 @@
 
                     console.log('save changes?', saveChanges);
 
-                    currentNodeBeingConfigured.dataset.topic = configurationPanelElement.querySelector('input[name="topic"]').value;
+                    if(true /*saveChanges*/){
+
+                        currentNodeBeingConfigured.dataset.topic = configurationPanelElement.querySelector('input[name="topic"]').value;
+                        const rules = Array.from(storedRules.querySelectorAll('.rule')).map(storedRule => {
+                            console.log(storedRule);
+
+                            const property = storedRule.querySelector('input[name="property"]').value;
+                            const value = storedRule.querySelector('input[name="value"]').value;
+                            const action = storedRule.querySelector('input[type="color"]').value;
+
+                            return {
+                                name : storedRule.querySelector('input[name="rule_name"]').value,
+                                property : property/*.replace(/\./g, ':')*/,
+                                value : value,
+                                action : action
+                            };
+
+                        });
+
+                        currentNodeBeingConfigured.dataset.rules = JSON.stringify(rules);
+
+                    }
                     
                     currentNodeBeingConfigured = undefined;
                     configurationPanelElement.dataset.active = "false";
