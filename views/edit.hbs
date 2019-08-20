@@ -81,7 +81,7 @@
                 const storedRules = rulesContainer.querySelector('#storedRules');
                 const newRulesButton = configurationPanelElement.querySelector('#newRule');
 
-                function createRule(name, conditionProperty, conditionValue, actionValue){
+                function createRule(name, conditionProperty = "", conditionValue = "", actionValue = ""){
 
                     const ruleFragment = document.createDocumentFragment();
                     
@@ -141,14 +141,19 @@
                     currentNodeBeingConfigured = node;
                     
                     configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic;
-                    const rules = JSON.parse(currentNodeBeingConfigured.dataset.rules);
+                    
+                    if(currentNodeBeingConfigured.dataset.rules){
 
-                    rules.forEach(rule => {
+                        const rules = JSON.parse(currentNodeBeingConfigured.dataset.rules);
 
-                        const existingRule = createRule(rule.name, rule.property, rule.value, rule.action);
-                        storedRules.appendChild(existingRule);
+                        rules.forEach(rule => {
 
-                    });
+                            const existingRule = createRule(rule.name, rule.property, rule.value, rule.action);
+                            storedRules.appendChild(existingRule);
+
+                        });
+
+                    }
 
                     configurationPanelElement.dataset.active = "true";                    
 
