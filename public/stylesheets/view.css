@@ -27,27 +27,31 @@ main{
     z-index: 1000;
 }
 
-#configurePanel{
+#transcriptPanel{
     position: fixed;
     left: 100%;
     top: 0;
     width: 400px;
     height: 100%;
-    background: white;
+    background: #333;
     box-shadow: 0 -10px 10px rgba(0, 0, 0, 0.6);
     padding: 1em;
     box-sizing: border-box;
-    overflow: scroll;
+    overflow: hidden;
     transition: transform 0.25s ease-in-out;
     transform: translateX(10%);
     z-index: 10;
+    color: white;
+    border: 1px solid white;
+    border-top: 0px;
+    border-bottom: 0px;
 }
 
-#configurePanel[data-active="true"]{
+#transcriptPanel[data-active="true"]{
     transform: translateX(-100%);
 }
 
-#configurePanel #closePanelBtn{
+#transcriptPanel #closePanelBtn{
     position: absolute;
     right: 1em;
     top: 1em;
@@ -68,82 +72,38 @@ main{
     background-repeat: no-repeat;
 }
 
-#configurePanel #closePanelBtn:hover{
+#transcriptPanel #closePanelBtn:hover{
     background-color: #9e9e9e;
 }
 
-#toolBox{
-    width: 100px;
-    height: 30px;
-    background: white;
-    position: fixed;
-    top: 0;
-    left: 0;
+#transcriptPanel #nodeTopic{
+    margin-top: 0.1em;
+    border-bottom: 1px solid white;
+    padding-bottom: 1em;
+}
+
+#transcriptPanel #log{
+    padding: 0;
+    margin: 0;
+    max-height: 100%;
+    overflow: scroll;
+    box-sizing: border-box;
+    padding-bottom: 10vh;
+}
+
+#transcriptPanel #log li{
     list-style-type: none;
-    display: flex;
-    box-shadow: 0 1px 2px black;
-    border-radius: 5px;
     margin: 0;
-    padding: 0;
-    background-color: #dcdcdc;
-    top: 1em;
-    left: 50%;
-    margin-left: -50px;
-    overflow: hidden;
+    border-bottom: 1px solid white;
+    box-sizing: border-box;
+    padding: 0.5em;
+    background-color: rgba(0,0,0,0.4);
 }
 
-#toolBox li{
-    background-size: 60%;
-    background-position: 50%;
-    flex-grow: 1;
-    background-repeat: no-repeat;
-    border-right: 1px solid #bdbdbd;
-    padding: 0;
-    margin: 0;
-    height: 100%;
-    cursor: pointer;
+#transcriptPanel #log li span{
+    font-size: 0.8em;
 }
 
-#toolBox li:last-of-type{
-    border-right: 0px solid transparent;
-}
-
-#toolBox li[data-selected="true"]{
-    background-color: white;
-}
-
-#toolBox #squareCreationTool{
-    background-image: url('/images/squareCreationTool.png');
-}
-
-#toolBox #ellipseCreationTool{
-    background-image: url('/images/ellipseCreationTool.png');
-}
-
-#toolBox #selectionTool{
-    background-image: url('/images/selectionTool.png');
-}
-
-#colorSelect{
-    position: fixed;
-    bottom: 1em;
-    right: 1em;
-    display: flex;
-    align-items: center;
-    background: white;
-    padding: 0.3em 0.3em;
-    margin: 0;
-    border-radius: 3px;
-    overflow: hidden;
-    box-shadow: 0 1px 2px;
-}
-
-#colorSelect p{
-    margin-left: 0.5em;
-}
-
-#twinDetails{
-    position: fixed;
-    bottom: 1em;
-    left: 1em;
+#transcriptPanel #log li pre{
+    font-size: 1.2em;
 }

@@ -10,7 +10,7 @@ function bindEventsForClient(socket){
 
 	socket.on('message', function(payload){
 		
-		debug('Received message from client:', payload.toString('utf8'));
+		debug('Received message from Digital Twin client:', payload.toString('utf8'));
 
 		payload = JSON.parse(payload);
 
@@ -66,10 +66,12 @@ function bindEventsForClient(socket){
 					if (err) {
 						console.log('MQTT Subscription Error:', err);
 					} else {
-						console.log('Successful subscription to topic');
+						console.log('Successful subscription to topic:', payload.data.topic);
 
 						mqttClient.on('message', function (topic, data) {
 
+							// debug(`Data from broker on topic ${topic}:`, data.toString('utf8'));
+							
 							socket.send(JSON.stringify({
 								status : 'ok',
 								type : 'data',

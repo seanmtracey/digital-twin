@@ -5,6 +5,24 @@
         <!-- The output are where nodes are persisted -->
 
     </div>
+
+    <div id="transcriptPanel" data-active="false">
+        
+        <h2>Node Log</h2>
+        <div id="closePanelBtn"></div>
+        <p id="nodeTopic"></p>
+
+        <ol id="log">
+            
+            <!--<li>
+                <span>Time Received: 1234567890</span>
+                <pre>{"status" : "good"}</pre>
+            </li>-->
+            
+        </ol>
+
+    </div>
+
     <script src="/scripts/twin_nodes.js"></script>
     <script>
 
@@ -16,15 +34,12 @@
                 
                 if(node.dataset.rules){
                     
-                    const rules = JSON.parse(JSON.parse(node.dataset.rules));
+                    const rules = JSON.parse(node.dataset.rules);
 
                     rules.forEach(function(rule){
 
                         if(data[rule.property] === rule.value){
-                            console.log('matched rule');
                             node.style.backgroundColor = rule.action;
-                        } else {
-                            console.log('no match');
                         }
 
                     });
@@ -33,15 +48,124 @@
 
             }
 
+            const transcriptPanel = (function(){
+                
+                const transcriptPanelElement = document.querySelector('#transcriptPanel');
+                let currentNodeLogBeingDisplayed = undefined;
+
+                const nodeTopicDisplayElement = transcriptPanelElement.querySelector('p#nodeTopic');
+                const logElement = transcriptPanelElement.querySelector('ol#log');
+
+                function generateLog(log){
+                    
+                    const logDocumentFragment = document.createDocumentFragment();
+
+                    for(let index = log.length - 1; index > 0; index -= 1){
+                        console.log(log[index]);
+
+                        const thisLogItem = log[index];
+
+                        const li = document.createElement('li');
+                        const span = document.createElement('span');
+                        const pre = document.createElement('pre');
+
+                        span.textContent = `Time Receieved: ${thisLogItem.received}`;
+                        pre.textContent = thisLogItem.data.data;
+
+                        li.appendChild(span);
+                        li.appendChild(pre);
+                        
+                        logDocumentFragment.appendChild(li);
+
+                    }
+
+                    return logDocumentFragment;
+
+                }
+
+                function showTranscriptPanel(node){
+                    console.log("ShowPanel");
+
+                    currentNodeLogBeingDisplayed = node;
+
+                    nodeTopicDisplayElement.textContent = currentNodeLogBeingDisplayed.dataset.topic;
+                    
+                    if(localStorage.getItem(node.dataset.name)){
+                        
+                        const log = generateLog( JSON.parse(localStorage.getItem(currentNodeLogBeingDisplayed.dataset.name)) );
+                        
+                        logElement.appendChild(log);
+
+                    }
+
+                    transcriptPanelElement.dataset.active = "true";                    
+
+                }
+
+                function hideTranscriptPanel(saveChanges = true){
+
+                    console.log('save changes?', saveChanges);
+                    
+                    currentNodeLogBeingDisplayed = undefined;
+                    logElement.innerHTML = "";
+                    transcriptPanelElement.dataset.active = "false";
+
+                    // DELETE LOG
+
+                }
+
+                function updateLogInPanel(node){
+
+                    if(currentNodeLogBeingDisplayed === undefined){
+                        return;
+                    }
+
+                    if(node.name === currentNodeLogBeingDisplayed.name){
+
+                        if(localStorage.getItem(node.dataset.name)){
+                        
+                            const log = generateLog( JSON.parse(localStorage.getItem(currentNodeLogBeingDisplayed.dataset.name)) );
+                            logElement.innerHTML = "";
+
+                            logElement.appendChild(log);
+
+                        }
+                    }
+
+                }
+
+                function checkIfTranscriptPanelIsShowing(){
+                    return transcriptPanelElement.dataset.active === "true";
+                }
+
+                transcriptPanelElement.querySelector('#closePanelBtn').addEventListener('click', e => {
+                    hideTranscriptPanel(false);
+                }, false);
+
+                return {
+                    show : showTranscriptPanel,
+                    hide : hideTranscriptPanel,
+                    update : updateLogInPanel,
+                    isVisible : checkIfTranscriptPanelIsShowing
+                };
+
+            }());
+
+
             const twinUUID = "{{twinData.UUID}}";
             const nodesHolder = document.querySelector('#nodes');
-
+            const subsribedToTopics = [];
             // Reconstruct pre-existing nodes
             const existingNodes = JSON.parse(`{{{ twinData.nodes }}}`);
 
             existingNodes.forEach(savedNode => {
                 // x, y, width, height, type, name, topic, rules
-                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, JSON.stringify(savedNode.rules) );
+                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules );
+
+                recreatedNode.addEventListener('click', function(){
+                    transcriptPanel.show(this);
+                }, false);
+
                 nodesHolder.appendChild(recreatedNode);
             });
 
@@ -75,13 +199,20 @@
                             Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
                                 
                                 if(node.dataset.topic){
+                                    
+                                    if(subsribedToTopics.indexOf(node.dataset.topic) === -1){
 
-                                    ws.send(JSON.stringify({
-                                        type : 'subscribe',
-                                        data : {
-                                            topic : node.dataset.topic
-                                        }
-                                    }));
+                                        ws.send(JSON.stringify({
+                                            type : 'subscribe',
+                                            data : {
+                                                topic : node.dataset.topic
+                                            }
+                                        }));
+
+                                        subsribedToTopics.push(node.dataset.topic);
+
+                                    }
+
 
                                 }
 
@@ -116,6 +247,8 @@
                                 }
 
                                 localStorage.setItem(node.dataset.name, JSON.stringify(transcript));
+                                
+                                transcriptPanel.update(node);
 
                             }
 
