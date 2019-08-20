@@ -113,21 +113,85 @@ main{
     display: flex;
     flex-direction: column;
     margin-bottom: 1em;
+    list-style-type: none;
 }
 
 #configurePanel form #nodeRules #storedRules .rule{
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 1em;
-    margin-bottom: 1em;
+    padding-bottom: 0em;
+    margin-bottom: 0em;
     border-bottom: 1px solid rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-#configurePanel form #nodeRules #storedRules .rule textarea{
-    border-radius: 3px;
+#configurePanel form #nodeRules #storedRules .rule input[type="text"]{
+    font-size: 0.8em;
+}
+
+#configurePanel form #nodeRules #storedRules .rule .deleteRuleButton{
     box-sizing: border-box;
-    padding: 1em;
-    font-family: monospace;
+    margin-left: 0.5em;
+    border-radius: 3px;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background-image: url('/images/deleteIcon.png');
+    background-repeat: no-repeat;
+    background-size: 40%;
+    background-position: 50%;
+    width: 45px;
+    height: 35px;
+}
+
+#configurePanel form #nodeRules #storedRules .rule .deleteRuleButton:hover{
+    background-color: #b52222;
+}
+
+#configurePanel form #nodeRules #storedRules .rule .ruleDetails{
+    display: flex;
+    flex-direction: column;
+    flex: 5;
+}
+
+#configurePanel form #nodeRules #storedRules .rule .ruleDetails .ruleCondition, #configurePanel form #nodeRules #storedRules .rule .ruleDetails .ruleAction {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+#configurePanel form #nodeRules #storedRules .rule .userInput{
+    background: rgba(0, 0, 0, 0.47);
+    color: white;
+    border-width: 0 0 1px;
+    border-radius: 0;
+    border-color: white;
+    outline: transparent;
+    margin-bottom: 0;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    width: 100%;
+    min-width: 0;
+}
+
+#configurePanel form #nodeRules #storedRules .rule .ruleCondition .userInput:last-of-type{
+    margin-right: 0;   
+}
+
+#configurePanel form #nodeRules #storedRules .rule .ruleAction select{
+    -webkit-appearance: none; 
+    -moz-appearance: none;
+    appearance: none;  
+}
+
+#configurePanel form #nodeRules #storedRules .rule .ruleAction strong{
+    min-width: 100px;
+}
+
+#configurePanel form #nodeRules #storedRules .rule .ruleAction input[type="color"]{
+    padding: 0;
+    border: 0px solid transparent;
+    margin: 0;
+    min-height: 1em;
 }
 
 #toolBox{

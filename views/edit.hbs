@@ -8,13 +8,13 @@
 
     </div>
 
-    <div id="configurePanel" data-active="false">
+    <div id="configurePanel" data-active="true">
         <h2>Configure Node</h2>
         <div id="closePanelBtn"></div>
 
         <form>
             <label>Topic</label>
-            <input type="text" name="topic" />
+            <input type="text" name="topic" placeholder="MQTT topic to subscribe and respond to..." />
 
             <label>Rules</label>
             
@@ -22,14 +22,27 @@
                 
                 <ol id="storedRules">
                 
-                    <!--<li class="rule">
-                        <input type="text" name="rule_name" placeholder="Rule Name"/>
-                        <textarea name="rule_content" rows="8"></textarea>
-                    </li>-->
+                    <li class="rule">
+                        <div class="ruleDetails">
+                            <input type="text" name="rule_name" placeholder="Rule Name"/>
+                            <div class="ruleCondition">
+                                <strong>IF</strong> <input type="text" class="userInput" name="property" placeholder="property" /> &#61;&#61;&#61; <input type="text" class="userInput" name="value" placeholder="value"/><br/>
+                            </div>
+
+                            <div class="ruleAction">
+                                <!--<select id="actionToUndertake">
+                                    <option value="setColor">Set Color</option>
+                                </select>-->
+                                <strong>SET COLOR</strong> <input type="color" id="head" name="head" value="#f5f5f5" class="userInput">
+                            </div>
+
+                        </div>
+                        <div class="deleteRuleButton"></div>
+                    </li>
                 
                 </ol>
                 
-                <button id="newRule" >+ Add new rule</button>
+                <button id="newRule">Add new rule</button>
             </div>
 
         </form>
@@ -76,25 +89,33 @@
                     const ruleFragment = document.createDocumentFragment();
                     
                     const newRule = document.createElement('li');
+                    const ruleDetailsContainer = document.createElement('div');
+                    const deleteRuleButton = document.createElement('div');
                     const nameInput = document.createElement('input');
-                    const ruleContent = document.createElement('textarea');
 
                     newRule.classList.add('rule');
-                    
+                    ruleDetailsContainer.classList.add('ruleDetails');
+                    deleteRuleButton.classList.add('deleteRuleButton');
+
                     nameInput.setAttribute('type', 'text');
                     nameInput.setAttribute('name', 'rule_name');
                     nameInput.setAttribute('placeholder', 'Rule Name');
 
-                    ruleContent.setAttribute('name', 'rule_content');
-                    ruleContent.setAttribute('rows', '8');
-
                     nameInput.value = name || "";
-                    ruleContent.value = content || "";
 
-                    newRule.appendChild(nameInput);
-                    newRule.appendChild(ruleContent);
+                    deleteRuleButton.addEventListener('click', function(){
+                        
+                        storedRules.removeChild(this.parentNode);
+
+                    }, false);
+
+                    ruleDetailsContainer.appendChild(nameInput);
+
+                    newRule.appendChild(ruleDetailsContainer);
+                    newRule.appendChild(deleteRuleButton);
 
                     ruleFragment.appendChild(newRule);
+
 
                     return ruleFragment;
 
@@ -116,13 +137,6 @@
                     currentNodeBeingConfigured = node;
                     
                     configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic;
-                    
-                    const existingRules = currentNodeBeingConfigured.dataset.rules !== "" ? JSON.parse(currentNodeBeingConfigured.dataset.rules) : [];
-
-                    existingRules.forEach(rule => {
-                        const ruleToDisplay = createRule(rule.name, rule.content);
-                        storedRules.appendChild(ruleToDisplay);
-                    });
 
                     configurationPanelElement.dataset.active = "true";                    
 
@@ -132,23 +146,7 @@
 
                     console.log('save changes?', saveChanges);
 
-                    // if(saveChanges){
-
-                        currentNodeBeingConfigured.dataset.topic = configurationPanelElement.querySelector('input[name="topic"]').value;
-
-                        const rules = Array.from(storedRules.querySelectorAll('.rule')).map(rule => {
-                            return {
-                                name : rule.querySelector('input[name="rule_name"]').value,
-                                content : rule.querySelector('textarea').value
-                            }
-                        });
-
-                        console.log(rules);
-
-                        currentNodeBeingConfigured.dataset.rules = JSON.stringify(rules);
-
-                    // }
-
+                    currentNodeBeingConfigured.dataset.topic = configurationPanelElement.querySelector('input[name="topic"]').value;
                     
                     currentNodeBeingConfigured = undefined;
                     configurationPanelElement.dataset.active = "false";
