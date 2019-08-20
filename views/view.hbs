@@ -12,21 +12,24 @@
 
             'use strict';
 
-            function generateRandomID(length = 8){
+            function evaluateRules(node, data){
+                
+                if(node.dataset.rules){
+                    
+                    const rules = JSON.parse(JSON.parse(node.dataset.rules));
 
-                const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_-abcdefghijklmnopqrstuvwxyz0123456789";
-                const code = [];
-                let remainingCharacters = length;
+                    rules.forEach(function(rule){
 
-                while(remainingCharacters > 0){
+                        if(data[rule.property] === rule.value){
+                            console.log('matched rule');
+                            node.style.backgroundColor = rule.action;
+                        } else {
+                            console.log('no match');
+                        }
 
-                    code.push( characters[ Math.random() * characters.length | 0 ] );
-
-                    remainingCharacters -= 1;
+                    });
 
                 }
-
-                return code.join('');
 
             }
 
@@ -37,10 +40,9 @@
             const existingNodes = JSON.parse(`{{{ twinData.nodes }}}`);
 
             existingNodes.forEach(savedNode => {
-                // x, y, width, height, type = selectedTool
-                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type);
+                // x, y, width, height, type, name, topic, rules
+                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, JSON.stringify(savedNode.rules) );
                 nodesHolder.appendChild(recreatedNode);
-
             });
 
             const ws = new WebSocket(`ws://${window.location.host}`);
@@ -51,7 +53,7 @@
                     type : 'connect',
                     data : {
                         connectionDetails : {
-                            broker : 'mqtt://mqtt.eclipse.org',
+                            broker : `{{{twinData.broker}}}`,
                             port : 1883
                         }
                     }
@@ -70,12 +72,15 @@
 
                         if(payload.data === 'connected'){
 
-                            ws.send(JSON.stringify({
-                                type : 'subscribe',
-                                data : {
-                                    topic : '#'
-                                }
-                            }));
+                            Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
+
+                                ws.send(JSON.stringify({
+                                    type : 'subscribe',
+                                    data : {
+                                        topic : node.dataset.topic
+                                    }
+                                }));
+                            });
 
                         }
 
@@ -83,6 +88,15 @@
 
                     if(payload.type === 'data'){
                         console.log('BROKER DATA:', payload.data);
+
+                        Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
+                            
+                            if(node.dataset.topic === payload.data.topic){
+                                evaluateRules(node, JSON.parse(payload.data.data) );
+                            }
+                            
+                        });
+
                     }
 
                 }

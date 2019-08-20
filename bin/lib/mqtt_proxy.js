@@ -75,7 +75,7 @@ function bindEventsForClient(socket){
 								type : 'data',
 								data : {
 									topic,
-									data
+									data : data.toString('utf8')
 								}
 							}));
 

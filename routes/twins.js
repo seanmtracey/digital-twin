@@ -15,7 +15,7 @@ router.post(`/create`, function(req, res, next) {
 
     if(req.body.name){
 
-        twins.create({ name : req.body.name, owner: res.locals.w3id_userid })
+        twins.create({ name : req.body.name, owner: res.locals.w3id_userid, broker : req.body.broker })
             .then(data => {
                 
                 res.json({
