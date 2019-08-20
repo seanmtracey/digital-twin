@@ -253,6 +253,10 @@
 
                     console.log('NODE CLICK');
 
+                    if(e.clientX === originalMousePosition.x && e.clientY === originalMousePosition.y){
+                        MOVING = false;
+                    }
+
                     if(CREATING){
                         endCreationHandler(e);
                     } else if(!MOVING){
@@ -451,8 +455,8 @@
             });
 
             window.addEventListener('resize', (e) => {
-                creationCanvas.width = window.innerWidth;
-                creationCanvas.height = window.innerHeight;
+                creationCanvas.width = window.innerWidth * window.devicePixelRatio;
+                creationCanvas.height = window.innerHeight * window.devicePixelRatio;
             }, false);
 
         }());
