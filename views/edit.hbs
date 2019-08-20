@@ -4,13 +4,46 @@
 
     <div id="nodes">
 
-        <!-- The output are where nodes are persisted -->
+        <!-- The output is where our nodes are persisted -->
 
     </div>
 
     <div id="configurePanel" data-active="false">
         <h2>Configure Node</h2>
         <div id="closePanelBtn"></div>
+
+        <form>
+            <label>Topic</label>
+            <input type="text" name="topic" placeholder="MQTT topic to subscribe and react to..." />
+
+            <label>Rules</label>
+            
+            <div id="nodeRules">
+                
+                <ol id="storedRules">
+                
+                    <!--<li class="rule">
+                        <div class="ruleDetails">
+                            <input type="text" name="rule_name" placeholder="Rule Name"/>
+                            <div class="ruleCondition">
+                                <strong>IF</strong> <input type="text" class="userInput" name="property" placeholder="property" /> &#61;&#61;&#61; <input type="text" class="userInput" name="value" placeholder="value"/><br/>
+                            </div>
+
+                            <div class="ruleAction">
+                                <strong>SET COLOR</strong> <input type="color" id="head" name="head" value="#f5f5f5" class="userInput">
+                            </div>
+
+                        </div>
+                        <div class="deleteRuleButton"></div>
+                    </li>-->
+                
+                </ol>
+                
+                <button id="newRule">Add new rule</button>
+            </div>
+
+        </form>
+
     </div>
 
     <ul id="toolBox">
@@ -28,9 +61,11 @@
 
     <div id="twinDetails">
         <h3>{{twinData.name}}</h3>
-        <p>Created by {{twinData.owner}}</p>
+        <p>{{twinData.broker}}</p>
     </div>
 
+    <script src="/scripts/utilities.js"></script>
+    <script src="/scripts/twin_nodes.js"></script>
     <script>
 
         (function(){
@@ -42,19 +77,122 @@
                 const configurationPanelElement = document.querySelector('#configurePanel');
                 let currentNodeBeingConfigured = undefined;
 
-                function showConfigurationPanel(node){
-                    console.log("ShowPanel")
-                    currentNodeBeingConfigured = node;
-                    configurationPanelElement.dataset.active = "true";
+                const rulesContainer = configurationPanelElement.querySelector('#nodeRules');
+                const storedRules = rulesContainer.querySelector('#storedRules');
+                const newRulesButton = configurationPanelElement.querySelector('#newRule');
+
+                function createRule(name, conditionProperty = "", conditionValue = "", actionValue = ""){
+
+                    const ruleFragment = document.createDocumentFragment();
+                    
+                    const newRule = document.createElement('li');
+                    const ruleDetailsContainer = document.createElement('div');
+                    const ruleConditionContainer = document.createElement('div');
+                    const ruleActionContainer = document.createElement('div');
+                    const deleteRuleButton = document.createElement('div');
+                    const nameInput = document.createElement('input');
+
+                    newRule.classList.add('rule');
+                    ruleDetailsContainer.classList.add('ruleDetails');
+                    ruleConditionContainer.classList.add('ruleCondition');
+                    ruleActionContainer.classList.add('ruleCondition');
+                    deleteRuleButton.classList.add('deleteRuleButton');
+
+                    nameInput.setAttribute('type', 'text');
+                    nameInput.setAttribute('name', 'rule_name');
+                    nameInput.setAttribute('placeholder', 'Rule Name');
+
+                    nameInput.value = name || "";
+                    ruleConditionContainer.innerHTML = `<strong>IF</strong> <input type="text" class="userInput" name="property" placeholder="property" value="${conditionProperty}" /> &#61;&#61;&#61; <input type="text" class="userInput" name="value" placeholder="value" value="${conditionValue}"/><br/>`;
+                    ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="color" id="head" name="head" value="${actionValue}" class="userInput">`
+
+                    deleteRuleButton.addEventListener('click', function(){
                         
+                        storedRules.removeChild(this.parentNode);
+
+                    }, false);
+
+                    ruleDetailsContainer.appendChild(nameInput);
+                    ruleDetailsContainer.appendChild(ruleConditionContainer);
+                    ruleDetailsContainer.appendChild(ruleActionContainer);
+
+                    newRule.appendChild(ruleDetailsContainer);
+                    newRule.appendChild(deleteRuleButton);
+
+                    ruleFragment.appendChild(newRule);
+
+                    return ruleFragment;
+
+                }
+
+                newRulesButton.addEventListener('click', function(e){
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    const newRule = createRule();
+                    
+                    storedRules.appendChild(newRule);
+
+                }, false);
+
+                function showConfigurationPanel(node){
+                    console.log("ShowPanel");
+
+                    currentNodeBeingConfigured = node;
+                    
+                    configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic;
+                    
+                    if(currentNodeBeingConfigured.dataset.rules){
+
+                        const rules = JSON.parse(currentNodeBeingConfigured.dataset.rules);
+
+                        rules.forEach(rule => {
+
+                            const existingRule = createRule(rule.name, rule.property, rule.value, rule.action);
+                            storedRules.appendChild(existingRule);
+
+                        });
+
+                    }
+
+                    configurationPanelElement.dataset.active = "true";                    
+
                 }
 
                 function hideConfigurationPanel(saveChanges = true){
 
                     console.log('save changes?', saveChanges);
+
+                    if(true /*saveChanges*/){
+
+                        currentNodeBeingConfigured.dataset.topic = configurationPanelElement.querySelector('input[name="topic"]').value;
+                        const rules = Array.from(storedRules.querySelectorAll('.rule')).map(storedRule => {
+                            console.log(storedRule);
+
+                            const property = storedRule.querySelector('input[name="property"]').value;
+                            const value = storedRule.querySelector('input[name="value"]').value;
+                            const action = storedRule.querySelector('input[type="color"]').value;
+
+                            return {
+                                name : storedRule.querySelector('input[name="rule_name"]').value,
+                                property : property/*.replace(/\./g, ':')*/,
+                                value : value,
+                                action : action
+                            };
+
+                        });
+
+                        currentNodeBeingConfigured.dataset.rules = JSON.stringify(rules);
+
+                    }
+                    
                     currentNodeBeingConfigured = undefined;
                     configurationPanelElement.dataset.active = "false";
 
+                    Array.from(storedRules.querySelectorAll('.rule')).forEach(storedRule => {
+                        storedRule.parentNode.removeChild(storedRule);
+                    });
+                    
                     Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
                         node.dataset.selected = "false";
                     });
@@ -77,70 +215,32 @@
 
             }());
 
-            function generateRandomID(length = 8){
-
-                const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ_-abcdefghijklmnopqrstuvwxyz0123456789";
-                const code = [];
-                let remainingCharacters = length;
-
-                while(remainingCharacters > 0){
-
-                    code.push( characters[ Math.random() * characters.length | 0 ] );
-
-                    remainingCharacters -= 1;
-
-                }
-
-                return code.join('');
-
-            }
-
-            function updateNodesRecord(){
-
-                const nodes = Array.from( nodesHolder.querySelectorAll('div.node') );
-
-                const nodeData = nodes.map(node => {
-
-                    return {
-                        left : node.dataset.left,
-                        top : node.dataset.top,
-                        width : node.dataset.width,
-                        height : node.dataset.height,
-                        selected : node.dataset.selected,
-                        type : node.dataset.type,
-                        name : node.dataset.name
-                    };
-
-                });
-
-                console.log(nodeData);
-                console.log(`Posting update to ${window.location.origin}/twins/update/${twinUUID}`);
-                fetch(`${window.location.origin}/twins/update/${twinUUID}`, {
-                        method : "POST",
-                        headers : {
-                            "Content-Type" : "application/json"
-                        },
-                        credentials : 'same-origin',
-                        body : JSON.stringify( { data : { nodes: nodeData } } )
-                    })
-                    .then(res => {
-                        if(!res.ok){
-                            throw res;
-                        } else {
-                            return res.json()
-                        }
-                    })
-                    .then(data => {
-                        console.log(data);
-                    })
-                    .catch(err => {
-
-                        console.log(`Error saving Digital Twin updates:`, err);
-
-                    })
+            function bindCreationHandlersToNode(node){
                 
-                ;
+                node.addEventListener('mouseup', function(e){
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
 
+                    console.log('NODE CLICK');
+
+                    if(CREATING){
+                        endCreationHandler(e);
+                    } else {
+                        configurationPanel.show(this);
+                        
+                        Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
+                            node.dataset.selected = "false";
+                        });
+
+                        this.dataset.selected = "true";
+
+                    }
+
+                }, false);
+
+                node.addEventListener('mousemove', inProgressCreationHandler, false);
+                node.addEventListener('mouseup', endCreationHandler, false);
+                
             }
 
             function startCreationHandler(e){
@@ -188,7 +288,9 @@
                     const positionX = e.clientX < startCoords.x ? e.clientX : startCoords.x;
                     const positionY = e.clientY < startCoords.y ? e.clientY : startCoords.y;
 
-                    const node = createNode(positionX, positionY, elementWidth, elementHeight);
+                    const node = twinNodes.create(positionX, positionY, elementWidth, elementHeight, selectedTool, utilities.uuid());
+
+                    bindCreationHandlersToNode(node);
 
                     nodesHolder.appendChild(node);
                 
@@ -196,52 +298,6 @@
 
                 CREATING = false;
                 startCoords = undefined;
-
-            }
-
-            function createNode(x, y, width, height, type = selectedTool, name){
-
-                width = width < 0 ? -width : width;
-                height = height < 0 ? -height : height;
-
-                const div = document.createElement('div');
-                
-                div.dataset.left = x;
-                div.dataset.top = y;
-                div.dataset.width = width;
-                div.dataset.height = height;
-                div.dataset.selected = "false";
-                div.dataset.type = type;
-                div.dataset.name = name || generateRandomID();
-
-                div.classList.add('node');
-                div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
-
-                div.addEventListener('mouseup', function(e){
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-
-                    console.log('NODE CLICK');
-
-                    if(CREATING){
-                        endCreationHandler(e);
-                    } else {
-                        configurationPanel.show(this);
-                        
-                        Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
-                            node.dataset.selected = "false";
-                        });
-
-                        this.dataset.selected = "true";
-
-                    }
-
-                }, false);
-
-                div.addEventListener('mousemove', inProgressCreationHandler, false);
-                div.addEventListener('mouseup', endCreationHandler, false);
-
-                return div;
 
             }
 
@@ -292,8 +348,12 @@
             const existingNodes = JSON.parse(`{{{ twinData.nodes }}}`);
 
             existingNodes.forEach(savedNode => {
+
                 // x, y, width, height, type = selectedTool
-                const recreatedNode = createNode(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type);
+                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules);
+                
+                bindCreationHandlersToNode(recreatedNode);
+
                 nodesHolder.appendChild(recreatedNode);
 
             });
@@ -301,13 +361,13 @@
             const nodeMutationObsererOptions = {
                 childList: true,
                 attributes: true,
-                subtree: true //Omit or set to false to observe only changes to the parent node.
+                subtree: true
             };
 
             const NodeMutationObserver = new MutationObserver(function(mutations) {
  
                 console.log(mutations);
-                updateNodesRecord();
+                twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
  
             });
 
@@ -318,7 +378,6 @@
                 console.log("change", this.value);
                 creationCanvas.style.backgroundColor = this.value;
                 colorSelectorOutput.textContent = this.value.toUpperCase();
-                //debugger;
 
             }, false);
 
@@ -326,21 +385,6 @@
                 creationCanvas.width = window.innerWidth;
                 creationCanvas.height = window.innerHeight;
             }, false);
-
-            window.addEventListener('keyup', (e) => {
-                console.log(e);
-
-                // If the backspace key is pressed, and a node is selected, but the none of the input
-                // fields in the configuration panel are being edited, delete the selected node.
-                if(e.keyCode === 8){
-                    const selectedNode = nodesHolder.querySelector('.node[data-selected="true"]');
-
-                    selectedNode.parentNode.removeChild(selectedNode);
-                    configurationPanel.hide();
-
-                }
-
-            });
 
         }());
 

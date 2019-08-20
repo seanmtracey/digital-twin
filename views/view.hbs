@@ -6,45 +6,262 @@
 
     </div>
 
+    <div id="transcriptPanel" data-active="false">
+        
+        <h2>Node Log</h2>
+        <div id="closePanelBtn"></div>
+        <p id="nodeTopic"></p>
+
+        <ol id="log">
+            
+            <!--<li>
+                <span>Time Received: 1234567890</span>
+                <pre>{"status" : "good"}</pre>
+            </li>-->
+            
+        </ol>
+
+    </div>
+
+    <script src="/scripts/twin_nodes.js"></script>
     <script>
 
         (function(){
 
             'use strict';
 
-            function createNode(x, y, width, height, type = selectedTool, name){
-
-                width = width < 0 ? -width : width;
-                height = height < 0 ? -height : height;
-
-                const div = document.createElement('div');
+            function evaluateRules(node, data){
                 
-                div.dataset.left = x;
-                div.dataset.top = y;
-                div.dataset.width = width;
-                div.dataset.height = height;
-                div.dataset.selected = "false";
-                div.dataset.type = type;
-                div.dataset.name = name;
+                if(node.dataset.rules){
+                    
+                    const rules = JSON.parse(node.dataset.rules);
 
-                div.classList.add('node');
-                div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
+                    rules.forEach(function(rule){
 
-                return div;
+                        if(data[rule.property] === rule.value){
+                            node.style.backgroundColor = rule.action;
+                        }
+
+                    });
+
+                }
 
             }
 
+            const transcriptPanel = (function(){
+                
+                const transcriptPanelElement = document.querySelector('#transcriptPanel');
+                let currentNodeLogBeingDisplayed = undefined;
+
+                const nodeTopicDisplayElement = transcriptPanelElement.querySelector('p#nodeTopic');
+                const logElement = transcriptPanelElement.querySelector('ol#log');
+
+                function generateLog(log){
+                    
+                    const logDocumentFragment = document.createDocumentFragment();
+
+                    for(let index = log.length - 1; index > 0; index -= 1){
+                        console.log(log[index]);
+
+                        const thisLogItem = log[index];
+
+                        const li = document.createElement('li');
+                        const span = document.createElement('span');
+                        const pre = document.createElement('pre');
+
+                        span.textContent = `Time Receieved: ${thisLogItem.received}`;
+                        pre.textContent = thisLogItem.data.data;
+
+                        li.appendChild(span);
+                        li.appendChild(pre);
+                        
+                        logDocumentFragment.appendChild(li);
+
+                    }
+
+                    return logDocumentFragment;
+
+                }
+
+                function showTranscriptPanel(node){
+                    console.log("ShowPanel");
+
+                    currentNodeLogBeingDisplayed = node;
+
+                    nodeTopicDisplayElement.textContent = currentNodeLogBeingDisplayed.dataset.topic;
+                    
+                    if(localStorage.getItem(node.dataset.name)){
+                        
+                        const log = generateLog( JSON.parse(localStorage.getItem(currentNodeLogBeingDisplayed.dataset.name)) );
+                        
+                        logElement.appendChild(log);
+
+                    }
+
+                    transcriptPanelElement.dataset.active = "true";                    
+
+                }
+
+                function hideTranscriptPanel(saveChanges = true){
+
+                    console.log('save changes?', saveChanges);
+                    
+                    currentNodeLogBeingDisplayed = undefined;
+                    logElement.innerHTML = "";
+                    transcriptPanelElement.dataset.active = "false";
+
+                    // DELETE LOG
+
+                }
+
+                function updateLogInPanel(node){
+
+                    if(currentNodeLogBeingDisplayed === undefined){
+                        return;
+                    }
+
+                    if(node.name === currentNodeLogBeingDisplayed.name){
+
+                        if(localStorage.getItem(node.dataset.name)){
+                        
+                            const log = generateLog( JSON.parse(localStorage.getItem(currentNodeLogBeingDisplayed.dataset.name)) );
+                            logElement.innerHTML = "";
+
+                            logElement.appendChild(log);
+
+                        }
+                    }
+
+                }
+
+                function checkIfTranscriptPanelIsShowing(){
+                    return transcriptPanelElement.dataset.active === "true";
+                }
+
+                transcriptPanelElement.querySelector('#closePanelBtn').addEventListener('click', e => {
+                    hideTranscriptPanel(false);
+                }, false);
+
+                return {
+                    show : showTranscriptPanel,
+                    hide : hideTranscriptPanel,
+                    update : updateLogInPanel,
+                    isVisible : checkIfTranscriptPanelIsShowing
+                };
+
+            }());
+
+
             const twinUUID = "{{twinData.UUID}}";
             const nodesHolder = document.querySelector('#nodes');
-
+            const subsribedToTopics = [];
             // Reconstruct pre-existing nodes
             const existingNodes = JSON.parse(`{{{ twinData.nodes }}}`);
 
             existingNodes.forEach(savedNode => {
-                // x, y, width, height, type = selectedTool
-                const recreatedNode = createNode(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type);
-                nodesHolder.appendChild(recreatedNode);
+                // x, y, width, height, type, name, topic, rules
+                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules );
 
+                recreatedNode.addEventListener('click', function(){
+                    transcriptPanel.show(this);
+                }, false);
+
+                nodesHolder.appendChild(recreatedNode);
+            });
+
+            const ws = new WebSocket(`ws://${window.location.host}`);
+
+            ws.addEventListener('open', function(e){
+               console.log(`Websocket connection opened`, e); 
+               ws.send(JSON.stringify({
+                    type : 'connect',
+                    data : {
+                        connectionDetails : {
+                            broker : `{{{twinData.broker}}}`,
+                            port : 1883
+                        }
+                    }
+                }));
+                
+            });
+            
+            ws.addEventListener('message', function(e){
+                console.log(e);
+                const payload = JSON.parse(e.data);
+                console.log('Parsed data:', payload);
+
+                if(payload.status === 'ok'){
+
+                    if(payload.type === 'connectionStatus'){
+
+                        if(payload.data === 'connected'){
+
+                            Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
+                                
+                                if(node.dataset.topic){
+                                    
+                                    if(subsribedToTopics.indexOf(node.dataset.topic) === -1){
+
+                                        ws.send(JSON.stringify({
+                                            type : 'subscribe',
+                                            data : {
+                                                topic : node.dataset.topic
+                                            }
+                                        }));
+
+                                        subsribedToTopics.push(node.dataset.topic);
+
+                                    }
+
+
+                                }
+
+                            });
+
+                        }
+
+                    }
+
+                    if(payload.type === 'data'){
+                        console.log('BROKER DATA:', payload.data);
+
+                        Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
+                            
+                            if(node.dataset.topic === payload.data.topic){
+                                evaluateRules(node, JSON.parse(payload.data.data) );
+                                
+                                let transcript;
+
+                                if(localStorage.getItem(node.dataset.name)){
+                                    transcript = JSON.parse(localStorage.getItem(node.dataset.name));
+                                } else {
+                                    transcript = [];
+                                }
+
+                                payload.received = Date.now() / 1000 | 0;
+
+                                transcript.push(payload);
+
+                                while(transcript.length > 50){
+                                    transcript.shift();
+                                }
+
+                                localStorage.setItem(node.dataset.name, JSON.stringify(transcript));
+                                
+                                transcriptPanel.update(node);
+
+                            }
+
+                        });
+
+                    }
+
+                }
+
+            });
+            
+            ws.addEventListener('error', function(err){
+                console.log('Websocket connection error:', err);
             });
 
         }());

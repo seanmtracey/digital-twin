@@ -24,7 +24,6 @@
                 </div>
             </li>
 
-
         {{/each}}
         
         <!--<li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
@@ -52,6 +51,7 @@
             <h3>Create new Digital Twin</h3>
             <form>
                 <input type="text" name="twinname" placeholder="Enter Digital Twin name" />
+                <input type="text" name="twinbroker" placeholder="Enter MQTT broker address for twin" />
                 <input type="submit" value="Create Twin" />
             </form>
         </div>
@@ -97,7 +97,8 @@
                         "Content-Type" : "application/json"
                     },
                     body : JSON.stringify({
-                        name : this[0].value
+                        name : this[0].value,
+                        broker : this[1].value
                     })
                 })
                 .then(response => {
