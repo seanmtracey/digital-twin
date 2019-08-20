@@ -219,6 +219,34 @@
 
             function bindCreationHandlersToNode(node){
                 
+                function finishMoveOfNodeAndSetPosition(){
+                    
+                    MOVING = false;
+                    nodeToMove.dataset.top = nodeToMove.style.top.replace('px', '');
+                    nodeToMove.dataset.left = nodeToMove.style.left.replace('px', '');
+
+                    originalMousePosition = undefined;
+                    nodeToMove = undefined;
+
+                    document.body.dataset.movingnode = "false";
+                
+                }
+
+                node.addEventListener('mousedown', function(e){
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+
+                    MOVING = true;
+                    nodeToMove = this;
+                    document.body.dataset.movingnode = true;
+
+                    originalMousePosition = {
+                        x : e.clientX,
+                        y : e.clientY
+                    };
+
+                }, false);
+
                 node.addEventListener('mouseup', function(e){
                     e.stopPropagation();
                     e.stopImmediatePropagation();
@@ -227,7 +255,7 @@
 
                     if(CREATING){
                         endCreationHandler(e);
-                    } else {
+                    } else if(!MOVING){
                         configurationPanel.show(this);
                         
                         Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
@@ -236,6 +264,8 @@
 
                         this.dataset.selected = "true";
 
+                    } else if(MOVING){
+                        finishMoveOfNodeAndSetPosition();
                     }
 
                 }, false);
@@ -258,7 +288,6 @@
 
                 }
                 
-
             }
 
             function inProgressCreationHandler(e){
@@ -271,6 +300,15 @@
                     creationCtx.clearRect(0,0, creationCanvas.width, creationCanvas.height);
                     creationCtx.strokeRect(startCoords.x * window.devicePixelRatio, startCoords.y * window.devicePixelRatio, selectionWidth * window.devicePixelRatio, selectionHeight * window.devicePixelRatio);
                     creationCtx.stroke();
+
+                } else if(MOVING){
+                    console.log('MOVING');
+
+                    const offsetX = originalMousePosition.x - e.clientX;
+                    const offsetY = originalMousePosition.y - e.clientY;
+
+                    nodeToMove.style.left = `${nodeToMove.dataset.left - offsetX}px`;
+                    nodeToMove.style.top = `${nodeToMove.dataset.top - offsetY}px`;
 
                 }
 
@@ -302,6 +340,10 @@
 
                     nodesHolder.appendChild(node);
                 
+                } else if(MOVING){
+                    
+                    finishMoveOfNodeAndSetPosition();
+
                 }
 
                 CREATING = false;
@@ -327,6 +369,10 @@
             let CREATING = false;
             let startCoords = undefined;
             let selectedTool = toolBox.querySelector('li[data-selected="true"]').dataset.toolname;
+            
+            let MOVING = false;
+            let originalMousePosition;
+            let nodeToMove;
 
             creationCanvas.addEventListener('mousedown', startCreationHandler, false);
             
@@ -376,7 +422,10 @@
             const NodeMutationObserver = new MutationObserver(function(mutations) {
  
                 console.log(mutations);
-                twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
+
+                if(!MOVING){
+                    twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
+                }
  
             });
 

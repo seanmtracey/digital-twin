@@ -1,3 +1,7 @@
+body[data-movingnode="true"] .node{
+    cursor: move !important;
+}
+
 main{
     padding-top: 0;
 }
