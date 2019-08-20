@@ -268,3 +268,7 @@ main{
     bottom: 1em;
     left: 1em;
 }
+
+#twinDetails a {
+    font-size: 0.8em;
+}
