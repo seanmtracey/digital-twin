@@ -24,6 +24,10 @@
 
 	</div>
 
+	<div id="connectionStatus" data-active="false">
+		<p>Connection Lost</p>
+	</div>
+
 	<script src="/scripts/twin_nodes.js"></script>
 	<script>
 
@@ -152,6 +156,30 @@
 
 			}());
 
+			const connectionStatus = (function(){
+
+				const connectionStatusElement = document.querySelector('#connectionStatus');
+				let disappearTimeout;
+
+				function updateConnectionStatus(status, disappear = false){
+
+					connectionStatusElement.querySelector('p').textContent = status;
+					connectionStatusElement.dataset.active = "true";
+
+					if(disappear){
+						clearTimeout(disappearTimeout);
+						disappearTimeout = setTimeout(function(){
+							connectionStatusElement.dataset.active = "false";
+						}, 5000);
+					}
+
+				}
+
+				return {
+					update : updateConnectionStatus
+				};
+
+			})();
 
 			const twinUUID = "{{twinData.UUID}}";
 			const nodesHolder = document.querySelector('#nodes');
@@ -179,8 +207,11 @@
 
 				ws = new WebSocket(`ws://${window.location.host}`);
 
+				connectionStatus.update('Connecting...');
+
 				ws.addEventListener('open', function(e){
 					console.log(`Websocket connection opened`, e);
+					connectionStatus.update('Connected', true);
 					ws.send(JSON.stringify({
 						type : 'connect',
 						data : {
@@ -270,10 +301,12 @@
 
 				ws.addEventListener('close', function(e){
 					console.log('WebSocket Connection Closed', e);
+					connectionStatus.update('Disconnected');
 				});
 
 				ws.addEventListener('error', function(err){
 					console.log('Websocket connection error:', err);
+					connectionStatus.update('Disconnected');
 				});
 
 			}
