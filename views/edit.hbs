@@ -269,7 +269,7 @@
                     const selectionHeight = e.clientY - startCoords.y;
 
                     creationCtx.clearRect(0,0, creationCanvas.width, creationCanvas.height);
-                    creationCtx.strokeRect(startCoords.x, startCoords.y, selectionWidth, selectionHeight);
+                    creationCtx.strokeRect(startCoords.x * window.devicePixelRatio, startCoords.y * window.devicePixelRatio, selectionWidth * window.devicePixelRatio, selectionHeight * window.devicePixelRatio);
                     creationCtx.stroke();
 
                 }
@@ -285,7 +285,13 @@
                     creationCtx.clearRect(0, 0, creationCanvas.width, creationCanvas.height);
                     
                     const elementWidth = e.clientX - startCoords.x;
-                    const elementHeight = e.clientY - startCoords.y
+                    const elementHeight = e.clientY - startCoords.y;
+
+                    if(elementWidth === 0 || elementHeight === 0){
+                        CREATING = false;
+                        startCoords = undefined;
+                        return;
+                    }
 
                     const positionX = e.clientX < startCoords.x ? e.clientX : startCoords.x;
                     const positionY = e.clientY < startCoords.y ? e.clientY : startCoords.y;
@@ -299,7 +305,7 @@
                 }
 
                 CREATING = false;
-                startCoords = undefined;
+
 
             }
 
@@ -312,10 +318,11 @@
             const creationCanvas = document.querySelector('canvas#creationCanvas');
             const creationCtx = creationCanvas.getContext('2d');
 
-            creationCanvas.width = window.innerWidth;
-            creationCanvas.height = window.innerHeight;
+            creationCanvas.width = window.innerWidth * window.devicePixelRatio;
+            creationCanvas.height = window.innerHeight * window.devicePixelRatio;
 
-            creationCtx.strokeStyle = "1px #333333";
+            creationCtx.strokeStyle = "#333333";
+            creationCtx.lineWidth = 4;
 
             let CREATING = false;
             let startCoords = undefined;
