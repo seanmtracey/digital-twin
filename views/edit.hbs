@@ -139,7 +139,8 @@
                     console.log("ShowPanel");
 
                     currentNodeBeingConfigured = node;
-                    
+                    storedRules.innerHTML = "";
+
                     configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic;
                     
                     if(currentNodeBeingConfigured.dataset.rules){
@@ -380,6 +381,17 @@
                 colorSelectorOutput.textContent = this.value.toUpperCase();
 
             }, false);
+
+            window.addEventListener('keydown', (e) => {
+                console.log(e);
+                // If the backspace key is pressed, and a node is selected, but the none of the input
+                // fields in the configuration panel are being edited, delete the selected node.
+                if(e.keyCode === 8 && e.ctrlKey === true){
+                    const selectedNode = nodesHolder.querySelector('.node[data-selected="true"]');
+                    selectedNode.parentNode.removeChild(selectedNode);
+                    configurationPanel.hide();
+                }
+            });
 
             window.addEventListener('resize', (e) => {
                 creationCanvas.width = window.innerWidth;

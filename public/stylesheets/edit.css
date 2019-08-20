@@ -20,6 +20,7 @@ main{
     position: fixed;
     cursor: pointer;
     box-sizing: border-box;
+    border: dashed rgba(0, 0, 0, 0.4);
 }
 
 #nodes .node[data-selected="true"]{
