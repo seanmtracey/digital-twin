@@ -73,13 +73,18 @@
                         if(payload.data === 'connected'){
 
                             Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
+                                
+                                if(node.dataset.topic){
 
-                                ws.send(JSON.stringify({
-                                    type : 'subscribe',
-                                    data : {
-                                        topic : node.dataset.topic
-                                    }
-                                }));
+                                    ws.send(JSON.stringify({
+                                        type : 'subscribe',
+                                        data : {
+                                            topic : node.dataset.topic
+                                        }
+                                    }));
+
+                                }
+
                             });
 
                         }
