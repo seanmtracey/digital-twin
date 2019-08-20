@@ -1,271 +1,336 @@
+<!-- IDEA: MAGNIFYING GLASS TO INSPECT -->
 <main>
 
-    <div id="nodes">
+	<div id="nodes">
 
-        <!-- The output are where nodes are persisted -->
+		<!-- The output are where nodes are persisted -->
 
-    </div>
+	</div>
 
-    <div id="transcriptPanel" data-active="false">
-        
-        <h2>Node Log</h2>
-        <div id="closePanelBtn"></div>
-        <p id="nodeTopic"></p>
+	<div id="transcriptPanel" data-active="false">
 
-        <ol id="log">
-            
-            <!--<li>
-                <span>Time Received: 1234567890</span>
-                <pre>{"status" : "good"}</pre>
-            </li>-->
-            
-        </ol>
+		<h2>Node Log</h2>
+		<div id="closePanelBtn"></div>
+		<p id="nodeTopic"></p>
 
-    </div>
+		<ol id="log">
 
-    <script src="/scripts/twin_nodes.js"></script>
-    <script>
+			<!--<li>
+				<span>Time Received: 1234567890</span>
+				<pre>{"status" : "good"}</pre>
+			</li>-->
 
-        (function(){
+		</ol>
 
-            'use strict';
+	</div>
 
-            function evaluateRules(node, data){
-                
-                if(node.dataset.rules){
-                    
-                    const rules = JSON.parse(node.dataset.rules);
+	<div id="connectionStatus" data-active="false">
+		<p>Connection Lost</p>
+	</div>
 
-                    rules.forEach(function(rule){
+	<script src="/scripts/twin_nodes.js"></script>
+	<script>
 
-                        if(data[rule.property] === rule.value){
-                            node.style.backgroundColor = rule.action;
-                        }
+		(function(){
 
-                    });
+			'use strict';
 
-                }
+			function evaluateRules(node, data){
 
-            }
+				if(node.dataset.rules){
 
-            const transcriptPanel = (function(){
-                
-                const transcriptPanelElement = document.querySelector('#transcriptPanel');
-                let currentNodeLogBeingDisplayed = undefined;
+					const rules = JSON.parse(node.dataset.rules);
 
-                const nodeTopicDisplayElement = transcriptPanelElement.querySelector('p#nodeTopic');
-                const logElement = transcriptPanelElement.querySelector('ol#log');
+					rules.forEach(function(rule){
 
-                function generateLog(log){
-                    
-                    const logDocumentFragment = document.createDocumentFragment();
+						if(data[rule.property] === rule.value){
+							node.style.backgroundColor = rule.action;
+						}
 
-                    for(let index = log.length - 1; index > 0; index -= 1){
-                        console.log(log[index]);
+					});
 
-                        const thisLogItem = log[index];
+				}
 
-                        const li = document.createElement('li');
-                        const span = document.createElement('span');
-                        const pre = document.createElement('pre');
+			}
 
-                        span.textContent = `Time Receieved: ${thisLogItem.received}`;
-                        pre.textContent = thisLogItem.data.data;
+			const transcriptPanel = (function(){
 
-                        li.appendChild(span);
-                        li.appendChild(pre);
-                        
-                        logDocumentFragment.appendChild(li);
+				const transcriptPanelElement = document.querySelector('#transcriptPanel');
+				let currentNodeLogBeingDisplayed = undefined;
 
-                    }
+				const nodeTopicDisplayElement = transcriptPanelElement.querySelector('p#nodeTopic');
+				const logElement = transcriptPanelElement.querySelector('ol#log');
 
-                    return logDocumentFragment;
+				function generateLog(log){
 
-                }
+					const logDocumentFragment = document.createDocumentFragment();
 
-                function showTranscriptPanel(node){
-                    console.log("ShowPanel");
+					for(let index = log.length - 1; index > 0; index -= 1){
+						console.log(log[index]);
 
-                    currentNodeLogBeingDisplayed = node;
+						const thisLogItem = log[index];
 
-                    nodeTopicDisplayElement.textContent = currentNodeLogBeingDisplayed.dataset.topic;
-                    
-                    if(localStorage.getItem(node.dataset.name)){
-                        
-                        const log = generateLog( JSON.parse(localStorage.getItem(currentNodeLogBeingDisplayed.dataset.name)) );
-                        
-                        logElement.appendChild(log);
+						const li = document.createElement('li');
+						const span = document.createElement('span');
+						const pre = document.createElement('pre');
 
-                    }
+						span.textContent = `Time Receieved: ${thisLogItem.received}`;
+						pre.textContent = thisLogItem.data.data;
 
-                    transcriptPanelElement.dataset.active = "true";                    
+						li.appendChild(span);
+						li.appendChild(pre);
 
-                }
+						logDocumentFragment.appendChild(li);
 
-                function hideTranscriptPanel(saveChanges = true){
+					}
 
-                    console.log('save changes?', saveChanges);
-                    
-                    currentNodeLogBeingDisplayed = undefined;
-                    logElement.innerHTML = "";
-                    transcriptPanelElement.dataset.active = "false";
+					return logDocumentFragment;
 
-                    // DELETE LOG
+				}
 
-                }
+				function showTranscriptPanel(node){
+					console.log("ShowPanel");
 
-                function updateLogInPanel(node){
+					currentNodeLogBeingDisplayed = node;
 
-                    if(currentNodeLogBeingDisplayed === undefined){
-                        return;
-                    }
+					nodeTopicDisplayElement.textContent = currentNodeLogBeingDisplayed.dataset.topic;
 
-                    if(node.name === currentNodeLogBeingDisplayed.name){
+					if(localStorage.getItem(node.dataset.name)){
 
-                        if(localStorage.getItem(node.dataset.name)){
-                        
-                            const log = generateLog( JSON.parse(localStorage.getItem(currentNodeLogBeingDisplayed.dataset.name)) );
-                            logElement.innerHTML = "";
+						const log = generateLog( JSON.parse(localStorage.getItem(currentNodeLogBeingDisplayed.dataset.name)) );
 
-                            logElement.appendChild(log);
+						logElement.appendChild(log);
 
-                        }
-                    }
+					}
 
-                }
+					transcriptPanelElement.dataset.active = "true";
 
-                function checkIfTranscriptPanelIsShowing(){
-                    return transcriptPanelElement.dataset.active === "true";
-                }
+				}
 
-                transcriptPanelElement.querySelector('#closePanelBtn').addEventListener('click', e => {
-                    hideTranscriptPanel(false);
-                }, false);
+				function hideTranscriptPanel(saveChanges = true){
 
-                return {
-                    show : showTranscriptPanel,
-                    hide : hideTranscriptPanel,
-                    update : updateLogInPanel,
-                    isVisible : checkIfTranscriptPanelIsShowing
-                };
+					console.log('save changes?', saveChanges);
 
-            }());
+					currentNodeLogBeingDisplayed = undefined;
+					logElement.innerHTML = "";
+					transcriptPanelElement.dataset.active = "false";
 
+					// DELETE LOG
 
-            const twinUUID = "{{twinData.UUID}}";
-            const nodesHolder = document.querySelector('#nodes');
-            const subsribedToTopics = [];
-            // Reconstruct pre-existing nodes
-            const existingNodes = JSON.parse(`{{{ twinData.nodes }}}`);
+				}
 
-            existingNodes.forEach(savedNode => {
-                // x, y, width, height, type, name, topic, rules
-                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules );
+				function updateLogInPanel(node){
 
-                recreatedNode.addEventListener('click', function(){
-                    transcriptPanel.show(this);
-                }, false);
+					if(currentNodeLogBeingDisplayed === undefined){
+						return;
+					}
 
-                nodesHolder.appendChild(recreatedNode);
-            });
+					if(node.name === currentNodeLogBeingDisplayed.name){
 
-            const ws = new WebSocket(`ws://${window.location.host}`);
+						if(localStorage.getItem(node.dataset.name)){
 
-            ws.addEventListener('open', function(e){
-               console.log(`Websocket connection opened`, e); 
-               ws.send(JSON.stringify({
-                    type : 'connect',
-                    data : {
-                        connectionDetails : {
-                            broker : `{{{twinData.broker}}}`,
-                            port : 1883
-                        }
-                    }
-                }));
-                
-            });
-            
-            ws.addEventListener('message', function(e){
-                console.log(e);
-                const payload = JSON.parse(e.data);
-                console.log('Parsed data:', payload);
+							const log = generateLog( JSON.parse(localStorage.getItem(currentNodeLogBeingDisplayed.dataset.name)) );
+							logElement.innerHTML = "";
 
-                if(payload.status === 'ok'){
+							logElement.appendChild(log);
 
-                    if(payload.type === 'connectionStatus'){
+						}
+					}
 
-                        if(payload.data === 'connected'){
+				}
 
-                            Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
-                                
-                                if(node.dataset.topic){
-                                    
-                                    if(subsribedToTopics.indexOf(node.dataset.topic) === -1){
+				function checkIfTranscriptPanelIsShowing(){
+					return transcriptPanelElement.dataset.active === "true";
+				}
 
-                                        ws.send(JSON.stringify({
-                                            type : 'subscribe',
-                                            data : {
-                                                topic : node.dataset.topic
-                                            }
-                                        }));
+				transcriptPanelElement.querySelector('#closePanelBtn').addEventListener('click', e => {
+					hideTranscriptPanel(false);
+				}, false);
 
-                                        subsribedToTopics.push(node.dataset.topic);
+				return {
+					show : showTranscriptPanel,
+					hide : hideTranscriptPanel,
+					update : updateLogInPanel,
+					isVisible : checkIfTranscriptPanelIsShowing
+				};
 
-                                    }
+			}());
 
+			const connectionStatus = (function(){
 
-                                }
+				const connectionStatusElement = document.querySelector('#connectionStatus');
+				let disappearTimeout;
 
-                            });
+				function updateConnectionStatus(status, disappear = false){
 
-                        }
+					connectionStatusElement.querySelector('p').textContent = status;
+					connectionStatusElement.dataset.active = "true";
 
-                    }
+					if(disappear){
+						clearTimeout(disappearTimeout);
+						disappearTimeout = setTimeout(function(){
+							connectionStatusElement.dataset.active = "false";
+						}, 5000);
+					}
 
-                    if(payload.type === 'data'){
-                        console.log('BROKER DATA:', payload.data);
+				}
 
-                        Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
-                            
-                            if(node.dataset.topic === payload.data.topic){
-                                evaluateRules(node, JSON.parse(payload.data.data) );
-                                
-                                let transcript;
+				return {
+					update : updateConnectionStatus
+				};
 
-                                if(localStorage.getItem(node.dataset.name)){
-                                    transcript = JSON.parse(localStorage.getItem(node.dataset.name));
-                                } else {
-                                    transcript = [];
-                                }
+			})();
 
-                                payload.received = Date.now() / 1000 | 0;
+			const twinUUID = "{{twinData.UUID}}";
+			const nodesHolder = document.querySelector('#nodes');
+			const subsribedToTopics = [];
+			// Reconstruct pre-existing nodes
+			const existingNodes = JSON.parse(`{{{ twinData.nodes }}}`);
 
-                                transcript.push(payload);
+			existingNodes.forEach(savedNode => {
+				// x, y, width, height, type, name, topic, rules
+				const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules );
 
-                                while(transcript.length > 50){
-                                    transcript.shift();
-                                }
+				recreatedNode.addEventListener('click', function(){
+					transcriptPanel.show(this);
+				}, false);
 
-                                localStorage.setItem(node.dataset.name, JSON.stringify(transcript));
-                                
-                                transcriptPanel.update(node);
+				nodesHolder.appendChild(recreatedNode);
+			});
+			
+			let timeOfLastWebSocketConnectionAttempt = new Date() / 1000 | 0;
+			let ws;
 
-                            }
+			function connectToWebSocketServer(){
 
-                        });
+				timeOfLastWebSocketConnectionAttempt = new Date() / 1000 | 0;
 
-                    }
+				ws = new WebSocket(`ws://${window.location.host}`);
 
-                }
+				connectionStatus.update('Connecting...');
 
-            });
-            
-            ws.addEventListener('error', function(err){
-                console.log('Websocket connection error:', err);
-            });
+				ws.addEventListener('open', function(e){
+					console.log(`Websocket connection opened`, e);
+					connectionStatus.update('Connected', true);
+					ws.send(JSON.stringify({
+						type : 'connect',
+						data : {
+							connectionDetails : {
+								broker : `{{{twinData.broker}}}`,
+								port : 1883
+							}
+						}
+					}));
 
-        }());
+				});
 
-    </script>
+				ws.addEventListener('message', function(e){
+					console.log(e);
+					const payload = JSON.parse(e.data);
+					console.log('Parsed data:', payload);
+
+					if(payload.status === 'ok'){
+
+						if(payload.type === 'connectionStatus'){
+
+							if(payload.data === 'connected'){
+
+								Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
+
+									if(node.dataset.topic){
+
+										if(subsribedToTopics.indexOf(node.dataset.topic) === -1){
+
+											ws.send(JSON.stringify({
+												type : 'subscribe',
+												data : {
+													topic : node.dataset.topic
+												}
+											}));
+
+											subsribedToTopics.push(node.dataset.topic);
+
+										}
+
+
+									}
+
+								});
+
+							}
+
+						}
+
+						if(payload.type === 'data'){
+							console.log('BROKER DATA:', payload.data);
+
+							Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
+
+								if(node.dataset.topic === payload.data.topic){
+									evaluateRules(node, JSON.parse(payload.data.data) );
+
+									let transcript;
+
+									if(localStorage.getItem(node.dataset.name)){
+										transcript = JSON.parse(localStorage.getItem(node.dataset.name));
+									} else {
+										transcript = [];
+									}
+
+									payload.received = Date.now() / 1000 | 0;
+
+									transcript.push(payload);
+
+									while(transcript.length > 50){
+										transcript.shift();
+									}
+
+									localStorage.setItem(node.dataset.name, JSON.stringify(transcript));
+
+									transcriptPanel.update(node);
+
+								}
+
+							});
+
+						}
+
+					}
+
+				});
+
+				ws.addEventListener('close', function(e){
+					console.log('WebSocket Connection Closed', e);
+					connectionStatus.update('Disconnected');
+				});
+
+				ws.addEventListener('error', function(err){
+					console.log('Websocket connection error:', err);
+					connectionStatus.update('Disconnected');
+				});
+
+			}
+
+			connectToWebSocketServer();
+
+			// WebSocket Connection Maintainer
+			setInterval(function(){
+
+				if(ws){
+					
+					if(ws.readyState !== 1){
+						ws.close(1000, `WebSocket connection was not in a desired state. The readyState was ${ws.readyState}`);
+						console.log('Reconnecting to WebSocket Server');
+						subsribedToTopics.length = 0;
+						connectToWebSocketServer();
+					}
+
+				}
+
+			}, 5000);
+
+		}());
+
+	</script>
 
 </main>
