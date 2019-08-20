@@ -98,8 +98,27 @@
                             
                             if(node.dataset.topic === payload.data.topic){
                                 evaluateRules(node, JSON.parse(payload.data.data) );
+                                
+                                let transcript;
+
+                                if(localStorage.getItem(node.dataset.name)){
+                                    transcript = JSON.parse(localStorage.getItem(node.dataset.name));
+                                } else {
+                                    transcript = [];
+                                }
+
+                                payload.received = Date.now() / 1000 | 0;
+
+                                transcript.push(payload);
+
+                                while(transcript.length > 50){
+                                    transcript.shift();
+                                }
+
+                                localStorage.setItem(node.dataset.name, JSON.stringify(transcript));
+
                             }
-                            
+
                         });
 
                     }
