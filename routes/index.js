@@ -12,6 +12,12 @@ router.get('/', function(req, res, next) {
 
 			debug("Stored Twins", JSON.stringify(twins));
 
+			twins = twins.filter( twin => {
+				
+				return twin.owner === res.locals.w3id_userid;
+
+			});
+
 			res.render('index', { 
 				title: 'Digital Twin Selector',
 				stylesheet : "selection.css",

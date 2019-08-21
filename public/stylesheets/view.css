@@ -112,12 +112,12 @@ main{
     position: fixed;
     right: 1em;
     bottom: 1em;
-    background: black;
+    background: white;
     padding: 0.5em 1em;
     font-weight: 800;
-    color: white;
+    color: black;
     border-radius: 5px;
-    border: 1px solid white;
+    border: 1px solid black;
     opacity: 0;
     filter: blur(30px);
     transition: opacity 1s ease-in-out, filter 1s ease-in-out;

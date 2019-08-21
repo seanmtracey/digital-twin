@@ -253,8 +253,12 @@
 
                     console.log('NODE CLICK');
 
-                    if(e.clientX === originalMousePosition.x && e.clientY === originalMousePosition.y){
-                        MOVING = false;
+                    if(originalMousePosition){
+
+                        if(e.clientX === originalMousePosition.x && e.clientY === originalMousePosition.y){
+                            MOVING = false;
+                        }
+
                     }
 
                     if(CREATING){
