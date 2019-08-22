@@ -27,6 +27,10 @@ main{
     z-index: 1000;
 }
 
+#nodes .node.ellipse{
+    border-radius: 100%;
+}
+
 #transcriptPanel{
     position: fixed;
     left: 100%;
