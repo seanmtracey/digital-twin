@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@cloudant/cloudant": "^4.1.0",
+    "aws-sdk": "^2.514.0",
     "cookie-parser": "~1.4.3",
     "debug": "^2.6.9",
     "dotenv": "^6.1.0",
