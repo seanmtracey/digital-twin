@@ -24,9 +24,23 @@ const utilities = (function(){
 
     }
 
+    function convertPixelDimensionsToPercentages(value, dimension){
+
+        return (value / dimension) * 100;
+
+    }
+
+    function convertPercentageDimensionsToPixels(value, dimension){
+
+        return dimension * (value / 100);
+
+    }
+
     return {
         uuid : generateRandomID,
-        getProperty : getPropertyFromObjectWithStringOfDotNotation
-    }
+        getProperty : getPropertyFromObjectWithStringOfDotNotation,
+        pixelToPercent : convertPixelDimensionsToPercentages,
+        percentToPixel : convertPercentageDimensionsToPixels
+    };
     
 })();
