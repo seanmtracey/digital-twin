@@ -305,9 +305,45 @@
                     const selectionWidth = e.clientX - startCoords.x;
                     const selectionHeight = e.clientY - startCoords.y;
 
-                    creationCtx.clearRect(0,0, creationCanvas.width, creationCanvas.height);
-                    creationCtx.strokeRect(startCoords.x * window.devicePixelRatio, startCoords.y * window.devicePixelRatio, selectionWidth * window.devicePixelRatio, selectionHeight * window.devicePixelRatio);
-                    creationCtx.stroke();
+                    if(selectedTool === "square"){
+
+                        creationCtx.clearRect(0,0, creationCanvas.width, creationCanvas.height);
+                        creationCtx.strokeRect(startCoords.x * window.devicePixelRatio, startCoords.y * window.devicePixelRatio, selectionWidth * window.devicePixelRatio, selectionHeight * window.devicePixelRatio);
+                        creationCtx.stroke();
+
+                    } else if(selectedTool === "ellipse"){
+                        
+                        creationCtx.clearRect(0,0, creationCanvas.width, creationCanvas.height);
+
+                        const centerX = ( e.clientX - ( (e.clientX - startCoords.x) / 2 ) ) * 2;
+                        const centerY = ( e.clientY - ( (e.clientY - startCoords.y) / 2 ) ) * 2;
+                        const height = (e.clientY - startCoords.y) * 2;
+                        const width = (e.clientX - startCoords.x) * 2;
+
+                        // Borrowed from https://stackoverflow.com/questions/2172798/how-to-draw-an-oval-in-html5-canvas
+                        function drawEllipse(ctx, x, y, w, h) {
+                            var kappa = 0.5522848,
+                                ox = (w / 2) * kappa, // control point offset horizontal
+                                oy = (h / 2) * kappa, // control point offset vertical
+                                xe = x + w,           // x-end
+                                ye = y + h,           // y-end
+                                xm = x + w / 2,       // x-middle
+                                ym = y + h / 2;       // y-middle
+
+                            ctx.beginPath();
+                            ctx.moveTo(x, ym);
+                            ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+                            ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+                            ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+                            ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+                            ctx.closePath(); // not used correctly, see comments (use to close off open path)
+                            ctx.stroke();
+                        }
+
+                        drawEllipse(creationCtx, centerX - (width / 2), centerY - (height / 2), width, height);
+
+
+                    }
 
                 } else if(MOVING){
                     console.log('MOVING');

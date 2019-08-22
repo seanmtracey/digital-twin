@@ -29,6 +29,10 @@ main{
     border: dashed rgba(0, 0, 0, 0.4);
 }
 
+#nodes .node.ellipse{
+    border-radius: 100%;
+}
+
 #nodes .node[data-selected="true"]{
     border: 3px solid #689fe2;
     z-index: 1000;

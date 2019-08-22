@@ -19,6 +19,11 @@ const twinNodes = (function(){
         div.dataset.rules = JSON.stringify(rules) || [];
 
         div.classList.add('node');
+
+        if(type === "ellipse"){
+            div.classList.add('ellipse');
+        }
+
         div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
 
         return div;
