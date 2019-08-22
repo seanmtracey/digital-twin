@@ -308,8 +308,10 @@
                     if(selectedTool === "square"){
 
                         creationCtx.clearRect(0,0, creationCanvas.width, creationCanvas.height);
+                        creationCtx.beginPath();
                         creationCtx.strokeRect(startCoords.x * window.devicePixelRatio, startCoords.y * window.devicePixelRatio, selectionWidth * window.devicePixelRatio, selectionHeight * window.devicePixelRatio);
                         creationCtx.stroke();
+                        creationCtx.closePath();
 
                     } else if(selectedTool === "ellipse"){
                         
@@ -335,8 +337,8 @@
                         creationCtx.bezierCurveTo(xm + ox, centerY, xe, ym - oy, xe, ym);
                         creationCtx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
                         creationCtx.bezierCurveTo(xm - ox, ye, centerX, ym + oy, centerX, ym);
-                        creationCtx.closePath()
                         creationCtx.stroke();
+                        creationCtx.closePath();
 
                     }
 
