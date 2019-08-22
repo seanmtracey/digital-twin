@@ -39,8 +39,8 @@ const utilities = (function(){
     return {
         uuid : generateRandomID,
         getProperty : getPropertyFromObjectWithStringOfDotNotation,
-        pixelToPercent : convertPixelDimensionsToPercentages,
-        percentToPixel : convertPercentageDimensionsToPixels
+        pixelsToPercent : convertPixelDimensionsToPercentages,
+        percentToPixels : convertPercentageDimensionsToPixels
     };
     
 })();
