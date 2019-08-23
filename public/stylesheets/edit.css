@@ -1,9 +1,19 @@
+html{
+    overscroll-behavior: none;
+}
+
+body{
+    overflow: hidden;
+}
+
 body[data-movingnode="true"] .node{
     cursor: move !important;
 }
 
 main{
     padding-top: 0;
+    overscroll-behavior: none;
+    overflow: hidden;
 }
 
 #creationCanvas{
