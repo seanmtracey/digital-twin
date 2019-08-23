@@ -232,12 +232,13 @@
                 
                 }
 
-                node.addEventListener('mousedown', function(e){
+                function handleDownEvent(e){
+
                     e.preventDefault();
                     e.stopImmediatePropagation();
 
                     MOVING = true;
-                    nodeToMove = this;
+                    nodeToMove = e.target;
                     document.body.dataset.movingnode = true;
 
                     originalMousePosition = {
@@ -245,9 +246,10 @@
                         y : e.clientY
                     };
 
-                }, false);
+                }
 
-                node.addEventListener('mouseup', function(e){
+                function handleUpEvent(e){
+
                     e.stopPropagation();
                     e.stopImmediatePropagation();
 
@@ -264,23 +266,28 @@
                     if(CREATING){
                         endCreationHandler(e);
                     } else if(!MOVING){
-                        configurationPanel.show(this);
+                        configurationPanel.show(e.target);
                         
                         Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
                             node.dataset.selected = "false";
                         });
 
-                        this.dataset.selected = "true";
+                        e.target.dataset.selected = "true";
 
                     } else if(MOVING){
                         finishMoveOfNodeAndSetPosition();
                     }
 
-                }, false);
+                }
 
+                node.addEventListener('mousedown', handleDownEvent, false);
                 node.addEventListener('mousemove', inProgressCreationHandler, false);
-                node.addEventListener('mouseup', endCreationHandler, false);
+                node.addEventListener('mouseup', handleUpEvent, false);
                 
+                node.addEventListener("touchstart", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; handleDownEvent(e); }, false);
+                node.addEventListener("touchmove", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; inProgressCreationHandler(e); }, false);
+                node.addEventListener("touchend", function(e){ e.clientX = e.changedTouches[0].clientX; e.clientY = e.changedTouches[0].clientY; handleUpEvent(e); }, false);
+
             }
 
             function startCreationHandler(e){
@@ -498,6 +505,8 @@
                 creationCanvas.width = window.innerWidth * window.devicePixelRatio;
                 creationCanvas.height = window.innerHeight * window.devicePixelRatio;
             }, false);
+
+            document.body.addEventListener('touchmove', function(e){ e.preventDefault(); });
 
         }());
 
