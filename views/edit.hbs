@@ -363,8 +363,8 @@
 
                     creationCtx.clearRect(0, 0, creationCanvas.width, creationCanvas.height);
                     
-                    const elementWidth = e.clientX - startCoords.x;
-                    const elementHeight = e.clientY - startCoords.y;
+                    const elementWidth = utilities.pixelsToPercent(e.clientX - startCoords.x, window.innerWidth);
+                    const elementHeight = utilities.pixelsToPercent(e.clientY - startCoords.y, window.innerHeight);
 
                     if(elementWidth === 0 || elementHeight === 0){
                         CREATING = false;
@@ -375,7 +375,7 @@
                     const positionX = e.clientX < startCoords.x ? e.clientX : startCoords.x;
                     const positionY = e.clientY < startCoords.y ? e.clientY : startCoords.y;
 
-                    const node = twinNodes.create(positionX, positionY, elementWidth, elementHeight, selectedTool, utilities.uuid());
+                    const node = twinNodes.create({ width : window.innerWidth, height: window.innerHeight }, positionX, positionY, elementWidth, elementHeight, selectedTool, utilities.uuid());
 
                     bindCreationHandlersToNode(node);
 
@@ -446,8 +446,8 @@
             existingNodes.forEach(savedNode => {
 
                 // x, y, width, height, type = selectedTool
-                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules);
-                
+                const recreatedNode = twinNodes.create({ width : window.innerWidth, height: window.innerHeight }, savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules);
+
                 bindCreationHandlersToNode(recreatedNode);
 
                 nodesHolder.appendChild(recreatedNode);

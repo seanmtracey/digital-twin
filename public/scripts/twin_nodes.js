@@ -1,7 +1,7 @@
 const twinNodes = (function(){
     'use strict';
 
-    function createNode(x, y, width, height, type, name, topic, rules){
+    function createNode(screenDimensions, x, y, width, height, type, name, topic, rules){
 
         width = width < 0 ? -width : width;
         height = height < 0 ? -height : height;
@@ -24,7 +24,7 @@ const twinNodes = (function(){
             div.classList.add('ellipse');
         }
 
-        div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
+        div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${ utilities.percentToPixels(width, screenDimensions.width)}px; height: ${utilities.percentToPixels(height, screenDimensions.height)}px; background-color: #e6e6e6;`);
 
         return div;
 
