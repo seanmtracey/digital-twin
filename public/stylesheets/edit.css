@@ -227,7 +227,7 @@ main{
     margin: 0;
     padding: 0;
     background-color: #dcdcdc;
-    top: 1em;
+    top: 8vh;
     left: 50%;
     margin-left: -50px;
     overflow: hidden;
@@ -285,7 +285,7 @@ main{
 
 #twinDetails{
     position: fixed;
-    bottom: 0;
+    top: 0;
     left: 0;
     color: white;
     background: #0c3071;
