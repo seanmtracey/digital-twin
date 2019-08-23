@@ -48,8 +48,8 @@
 
     <ul id="toolBox">
 
-        <li data-selected="true" data-toolname="square" id="squareCreationTool"></li>
-        <li data-selected="false" data-toolname="ellipse" id="ellipseCreationTool"></li>
+        <li data-selected="false" data-toolname="square" id="squareCreationTool"></li>
+        <li data-selected="true" data-toolname="ellipse" id="ellipseCreationTool"></li>
         <li data-selected="false" data-toolname="select" id="selectionTool"></li>
 
     </ul>
@@ -324,10 +324,16 @@
                         
                         creationCtx.clearRect(0,0, creationCanvas.width, creationCanvas.height);
 
-                        const height = (e.clientY - startCoords.y) * 2;
-                        const width = (e.clientX - startCoords.x) * 2;
-                        const centerX = ( ( e.clientX - ( (e.clientX - startCoords.x) / 2 ) ) * 2 ) - width / 2;
-                        const centerY = ( ( e.clientY - ( (e.clientY - startCoords.y) / 2 ) ) * 2 ) - height / 2;
+                        const adjustedX = e.clientX * window.devicePixelRatio;
+                        const adjustedY = e.clientY * window.devicePixelRatio
+
+                        const adjustedStartX = startCoords.x * window.devicePixelRatio;
+                        const adjustedStartY = startCoords.y * window.devicePixelRatio;
+
+                        const height = (adjustedY - adjustedStartY) ;
+                        const width = (adjustedX - adjustedStartX) ;
+                        const centerX = ( ( adjustedX - ( (adjustedX - adjustedStartX) / 2 ) ) ) - width / 2;
+                        const centerY = ( ( adjustedY - ( (adjustedY - adjustedStartY) / 2 ) ) ) - height / 2;
 
                         // Borrowed from https://stackoverflow.com/questions/2172798/how-to-draw-an-oval-in-html5-canvas
                         const kappa = 0.5522848;
@@ -423,11 +429,14 @@
             let nodeToMove;
 
             creationCanvas.addEventListener('mousedown', startCreationHandler, false);
-            
+            creationCanvas.addEventListener("touchstart", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; startCreationHandler(e); }, false);
+
             creationCanvas.addEventListener('mousemove', inProgressCreationHandler, false);
+            creationCanvas.addEventListener("touchmove", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; inProgressCreationHandler(e); }, false);
             toolBox.addEventListener('mousemove', inProgressCreationHandler, false);
             
             creationCanvas.addEventListener('mouseup', endCreationHandler, false);
+            creationCanvas.addEventListener("touchend", function(e){ e.clientX = e.changedTouches[0].clientX; e.clientY = e.changedTouches[0].clientY; endCreationHandler(e); }, false);
             toolBox.addEventListener('mouseup', endCreationHandler, false);
 
             Array.from(toolBox.querySelectorAll('li')).map(tool => {
@@ -505,8 +514,6 @@
                 creationCanvas.width = window.innerWidth * window.devicePixelRatio;
                 creationCanvas.height = window.innerHeight * window.devicePixelRatio;
             }, false);
-
-            document.body.addEventListener('touchmove', function(e){ e.preventDefault(); });
 
         }());
 
