@@ -24,7 +24,7 @@ const twinNodes = (function(){
             div.classList.add('ellipse');
         }
 
-        div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${ utilities.percentToPixels(width, screenDimensions.width)}px; height: ${utilities.percentToPixels(height, screenDimensions.height)}px; background-color: #e6e6e6;`);
+        div.setAttribute("style", `left: ${utilities.percentToPixels(x, window.innerWidth)}px; top: ${utilities.percentToPixels(y, window.innerHeight)}px; width: ${ utilities.percentToPixels(width, screenDimensions.width)}px; height: ${utilities.percentToPixels(height, screenDimensions.height)}px; background-color: #e6e6e6;`);
 
         return div;
 

@@ -348,10 +348,8 @@
                     const offsetX = originalMousePosition.x - e.clientX;
                     const offsetY = originalMousePosition.y - e.clientY;
 
-                    nodeToMove.style.left = `${nodeToMove.dataset.left - offsetX}px`;
-                    nodeToMove.style.top = `${nodeToMove.dataset.top - offsetY}px`;
-
-                }
+                    nodeToMove.style.left = `${utilities.percentToPixels( nodeToMove.dataset.left, window.innerWidth ) - offsetX }px`;
+                    nodeToMove.style.top = `${utilities.percentToPixels( nodeToMove.dataset.top, window.innerHeight ) - offsetY }px`;          }
 
             }
 
@@ -372,8 +370,8 @@
                         return;
                     }
 
-                    const positionX = e.clientX < startCoords.x ? e.clientX : startCoords.x;
-                    const positionY = e.clientY < startCoords.y ? e.clientY : startCoords.y;
+                    const positionX = utilities.pixelsToPercent(e.clientX < startCoords.x ? e.clientX : startCoords.x, window.innerWidth);
+                    const positionY = utilities.pixelsToPercent(e.clientY < startCoords.y ? e.clientY : startCoords.y, window.innerHeight);
 
                     const node = twinNodes.create({ width : window.innerWidth, height: window.innerHeight }, positionX, positionY, elementWidth, elementHeight, selectedTool, utilities.uuid());
 
