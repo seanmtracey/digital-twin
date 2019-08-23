@@ -222,8 +222,8 @@
                 function finishMoveOfNodeAndSetPosition(){
                     
                     MOVING = false;
-                    nodeToMove.dataset.top = nodeToMove.style.top.replace('px', '');
-                    nodeToMove.dataset.left = nodeToMove.style.left.replace('px', '');
+                    nodeToMove.dataset.top = utilities.pixelsToPercent( Number( nodeToMove.style.top.replace('px', '') ), window.innerHeight);
+                    nodeToMove.dataset.left = utilities.pixelsToPercent( Number( nodeToMove.style.left.replace('px', '') ), window.innerWidth)
 
                     originalMousePosition = undefined;
                     nodeToMove = undefined;
