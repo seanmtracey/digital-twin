@@ -51,6 +51,8 @@ router.post(`/update/:UUID(${UUIDRegex})`, function(req, res, next) {
 
     console.log(`Updating twin ${req.params.UUID}`);
 
+    req.body.data.modified = Date.now() / 1000 | 0;
+
     twins.update(req.params.UUID, req.body.data, res.locals.w3id_userid)
         .then(result => {
             debug(result);
@@ -88,6 +90,32 @@ router.post(`/delete/:UUID(${UUIDRegex})`, function(req, res, next) {
         status : "ok",
         message : "Twin successfully deleted."
     });
+});
+
+router.get(`/check-for-latest/:UUID(${UUIDRegex})`, (req, res, ) => {
+    
+    twins.get(req.params.UUID)
+		.then(twin => {
+			
+			debug("gettwin:", twin[0]);
+			
+			twin[0].nodes = JSON.stringify(twin[0].nodes);
+
+            res.json({
+                status : 'ok',
+                data : {
+                    modified : twin[0].modified || twin[0].modified
+                }
+            });
+
+		})
+		.catch(err => {
+			debug('Getting twin error:', err);
+			res.error = 500;
+			next();
+		})
+    ;
+    
 });
 
 module.exports = router;
