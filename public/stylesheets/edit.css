@@ -3,7 +3,7 @@ html{
 }
 
 body{
-    overscroll-behavior: none;
+    overflow: hidden;
 }
 
 body[data-movingnode="true"] .node{
@@ -13,6 +13,7 @@ body[data-movingnode="true"] .node{
 main{
     padding-top: 0;
     overscroll-behavior: none;
+    overflow: hidden;
 }
 
 #creationCanvas{
