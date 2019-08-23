@@ -182,6 +182,7 @@
 			})();
 
 			const twinUUID = "{{twinData.UUID}}";
+			const twinLastModifiedTime = {{{twinData.modified}}};
 			const nodesHolder = document.querySelector('#nodes');
 			const subsribedToTopics = [];
 			// Reconstruct pre-existing nodes
@@ -328,6 +329,31 @@
 				}
 
 			}, 5000);
+
+			// Check if twin is the latest version
+			setInterval(function(){
+
+				fetch(`${window.location.origin}/twins/check-for-latest/${twinUUID}`)
+					.then(res => {
+						if(res.ok){
+							return res.json();
+						} else {
+							throw res;
+						}
+					})
+					.then(result => {
+						if(result.data.modified > twinLastModifiedTime){
+							window.location = window.location;
+						} else {
+							console.log('Current version of twin is the latest version. Last update at:', twinLastModifiedTime)
+						}
+					})
+					.catch(err => {
+						console.log('Unable to check if twin is the latest version:', err);
+					})
+				;
+
+			}, 15000);
 
 		}());
 
