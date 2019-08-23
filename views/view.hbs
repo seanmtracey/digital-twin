@@ -345,7 +345,7 @@
 						if(result.data.modified > twinLastModifiedTime){
 							window.location = window.location;
 						} else {
-							console.log('Current version of twin is the latest version. Last update at:', twinLastModifiedTime)
+							console.log('Current version of twin is the latest version. Last update at:', new Date(twinLastModifiedTime * 1000) );
 						}
 					})
 					.catch(err => {
