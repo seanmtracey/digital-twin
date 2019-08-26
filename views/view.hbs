@@ -185,6 +185,7 @@
 			const twinLastModifiedTime = {{{twinData.modified}}};
 			const nodesHolder = document.querySelector('#nodes');
 			const subsribedToTopics = [];
+			const websocketProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 			// Reconstruct pre-existing nodes
 			const existingNodes = JSON.parse(`{{{ twinData.nodes }}}`);
 
@@ -206,7 +207,7 @@
 
 				timeOfLastWebSocketConnectionAttempt = new Date() / 1000 | 0;
 
-				ws = new WebSocket(`ws://${window.location.host}`);
+				ws = new WebSocket(`${websocketProtocol}://${window.location.host}`);
 
 				connectionStatus.update('Connecting...');
 
