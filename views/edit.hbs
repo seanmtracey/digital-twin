@@ -1,4 +1,4 @@
-<main>
+<main>	
 
 	<canvas id="creationCanvas"></canvas>
 
@@ -60,8 +60,8 @@
     </div>
 
     <div id="twinDetails">
-        <h3>{{twinData.name}}</h3>
-        <p>{{twinData.broker}}</p>
+        <span>Twin name:</span> <h3 id="twinNameSetting" contenteditable="true">{{twinData.name}}</h3>
+        <span>Twin Broker: </span> <h3 id="twinBrokerSetting" contenteditable="true">{{twinData.broker}}</h3>
         <a href="/view/{{twinData.UUID}}" target="_blank">View Twin</a>
     </div>
 
@@ -402,6 +402,36 @@
 
                 CREATING = false;
 
+            }
+
+            function updateTwinSettings(){
+
+                const twinName = twinNameSetting.textContent;
+                const twinBroker = twinBrokerSetting.textContent;
+
+                fetch(`${window.location.origin}/twins/update/${twinUUID}`, {
+                        method : 'POST',
+                        headers : {
+                            'Content-Type' : 'application/json'
+                        },
+                        credentials : 'same-origin',
+                        body: JSON.stringify( { data : { name : twinName, broker: twinBroker } })
+                    })
+                    .then(res => {
+                        if(res.ok){
+                            return res.json();
+                        } else {
+                            throw res;
+                        }
+                    })
+                    .then(result => {
+                        console.log('Updated twin settings:', result);
+                    })
+                    .catch(err => {
+                        console.log('Could not update Twin settings. Err:', err);
+                    })
+
+                console.log(twinName, twinBroker);
 
             }
 
@@ -413,6 +443,8 @@
             const colorSelectorOutput = colorSelectorHolder.querySelector('p');
             const creationCanvas = document.querySelector('canvas#creationCanvas');
             const creationCtx = creationCanvas.getContext('2d');
+            const twinNameSetting = document.querySelector('#twinNameSetting');
+            const twinBrokerSetting = document.querySelector('#twinBrokerSetting');
 
             creationCanvas.width = window.innerWidth * window.devicePixelRatio;
             creationCanvas.height = window.innerHeight * window.devicePixelRatio;
@@ -495,6 +527,10 @@
                 colorSelectorOutput.textContent = this.value.toUpperCase();
 
             }, false);
+
+            twinNameSetting.addEventListener('blur', updateTwinSettings, false);
+
+            twinBrokerSetting.addEventListener('blur', updateTwinSettings, false);
 
             window.addEventListener('keydown', (e) => {
                 console.log(e);

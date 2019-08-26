@@ -227,7 +227,7 @@ main{
     margin: 0;
     padding: 0;
     background-color: #dcdcdc;
-    top: 1em;
+    top: 8vh;
     left: 50%;
     margin-left: -50px;
     overflow: hidden;
@@ -285,11 +285,45 @@ main{
 
 #twinDetails{
     position: fixed;
-    bottom: 1em;
-    left: 1em;
+    top: 0;
+    left: 0;
+    color: white;
+    background: #0c3071;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0.8em 0.5em;
+    box-sizing: border-box;
+}
+
+#twinDetails > *{
+    margin-right: 0.5em;
+}
+
+#twinDetails span{
+    font-size: 0.75em;
+}
+
+#twinDetails h3{
+    font-size: 1em;
+    margin-right: 1.5em;
+    border-bottom: 1px solid white;
+    outline: 0;
+    min-width: 2em;
+}
+
+#twinDetails h3:focus{
+    font-weight: 400;
 }
 
 #twinDetails a {
     font-size: 0.8em;
-    color: #2a8aff;
+    color: #ffffff;
+    font-weight: 800;
+    text-decoration: none;
+    border: 1px solid white;
+    border-radius: 3px;
+    padding: 0.3em 0.5em;
+    box-sizing: border-box;
+    margin-left: auto;
 }
