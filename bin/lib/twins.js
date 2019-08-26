@@ -71,8 +71,27 @@ function updateAnExistingTwinWithAGivenID(UUID, data, user){
 
 }
 
-function duplicateAnExistingTwinWithAGivenID(UUID, data){
-    return Promise.resolve();
+function duplicateAnExistingTwinWithAGivenID(UUID, data, user){
+
+    return getAnExistingTwinWithAnID(UUID)
+        .then(twin => {
+
+            debug('TWIN TO DUPLICATE:', twin);
+
+            if(twin[0].owner !== user){
+                throw "User can not duplicate a twin that they do not own";
+            } else {
+                twin[0].name = data.name;
+                return createANewTwin(twin[0]);
+            }
+
+        })
+        .catch(err => {
+            debug(err);
+            throw err;
+        })
+    ;
+
 }
 
 function createANewTwin(data){
@@ -82,8 +101,8 @@ function createANewTwin(data){
         name : data.name,
         owner : data.owner,
         broker : data.broker,
-        nodes : [],
-        settings : [],
+        nodes : data.nodes || [],
+        settings : data.settings || [],
         created: Date.now() / 1000 | 0
     };
 

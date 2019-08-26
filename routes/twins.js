@@ -65,7 +65,7 @@ router.post(`/update/:UUID(${UUIDRegex})`, function(req, res, next) {
         })
         .catch(err => {
 
-            debug(`Error updating twin ${req.params.UUID}`. err);
+            debug(`Error updating twin ${req.params.UUID}`, err);
             
             res.status(500);
             res.json({
@@ -79,10 +79,32 @@ router.post(`/update/:UUID(${UUIDRegex})`, function(req, res, next) {
 });
 
 router.post(`/duplicate/:UUID(${UUIDRegex})`, function(req, res, next) {
-	res.json({
-        status : "ok",
-        message : "Twin successfully duplicated."
-    });
+
+    twins.duplicate(req.params.UUID, req.body.data)
+        .then(result => {
+            
+            debug(result);
+            
+            res.json({
+                status : "ok",
+                message : "Twin successfully duplicated.",
+                data : result
+            });
+
+        })
+        .catch(err => {
+            
+            debug(`Error duplicating twin ${req.params.UUID}`, err);
+
+            res.status(500);
+            res.json({
+                status : 'err',
+                message : 'An internal error occured preventing the duplication of the twin from being saved'
+            });
+
+        })
+    ;
+    
 });
 
 router.post(`/delete/:UUID(${UUIDRegex})`, function(req, res, next) {
