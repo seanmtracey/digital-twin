@@ -1,4 +1,4 @@
-const debug = require('debug')('bin:tokens');
+const debug = require('debug')('bin:database');
 const Cloudant = require('@cloudant/cloudant');
 
 const cloudant = new Cloudant({ 
@@ -14,6 +14,7 @@ const cloudant = new Cloudant({
 const DEFAULT_DB_NAME = process.env.DEFAULT_DB_NAME;
 
 function writeToDatabase(document, database = DEFAULT_DB_NAME){
+
     const db = cloudant.db.use(database);
 
     debug('ADDING DOCUMENT:', document);
@@ -33,6 +34,7 @@ function writeToDatabase(document, database = DEFAULT_DB_NAME){
 }
 
 function readFromDatabase(params, database = DEFAULT_DB_NAME){
+
     const db = cloudant.db.use(database);
 
     return new Promise( (resolve, reject) => {
@@ -57,6 +59,7 @@ function readFromDatabase(params, database = DEFAULT_DB_NAME){
 }
 
 function scanDatabase(params, database = DEFAULT_DB_NAME){
+    
     const db = cloudant.db.use(database);
 
     return new Promise( (resolve, reject) => {
@@ -85,6 +88,7 @@ function scanDatabase(params, database = DEFAULT_DB_NAME){
 }
 
 function queryItemsInDatabase(params, database = DEFAULT_DB_NAME){
+
     const db = cloudant.db.use(database);
 
     return new Promise( (resolve, reject) => {
@@ -113,6 +117,7 @@ function queryItemsInDatabase(params, database = DEFAULT_DB_NAME){
 }
 
 function updateItemInDatabase(document, database = DEFAULT_DB_NAME){
+
     const db = cloudant.db.use(database);
 
     debug('UPDATING DOCUMENT:', document);
@@ -131,10 +136,31 @@ function updateItemInDatabase(document, database = DEFAULT_DB_NAME){
 
 }
 
+function deleteAnItemFromTheDatabase(document, database = DEFAULT_DB_NAME){
+
+    const db = cloudant.db.use(database);
+
+    debug('DELETING DOCUMENT', document);
+
+    return new Promise( (resolve, reject) => {
+        
+        db.destroy(document._id, document._rev, (err, body, header) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+
+    });
+
+}
+
 module.exports = {
     write    : writeToDatabase,
 	read     : readFromDatabase,
 	scan     : scanDatabase,
 	query    : queryItemsInDatabase,
-	update   : updateItemInDatabase
+    update   : updateItemInDatabase,
+    delete   : deleteAnItemFromTheDatabase
 };

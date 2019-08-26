@@ -71,8 +71,27 @@ function updateAnExistingTwinWithAGivenID(UUID, data, user){
 
 }
 
-function duplicateAnExistingTwinWithAGivenID(UUID, data){
-    return Promise.resolve();
+function duplicateAnExistingTwinWithAGivenID(UUID, data, user){
+
+    return getAnExistingTwinWithAnID(UUID)
+        .then(twin => {
+
+            debug('TWIN TO DUPLICATE:', twin);
+
+            if(twin[0].owner !== user){
+                throw "User can not duplicate a twin that they do not own";
+            } else {
+                twin[0].name = data.name;
+                return createANewTwin(twin[0]);
+            }
+
+        })
+        .catch(err => {
+            debug(err);
+            throw err;
+        })
+    ;
+
 }
 
 function createANewTwin(data){
@@ -82,8 +101,8 @@ function createANewTwin(data){
         name : data.name,
         owner : data.owner,
         broker : data.broker,
-        nodes : [],
-        settings : [],
+        nodes : data.nodes || [],
+        settings : data.settings || [],
         created: Date.now() / 1000 | 0
     };
 
@@ -98,8 +117,29 @@ function createANewTwin(data){
     ;
 }
 
-function deleteAnExistingTwinWithAGivenID(UUID){
-    return Promise.resolve();
+function deleteAnExistingTwinWithAGivenID(UUID, user){
+
+    return database.read({
+            selector : {
+                "UUID" : UUID
+            }    
+        })
+        .then(document => {
+            debug('Document to delete:', document);
+
+            if(document.owner !== user){
+                throw "User can not delete a twin that they do not own.";
+            } else {
+                return database.delete(document);
+            }
+
+        })
+        .catch(err => {
+            debug('Delete a twin error:', err);
+            throw err;
+        })
+    ;
+
 }
 
 function getAListOfAllOfTheAvailableTwins(){
