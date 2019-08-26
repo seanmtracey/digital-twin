@@ -6,8 +6,12 @@ body{
     overflow: hidden;
 }
 
-body[data-movingnode="true"] .node{
+body[data-movingnode="true"] .node, body[data-movingnode="true"] .backgroundImage{
     cursor: move !important;
+}
+
+body[data-movingnode="true"] .backgroundImage{
+    z-index: 50;
 }
 
 main{
@@ -30,6 +34,10 @@ main{
     width: 0%;
     height: 0%;
     cursor: crosshair;
+}
+
+#nodes .backgroundImage{
+    position: fixed;
 }
 
 #nodes .node{
