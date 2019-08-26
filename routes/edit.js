@@ -11,14 +11,14 @@ router.get(`/:UUID(${UUIDRegex})`, function(req, res, next) {
 	twins.get(req.params.UUID)
 		.then(twin => {
 			
-			debug("gettwin:", twin[0]);
+			debug("gettwin:", twin);
 			
-			twin[0].nodes = JSON.stringify(twin[0].nodes);
+			twin.nodes = JSON.stringify(twin.nodes);
 
 			res.render('edit', { 
 				title: 'Digital Twin Editor',
 				stylesheet : "edit.css",
-				twinData : twin[0]
+				twinData : twin
 			});
 
 		})

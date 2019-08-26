@@ -136,14 +136,14 @@ router.get(`/check-for-latest/:UUID(${UUIDRegex})`, (req, res, ) => {
     twins.get(req.params.UUID)
 		.then(twin => {
 			
-			debug("gettwin:", twin[0]);
+			debug("gettwin:", twin);
 			
-			twin[0].nodes = JSON.stringify(twin[0].nodes);
+			twin.nodes = JSON.stringify(twin.nodes);
 
             res.json({
                 status : 'ok',
                 data : {
-                    modified : twin[0].modified || twin[0].modified
+                    modified : twin.modified || twin.created
                 }
             });
 

@@ -1,7 +1,7 @@
 const debug = require('debug')('bin:lib:twins');
 const uuid = require('uuid').v4;
 const database = require(`${__dirname}/database`);
-const sanitizeDocuments = require(`${__dirname}/sanitize_documents`);
+const sanitizeDocument = require(`${__dirname}/sanitize_documents`);
 
 const twinsWhitelistProperties = ['owner', 'nodes', 'settings', 'UUID', 'name', 'created', 'broker', 'modified'];
 
@@ -13,7 +13,7 @@ function getAnExistingTwinWithAnID(UUID){
             }    
         })
         .then(document => {
-            return sanitizeDocuments([document], twinsWhitelistProperties);
+            return sanitizeDocument(document, twinsWhitelistProperties);
         })
         .catch(err => {
             debug('Database get error:', err);
@@ -78,11 +78,11 @@ function duplicateAnExistingTwinWithAGivenID(UUID, data, user){
 
             debug('TWIN TO DUPLICATE:', twin);
 
-            if(twin[0].owner !== user){
+            if(twin.owner !== user){
                 throw "User can not duplicate a twin that they do not own";
             } else {
-                twin[0].name = data.name;
-                return createANewTwin(twin[0]);
+                twin.name = data.name;
+                return createANewTwin(twin);
             }
 
         })
@@ -156,7 +156,11 @@ function getAListOfAllOfTheAvailableTwins(){
         .then(documents => {
 
             if(documents.length > 0){
-                return sanitizeDocuments(documents, twinsWhitelistProperties);
+                
+                const sanitizedDocuments = documents.map(uncleanDocument => {return sanitizeDocument(uncleanDocument, twinsWhitelistProperties)});
+
+                return Promise.all(sanitizedDocuments);
+
             } else {
                 return [];
             }
