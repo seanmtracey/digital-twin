@@ -2,13 +2,14 @@ const debug = require('debug')('routes:twins');
 const express = require(`express`);
 const router = express.Router();
 
+const storage = require(`${__dirname}/../bin/lib/storage`);
 const twins = require(`${__dirname}/../bin/lib/twins`);
 
 /* GET home page. */
 
 const UUIDRegex = `[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}`;
 
-router.post(`/create`, function(req, res, next) {
+router.post(`/create`, function(req, res) {
 
     debug(req.body);
     debug(res.locals);
@@ -45,7 +46,7 @@ router.post(`/create`, function(req, res, next) {
 
 });
 
-router.post(`/update/:UUID(${UUIDRegex})`, function(req, res, next) {
+router.post(`/update/:UUID(${UUIDRegex})`, function(req, res) {
 
     debug(req.body);
 
@@ -78,7 +79,7 @@ router.post(`/update/:UUID(${UUIDRegex})`, function(req, res, next) {
 
 });
 
-router.post(`/duplicate/:UUID(${UUIDRegex})`, function(req, res, next) {
+router.post(`/duplicate/:UUID(${UUIDRegex})`, function(req, res) {
 
     twins.duplicate(req.params.UUID, req.body.data, res.locals.w3id_userid)
         .then(result => {
@@ -107,7 +108,7 @@ router.post(`/duplicate/:UUID(${UUIDRegex})`, function(req, res, next) {
     
 });
 
-router.post(`/delete/:UUID(${UUIDRegex})`, function(req, res, next) {
+router.post(`/delete/:UUID(${UUIDRegex})`, function(req, res) {
 
     twins.delete(req.params.UUID, res.locals.w3id_userid)
         .then(result => {
