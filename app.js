@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const w3id = require('w3id-middleware');
 
 const app = express();
 
@@ -21,13 +22,15 @@ app.use((req, res, next) => {
     next();
 });
 
-if(process.env.NODE_ENV !== "production"){
+if(process.env.NODE_ENV === "development"){
 
     app.use('*', (req, res, next) => {
         res.locals.w3id_userid = process.env.TEST_USER;
         next();
     });
 
+} else {
+    app.use(w3id);
 }
 
 app.use('/', require('./routes/index'));
