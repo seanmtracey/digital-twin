@@ -528,8 +528,10 @@
 
             }, false);
 
-            twinNameSetting.addEventListener('blur', updateTwinSettings, false);
+            twinNameSetting.addEventListener('keydown', function(e){ if( e.keyCode === 13 ){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); this.blur(); } });
+            twinBrokerSetting.addEventListener('keydown', function(e){ if( e.keyCode === 13 ){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); this.blur(); } });
 
+            twinNameSetting.addEventListener('blur', updateTwinSettings, false);
             twinBrokerSetting.addEventListener('blur', updateTwinSettings, false);
 
             window.addEventListener('keydown', (e) => {
