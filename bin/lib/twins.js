@@ -117,8 +117,29 @@ function createANewTwin(data){
     ;
 }
 
-function deleteAnExistingTwinWithAGivenID(UUID){
-    return Promise.resolve();
+function deleteAnExistingTwinWithAGivenID(UUID, user){
+
+    return database.read({
+            selector : {
+                "UUID" : UUID
+            }    
+        })
+        .then(document => {
+            debug('Document to delete:', document);
+
+            if(document.owner !== user){
+                throw "User can not delete a twin that they do not own.";
+            } else {
+                return database.delete(document);
+            }
+
+        })
+        .catch(err => {
+            debug('Delete a twin error:', err);
+            throw err;
+        })
+    ;
+
 }
 
 function getAListOfAllOfTheAvailableTwins(){

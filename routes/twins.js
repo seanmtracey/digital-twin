@@ -80,7 +80,7 @@ router.post(`/update/:UUID(${UUIDRegex})`, function(req, res, next) {
 
 router.post(`/duplicate/:UUID(${UUIDRegex})`, function(req, res, next) {
 
-    twins.duplicate(req.params.UUID, req.body.data)
+    twins.duplicate(req.params.UUID, req.body.data, res.locals.w3id_userid)
         .then(result => {
             
             debug(result);
@@ -108,10 +108,27 @@ router.post(`/duplicate/:UUID(${UUIDRegex})`, function(req, res, next) {
 });
 
 router.post(`/delete/:UUID(${UUIDRegex})`, function(req, res, next) {
-	res.json({
-        status : "ok",
-        message : "Twin successfully deleted."
-    });
+
+    twins.delete(req.params.UUID, res.locals.w3id_userid)
+        .then(result => {
+            debug(result);
+
+            res.json({
+                status : "ok",
+                message : `Twin ${req.params.UUID} successfully deleted.`,
+            });
+
+        })
+        .catch(err => {
+            debug('Deleting twin error:', err);
+            res.status(500);
+            res.json({
+                status : 'err',
+                message : `An internal error occured preventing the deletion of the twin ${req.params.UUID}`
+            });
+        })
+    ;
+
 });
 
 router.get(`/check-for-latest/:UUID(${UUIDRegex})`, (req, res, ) => {
