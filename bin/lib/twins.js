@@ -3,7 +3,7 @@ const uuid = require('uuid').v4;
 const database = require(`${__dirname}/database`);
 const sanitizeDocument = require(`${__dirname}/sanitize_documents`);
 
-const twinsWhitelistProperties = ['owner', 'nodes', 'settings', 'UUID', 'name', 'created', 'broker', 'modified'];
+const twinsWhitelistProperties = ['owner', 'nodes', 'settings', 'UUID', 'name', 'created', 'broker', 'modified', 'backgroundImage'];
 
 function getAnExistingTwinWithAnID(UUID){
 
@@ -50,7 +50,6 @@ function updateAnExistingTwinWithAGivenID(UUID, data, user){
                 throw "User is not able to make edits to this twin.";
             } else { 
                 debug('Twin:', result);
-                //return Promise.resolve();
 
                 Object.keys(data).forEach(key => {
                     result[key] = data[key];

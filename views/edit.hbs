@@ -51,7 +51,7 @@
         <li data-selected="true" data-toolname="square" id="squareCreationTool"></li>
         <li data-selected="false" data-toolname="ellipse" id="ellipseCreationTool"></li>
         <li data-selected="false" data-toolname="select" id="selectionTool"></li>
-        <li data-selected="false" data-toolname="move" id="moveTool"></li>
+        <li data-selected="false" data-toolname="image" id="imageTool"></li>
         
     </ul>
 
@@ -218,7 +218,7 @@
 
             }());
 
-            function bindCreationHandlersToNode(node){
+            function bindCreationHandlersToNode(node, backgroundImage = false){
                 
                 function finishMoveOfNodeAndSetPosition(){
                     
@@ -438,13 +438,13 @@
 
             function saveBackgroundImage(src, type){
                 
-                fetch(`${window.location.origin}/twins/update/${twinUUID}`, {
+                fetch(`${window.location.origin}/twins/image/set/${twinUUID}`, {
                         method : "POST",
                         headers : {
                             "Content-Type" : "application/json"
                         },
                         credentials : 'same-origin',
-                        body : JSON.stringify( { data : { backgroundImage : src, type : type.replace('image/') } } )
+                        body : JSON.stringify( { data : { backgroundImage : src, type : type.replace('image/', '') } } )
                     })
                     .then(res => {
                         if(!res.ok){
@@ -484,7 +484,7 @@
                         backgroundImage.dataset.top = (window.innerHeight / 2) - (backgroundImage.height / 2);
                     }
 
-                    bindCreationHandlersToNode(backgroundImage);
+                    bindCreationHandlersToNode(backgroundImage, true);
                     backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
                     backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
 

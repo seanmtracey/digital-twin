@@ -15,11 +15,18 @@ router.get(`/:UUID(${UUIDRegex})`, function(req, res, next) {
 			
 			twin.nodes = JSON.stringify(twin.nodes);
 
-			res.render('edit', { 
-				title: 'Digital Twin Editor',
-				stylesheet : "edit.css",
-				twinData : twin
-			});
+			if(twin.owner === res.locals.w3id_userid){
+
+				res.render('edit', { 
+					title: 'Digital Twin Editor',
+					stylesheet : "edit.css",
+					twinData : twin
+				});	
+
+			} else {
+				res.status(401);
+				res.end();
+			}
 
 		})
 		.catch(err => {

@@ -9,7 +9,7 @@ const twins = require(`${__dirname}/../bin/lib/twins`);
 
 const UUIDRegex = `[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}`;
 
-router.post(`/create`, function(req, res) {
+router.post(`/create`, (req, res) => {
 
     debug(req.body);
     debug(res.locals);
@@ -46,7 +46,7 @@ router.post(`/create`, function(req, res) {
 
 });
 
-router.post(`/update/:UUID(${UUIDRegex})`, function(req, res) {
+router.post(`/update/:UUID(${UUIDRegex})`, (req, res) => {
 
     debug(req.body);
 
@@ -79,7 +79,108 @@ router.post(`/update/:UUID(${UUIDRegex})`, function(req, res) {
 
 });
 
-router.post(`/duplicate/:UUID(${UUIDRegex})`, function(req, res) {
+router.post(`/image/set/:UUID(${UUIDRegex})`, (req, res) => {
+
+    const base64ImageDescriptorPattern = /(data:image)\/(jpeg|png);base64,/gm;
+
+    const image = Buffer.from(req.body.data.backgroundImage.replace(base64ImageDescriptorPattern, ''), 'base64');
+    const extension = req.body.data.type;
+
+    const objectKey = `${req.params.UUID}.${extension}`;
+
+    if(extension !== 'jpeg' &&  extension !== 'jpg' && extension !== 'png'){
+
+        res.status(406);
+        res.json({
+            status : 'err',
+            message : `Only JPEG/PNG type images can be uploaded.`
+        });
+
+    } else {
+
+        return twins.update(req.params.UUID, { backgroundImage : objectKey }, res.locals.w3id_userid )
+            .then(function(){
+
+                storage.put(objectKey, image, process.env.COS_BACKGROUND_IMAGE_BUCKET)
+                    .then(function(){
+                        
+                        res.json({
+                            status : "ok",
+                            message : "Twin successfully updated."
+                        });
+
+                    })
+                    .catch(err => {
+                        debug('Save image error:', err);
+
+                        throw err;
+
+                    })
+                ;
+
+            })
+            .catch(err => {
+
+                debug(`Update background image for ${req.params.UUID} err:`, err);
+
+                res.status(500);
+                res.json({
+                    status : 'err',
+                    message : `The service was unable to store the image.`
+                });
+
+            })
+        ;
+
+    }
+
+});
+
+router.get(`/image/get/:KEY(${UUIDRegex})`, (req, res) => {
+
+    twins.get(req.params.UUID)
+        .then(twin => {
+
+            const backgroundImageKey = twin.backgroundImage;
+
+            if(!backgroundImageKey){
+                res.status(404);
+                res.end();
+            } else {
+
+                return storage.get(backgroundImageKey, process.env.COS_BACKGROUND_IMAGE_BUCKET)
+                    .then(result => {
+                        return {
+                            contentType : backgroundImageKey.split('.')[1],
+                            data : result.Body
+                        }
+                    })
+                ;
+
+            }
+
+        })
+        .then(result => {
+            
+            debug("result", result);
+
+            res.set('Content-Type', `image/${result.contentType}`);
+            res.send(result.data);
+
+        })
+        .catch(err => {
+            debug(`Could not retrieve image for ${req.params.UUID}:`, err);
+            res.status(500);
+            res.json({
+                status : 'err',
+                message : `The service was unable to retrieve the background image.`
+            });
+        })
+    ;
+
+});
+
+router.post(`/duplicate/:UUID(${UUIDRegex})`, (req, res) => {
 
     twins.duplicate(req.params.UUID, req.body.data, res.locals.w3id_userid)
         .then(result => {
@@ -108,7 +209,7 @@ router.post(`/duplicate/:UUID(${UUIDRegex})`, function(req, res) {
     
 });
 
-router.post(`/delete/:UUID(${UUIDRegex})`, function(req, res) {
+router.post(`/delete/:UUID(${UUIDRegex})`, (req, res) => {
 
     twins.delete(req.params.UUID, res.locals.w3id_userid)
         .then(result => {
@@ -132,7 +233,7 @@ router.post(`/delete/:UUID(${UUIDRegex})`, function(req, res) {
 
 });
 
-router.get(`/check-for-latest/:UUID(${UUIDRegex})`, (req, res, ) => {
+router.get(`/check-for-latest/:UUID(${UUIDRegex})`, (req, res) => {
     
     twins.get(req.params.UUID)
 		.then(twin => {
