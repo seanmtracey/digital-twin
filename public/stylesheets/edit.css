@@ -277,6 +277,10 @@ main{
     background-image: url('/images/moveTool.png');
 }
 
+#toolBox #imageTool{
+    background-image: url('/images/imageTool.png');
+}
+
 #colorSelect{
     position: fixed;
     bottom: 1em;
@@ -338,4 +342,45 @@ main{
     padding: 0.3em 0.5em;
     box-sizing: border-box;
     margin-left: auto;
+}
+
+#backgroundImageOverlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.75);
+    display: flex;
+    flex-direction: column;
+}
+
+#backgroundImageOverlayActions{
+    position: absolute;
+    bottom: 1em;
+    display: flex;
+    align-self: center;
+}
+
+#backgroundImageOverlayActions button{
+    background: transparent;
+    font-size: 1em;
+    padding: 0.8em 2em;
+    margin: 0.5em;
+    border-radius: 3px;
+    color: white;
+    font-weight: 600;
+    outline: 0;
+    cursor: pointer;
+    box-shadow: 0 1px 1px black;
+}
+
+#backgroundImageOverlayActions button[data-action="save"]:hover{
+    border: 1px solid #06d806;
+    background-color: green;
+}
+
+#backgroundImageOverlayActions button[data-action="cancel"]:hover{
+    border: 1px solid red;
+    background-color: #8e0101;
 }

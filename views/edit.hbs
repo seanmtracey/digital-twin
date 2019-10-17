@@ -60,6 +60,19 @@
         <p> <strong> #F5F5F5 </strong> </p>
     </div>
 
+    <div id="backgroundImageOverlay" data-active="false">
+
+        <div id="imageHolder">
+            <img />
+        </div>
+
+        <div id="backgroundImageOverlayActions">
+            <button data-action="cancel">Cancel</button>
+            <button data-action="save">Save</button>
+        </div>
+
+    </div>
+
     <div id="twinDetails">
         <span>Twin name:</span> <h3 id="twinNameSetting" contenteditable="true">{{twinData.name}}</h3>
         <span>Twin Broker: </span> <h3 id="twinBrokerSetting" contenteditable="true">{{twinData.broker}}</h3>
@@ -78,6 +91,10 @@
                 
                 const configurationPanelElement = document.querySelector('#configurePanel');
                 let currentNodeBeingConfigured = undefined;
+
+                const backgroundImageOverlay = document.querySelector('#backgroundImageOverlay');
+                const backgroundImageOverlayImageHolder = backgroundImageOverlay.querySelector('#imageHolder');
+                const backgroundImageElement = backgroundImageOverlayImageHolder.querySelector('img');
 
                 const rulesContainer = configurationPanelElement.querySelector('#nodeRules');
                 const storedRules = rulesContainer.querySelector('#storedRules');
@@ -572,10 +589,10 @@
 
             }
 
-            document.body.addEventListener('dragenter', handleDragEnter, false)
-            document.body.addEventListener('dragleave', handleDragLeave, false)
-            document.body.addEventListener('dragover', handleDragOver, false)
-            document.body.addEventListener('drop', handleDrop, false)
+            /*document.body.addEventListener('dragenter', handleDragEnter, false);
+            document.body.addEventListener('dragleave', handleDragLeave, false);
+            document.body.addEventListener('dragover', handleDragOver, false);
+            document.body.addEventListener('drop', handleDrop, false);*/
 
             Array.from(toolBox.querySelectorAll('li')).map(tool => {
 
@@ -589,6 +606,12 @@
 
                     this.dataset.selected = "true";
                     selectedTool = this.dataset.toolname;
+
+                    if(selectedTool === 'image'){
+
+                    } else {
+
+                    }
 
                 }, false);
 
