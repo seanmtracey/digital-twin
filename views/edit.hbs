@@ -63,6 +63,7 @@
     <div id="backgroundImageOverlay" data-active="false">
 
         <div id="imageHolder">
+            <p>Drag and drop an image onto the browser to set it as the background for the twin</p>
             <img />
         </div>
 
@@ -91,10 +92,6 @@
                 
                 const configurationPanelElement = document.querySelector('#configurePanel');
                 let currentNodeBeingConfigured = undefined;
-
-                const backgroundImageOverlay = document.querySelector('#backgroundImageOverlay');
-                const backgroundImageOverlayImageHolder = backgroundImageOverlay.querySelector('#imageHolder');
-                const backgroundImageElement = backgroundImageOverlayImageHolder.querySelector('img');
 
                 const rulesContainer = configurationPanelElement.querySelector('#nodeRules');
                 const storedRules = rulesContainer.querySelector('#storedRules');
@@ -195,7 +192,7 @@
 
                             return {
                                 name : storedRule.querySelector('input[name="rule_name"]').value,
-                                property : property/*.replace(/\./g, ':')*/,
+                                property : property,
                                 value : value,
                                 action : action
                             };
@@ -310,6 +307,10 @@
 
             function startCreationHandler(e){
                 console.log('MOUSEDOWN');
+
+                if(!selectedTool){
+                    return;
+                }
 
                 if(selectedTool !== "select"){
 
@@ -523,6 +524,11 @@
             const creationCtx = creationCanvas.getContext('2d');
             const twinNameSetting = document.querySelector('#twinNameSetting');
             const twinBrokerSetting = document.querySelector('#twinBrokerSetting');
+            const backgroundImageOverlay = document.querySelector('#backgroundImageOverlay');
+            const backgroundImageOverlayImageHolder = backgroundImageOverlay.querySelector('#imageHolder');
+            const backgroundImageElement = backgroundImageOverlayImageHolder.querySelector('img');
+            const backgroundImageSaveBtn = backgroundImageOverlay.querySelector('button[data-action="save"]');
+            const backgroundImageCancelBtn = backgroundImageOverlay.querySelector('button[data-action="cancel"]');
 
             creationCanvas.width = window.innerWidth * window.devicePixelRatio;
             creationCanvas.height = window.innerHeight * window.devicePixelRatio;
@@ -589,10 +595,10 @@
 
             }
 
-            /*document.body.addEventListener('dragenter', handleDragEnter, false);
-            document.body.addEventListener('dragleave', handleDragLeave, false);
-            document.body.addEventListener('dragover', handleDragOver, false);
-            document.body.addEventListener('drop', handleDrop, false);*/
+            backgroundImageOverlay.addEventListener('dragenter', handleDragEnter, false);
+            backgroundImageOverlay.addEventListener('dragleave', handleDragLeave, false);
+            backgroundImageOverlay.addEventListener('dragover', handleDragOver, false);
+            backgroundImageOverlay.addEventListener('drop', handleDrop, false);
 
             Array.from(toolBox.querySelectorAll('li')).map(tool => {
 
@@ -608,9 +614,9 @@
                     selectedTool = this.dataset.toolname;
 
                     if(selectedTool === 'image'){
-
+                        backgroundImageOverlay.dataset.active = "true";
                     } else {
-
+                        backgroundImageOverlay.dataset.active = "false";
                     }
 
                 }, false);
@@ -654,6 +660,21 @@
                 console.log("change", this.value);
                 creationCanvas.style.backgroundColor = this.value;
                 colorSelectorOutput.textContent = this.value.toUpperCase();
+
+            }, false);
+
+            backgroundImageSaveBtn.addEventListener('click', function(){
+
+                console.log("SAVE IMAGE");
+
+            }, false);
+
+            backgroundImageCancelBtn.addEventListener('click', function(){
+
+                console.log("CANCEL SAVE IMAGE");
+                backgroundImageOverlay.dataset.active = "false";
+                toolBox.querySelector('li[data-selected="true"]').dataset.selected = "false";
+                selectedTool = undefined;
 
             }, false);
 
