@@ -36,7 +36,7 @@ main{
     cursor: crosshair;
 }
 
-#nodes .backgroundImage{
+img.backgroundImage{
     position: fixed;
 }
 
@@ -352,7 +352,8 @@ main{
     height: 100%;
     background-color: rgba(0,0,0,0.75);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
 }
 
 #backgroundImageOverlay[data-active="false"]{
@@ -389,14 +390,9 @@ main{
     background-color: #8e0101;
 }
 
-#backgroundImageOverlay #imageHolder{
-    position: fixed;
-    top: 50%;
-    left: 50%;
+#backgroundImageOverlay #imageDropInstructions{
     width: 400px;
     height: 300px;
-    margin-top: -150px;
-    margin-left: -200px;
     color: white;
     display: flex;
     align-items: center;
@@ -411,4 +407,18 @@ main{
     text-shadow: 0 1px 1px black;
     background: rgba(255,255,255,0.3);
     overflow: hidden;
+    align-self: center;
+    justify-self: center;
+}
+
+#backgroundImageOverlay[data-imageplaced="true"] #imageDropInstructions{
+    display: none;
+}
+
+#backgroundImageOverlay #imagePositionAndSizer{
+
+}
+
+#backgroundImageOverlay[data-imageplaced="false"] #imagePositionAndSizer{
+    display: none;
 }

@@ -1,7 +1,7 @@
-<main>	
+<main>
 
 	<canvas id="creationCanvas"></canvas>
-    
+
     <div id="nodes">
 
         <!-- The output is where our nodes are persisted -->
@@ -17,11 +17,11 @@
             <input type="text" name="topic" placeholder="MQTT topic to subscribe and react to..." />
 
             <label>Rules</label>
-            
+
             <div id="nodeRules">
-                
+
                 <ol id="storedRules">
-                
+
                     <!--<li class="rule">
                         <div class="ruleDetails">
                             <input type="text" name="rule_name" placeholder="Rule Name"/>
@@ -36,9 +36,9 @@
                         </div>
                         <div class="deleteRuleButton"></div>
                     </li>-->
-                
+
                 </ol>
-                
+
                 <button id="newRule">Add new rule</button>
             </div>
 
@@ -52,7 +52,7 @@
         <li data-selected="false" data-toolname="ellipse" id="ellipseCreationTool"></li>
         <li data-selected="false" data-toolname="select" id="selectionTool"></li>
         <li data-selected="false" data-toolname="image" id="imageTool"></li>
-        
+
     </ul>
 
     <div id="colorSelect">
@@ -60,11 +60,14 @@
         <p> <strong> #F5F5F5 </strong> </p>
     </div>
 
-    <div id="backgroundImageOverlay" data-active="false">
+    <div id="backgroundImageOverlay" data-active="false" data-imageplaced="false">
 
-        <div id="imageHolder">
+        <div id="imageDropInstructions">
             <p>Drag and drop an image onto the browser to set it as the background for the twin</p>
-            <img />
+        </div>
+
+        <div id="imagePositionAndSizer">
+            <img src="">
         </div>
 
         <div id="backgroundImageOverlayActions">
@@ -89,7 +92,7 @@
             'use strict';
 
             const configurationPanel = (function(){
-                
+
                 const configurationPanelElement = document.querySelector('#configurePanel');
                 let currentNodeBeingConfigured = undefined;
 
@@ -100,7 +103,7 @@
                 function createRule(name, conditionProperty = "", conditionValue = "", actionValue = ""){
 
                     const ruleFragment = document.createDocumentFragment();
-                    
+
                     const newRule = document.createElement('li');
                     const ruleDetailsContainer = document.createElement('div');
                     const ruleConditionContainer = document.createElement('div');
@@ -123,7 +126,7 @@
                     ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="color" id="head" name="head" value="${actionValue}" class="userInput">`
 
                     deleteRuleButton.addEventListener('click', function(){
-                        
+
                         storedRules.removeChild(this.parentNode);
 
                     }, false);
@@ -146,7 +149,7 @@
                     e.stopImmediatePropagation();
 
                     const newRule = createRule();
-                    
+
                     storedRules.appendChild(newRule);
 
                 }, false);
@@ -158,7 +161,7 @@
                     storedRules.innerHTML = "";
 
                     configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic;
-                    
+
                     if(currentNodeBeingConfigured.dataset.rules){
 
                         const rules = JSON.parse(currentNodeBeingConfigured.dataset.rules);
@@ -172,13 +175,17 @@
 
                     }
 
-                    configurationPanelElement.dataset.active = "true";                    
+                    configurationPanelElement.dataset.active = "true";
 
                 }
 
                 function hideConfigurationPanel(saveChanges = true){
 
                     console.log('save changes?', saveChanges);
+
+                    if(!currentNodeBeingConfigured){
+                        return;
+                    }
 
                     if(true /*saveChanges*/){
 
@@ -202,14 +209,14 @@
                         currentNodeBeingConfigured.dataset.rules = JSON.stringify(rules);
 
                     }
-                    
+
                     currentNodeBeingConfigured = undefined;
                     configurationPanelElement.dataset.active = "false";
 
                     Array.from(storedRules.querySelectorAll('.rule')).forEach(storedRule => {
                         storedRule.parentNode.removeChild(storedRule);
                     });
-                    
+
                     Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
                         node.dataset.selected = "false";
                     });
@@ -232,10 +239,11 @@
 
             }());
 
+            // This function needs a better name
             function bindCreationHandlersToNode(node, backgroundImage = false){
-                
+
                 function finishMoveOfNodeAndSetPosition(){
-                    
+
                     MOVING = false;
                     nodeToMove.dataset.top = nodeToMove.style.top.replace('px', '');
                     nodeToMove.dataset.left = nodeToMove.style.left.replace('px', '');
@@ -244,7 +252,7 @@
                     nodeToMove = undefined;
 
                     document.body.dataset.movingnode = "false";
-                
+
                 }
 
                 function handleDownEvent(e){
@@ -280,9 +288,9 @@
 
                     if(CREATING){
                         endCreationHandler(e);
-                    } else if(!MOVING){
+                    } else if(!MOVING && e.target.classList.contains('node')){
                         configurationPanel.show(e.target);
-                        
+
                         Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
                             node.dataset.selected = "false";
                         });
@@ -298,13 +306,14 @@
                 node.addEventListener('mousedown', handleDownEvent, false);
                 node.addEventListener('mousemove', inProgressCreationHandler, false);
                 node.addEventListener('mouseup', handleUpEvent, false);
-                
+
                 node.addEventListener("touchstart", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; handleDownEvent(e); }, false);
                 node.addEventListener("touchmove", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; inProgressCreationHandler(e); }, false);
                 node.addEventListener("touchend", function(e){ e.clientX = e.changedTouches[0].clientX; e.clientY = e.changedTouches[0].clientY; handleUpEvent(e); }, false);
 
             }
 
+            // This function needs a better name
             function startCreationHandler(e){
                 console.log('MOUSEDOWN');
 
@@ -321,11 +330,12 @@
                     };
 
                 }
-                
+
             }
 
+            // This function needs a better name
             function inProgressCreationHandler(e){
-                
+
                 if(CREATING){
 
                     const selectionWidth = e.clientX - startCoords.x;
@@ -340,7 +350,7 @@
                         creationCtx.closePath();
 
                     } else if(selectedTool === "ellipse"){
-                        
+
                         creationCtx.clearRect(0,0, creationCanvas.width, creationCanvas.height);
 
                         const adjustedX = e.clientX * window.devicePixelRatio;
@@ -387,14 +397,15 @@
 
             }
 
+            // This function needs a better name
             function endCreationHandler(e){
 
                 console.log('MOUSEUP');
-                
+
                 if(CREATING){
 
                     creationCtx.clearRect(0, 0, creationCanvas.width, creationCanvas.height);
-                    
+
                     const elementWidth = e.clientX - startCoords.x;
                     const elementHeight = e.clientY - startCoords.y;
 
@@ -412,9 +423,9 @@
                     bindCreationHandlersToNode(node);
 
                     nodesHolder.appendChild(node);
-                
+
                 } else if(MOVING){
-                    
+
                     finishMoveOfNodeAndSetPosition();
 
                 }
@@ -455,7 +466,7 @@
             }
 
             function saveBackgroundImage(src, type){
-                
+
                 fetch(`${window.location.origin}/twins/image/set/${twinUUID}`, {
                         method : "POST",
                         headers : {
@@ -490,7 +501,7 @@
                 const backgroundImage = new Image();
 
                 backgroundImage.classList.add('backgroundImage');
-                
+
                 backgroundImage.addEventListener('load', function(){
                     console.log('Image Loaded');
 
@@ -506,7 +517,9 @@
                     backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
                     backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
 
-                    nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
+                    //nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
+
+                    backgroundImageOverlay.appendChild(backgroundImage);
 
                 }, false);
 
@@ -525,8 +538,6 @@
             const twinNameSetting = document.querySelector('#twinNameSetting');
             const twinBrokerSetting = document.querySelector('#twinBrokerSetting');
             const backgroundImageOverlay = document.querySelector('#backgroundImageOverlay');
-            const backgroundImageOverlayImageHolder = backgroundImageOverlay.querySelector('#imageHolder');
-            const backgroundImageElement = backgroundImageOverlayImageHolder.querySelector('img');
             const backgroundImageSaveBtn = backgroundImageOverlay.querySelector('button[data-action="save"]');
             const backgroundImageCancelBtn = backgroundImageOverlay.querySelector('button[data-action="cancel"]');
 
@@ -539,7 +550,7 @@
             let CREATING = false;
             let startCoords = undefined;
             let selectedTool = toolBox.querySelector('li[data-selected="true"]').dataset.toolname;
-            
+
             let MOVING = false;
             let originalMousePosition;
             let nodeToMove;
@@ -551,10 +562,14 @@
 
             creationCanvas.addEventListener('mousemove', inProgressCreationHandler, false);
             creationCanvas.addEventListener("touchmove", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; inProgressCreationHandler(e); }, false);
+            backgroundImageOverlay.addEventListener('mousemove', inProgressCreationHandler, false);
+            backgroundImageOverlay.addEventListener("touchmove", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; inProgressCreationHandler(e); }, false);
             toolBox.addEventListener('mousemove', inProgressCreationHandler, false);
-            
+
             creationCanvas.addEventListener('mouseup', endCreationHandler, false);
             creationCanvas.addEventListener("touchend", function(e){ e.clientX = e.changedTouches[0].clientX; e.clientY = e.changedTouches[0].clientY; endCreationHandler(e); }, false);
+            backgroundImageOverlay.addEventListener('mouseup', endCreationHandler, false);
+            backgroundImageOverlay.addEventListener("touchend", function(e){ e.clientX = e.changedTouches[0].clientX; e.clientY = e.changedTouches[0].clientY; endCreationHandler(e); }, false);
             toolBox.addEventListener('mouseup', endCreationHandler, false);
 
             function handleDragEnter(e){
@@ -588,8 +603,11 @@
                     //reader.onloadend = function() {}
                     reader.addEventListener('loadend', function(){
                         console.log(reader.result);
+
+                        backgroundImageOverlay.dataset.imageplaced = "true";
                         setBackgroundImage(reader.result);
-                        saveBackgroundImage(reader.result, file.type);
+                        // saveBackgroundImage(reader.result, file.type);
+
                     }, false);
                 }
 
@@ -615,6 +633,7 @@
 
                     if(selectedTool === 'image'){
                         backgroundImageOverlay.dataset.active = "true";
+                        configurationPanel.hide();
                     } else {
                         backgroundImageOverlay.dataset.active = "false";
                     }
@@ -630,7 +649,7 @@
 
                 // x, y, width, height, type = selectedTool
                 const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules);
-                
+
                 bindCreationHandlersToNode(recreatedNode);
 
                 nodesHolder.appendChild(recreatedNode);
@@ -644,16 +663,16 @@
             };
 
             const NodeMutationObserver = new MutationObserver(function(mutations) {
- 
+
                 console.log(mutations);
 
                 if(!MOVING){
                     twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
                 }
- 
+
             });
 
-            NodeMutationObserver.observe(nodesHolder, nodeMutationObsererOptions);       
+            NodeMutationObserver.observe(nodesHolder, nodeMutationObsererOptions);
 
             colorSelector.addEventListener('change', function(e){
 
@@ -688,14 +707,14 @@
                 console.log(e);
                 // If the backspace key is pressed, and a node is selected, but the none of the input
                 // fields in the configuration panel are being edited, delete the selected node.
-                
+
                 const selectedNode = nodesHolder.querySelector('.node[data-selected="true"]');
 
                 if(e.keyCode === 8 && e.ctrlKey === true && selectedNode !== null){
                     selectedNode.parentNode.removeChild(selectedNode);
                     configurationPanel.hide();
                 }
-                
+
             });
 
             window.addEventListener('resize', (e) => {
