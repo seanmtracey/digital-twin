@@ -1,13 +1,20 @@
 const debug = require('debug')('bin:database');
 const Cloudant = require('@cloudant/cloudant');
 
-const cloudant = new Cloudant({ 
-    url: process.env.DATABASE_ENDPOINT, 
-    plugins: { 
-        iamauth: { 
-            iamApiKey: process.env.DATABASE_API_KEY
-        }
-    } 
+const cloudant = Cloudant({ 
+    url: process.env.DATABASE_ENDPOINT,
+    maxAttempt: process.env.DATABASE_MAX_CONNECTION_ATTEMPTS || 5,
+    plugins: [ 
+        { 
+            iamauth: { 
+                iamApiKey: process.env.DATABASE_API_KEY 
+            } 
+        }, 
+        { 
+            retry: { 
+                retryDelayMultiplier: 2 
+            } 
+    } ]
 });
 
 //Edit this variable value to change name of database.
