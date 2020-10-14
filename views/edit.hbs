@@ -500,6 +500,8 @@
 
                 console.log(src);
 
+                debugger;
+
                 var existingBackgroundImage = nodesHolder.querySelector('.backgroundImage');
 
                 if(existingBackgroundImage){
@@ -518,8 +520,8 @@
                     console.log('Image Loaded');
 
                     if(position){
-                        backgroundImage.dataset.left = position.x;
-                        backgroundImage.dataset.top = position.y;
+                        backgroundImage.dataset.left = position.left;
+                        backgroundImage.dataset.top = position.top;
                     } else {
                         backgroundImage.dataset.left = (window.innerWidth / 2) - (backgroundImage.width / 2);
                         backgroundImage.dataset.top = (window.innerHeight / 2) - (backgroundImage.height / 2);
@@ -713,9 +715,15 @@
             const NodeMutationObserver = new MutationObserver(function(mutations) {
 
                 console.log(mutations);
+                const nodeAddedWasImage = mutations[0].addedNodes[0]?.classList.contains('backgroundImage');
+                console.log('HERE:', nodeAddedWasImage);
 
                 if(!MOVING){
-                    twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
+                    
+                    if(!nodeAddedWasImage){
+                        twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
+                    }
+
                 }
 
             });
@@ -733,20 +741,20 @@
             backgroundImageSaveBtn.addEventListener('click', function(){
 
                 console.log("SAVE IMAGE");
-
+                const overlayImage = backgroundImageOverlay.querySelector('img');
                 const copyCanvas = document.createElement('canvas');
-                copyCanvas.width = twinBackgroundImage.width;
-                copyCanvas.height = twinBackgroundImage.height;
+                copyCanvas.width = overlayImage.width;
+                copyCanvas.height = overlayImage.height;
 
                 const copyCtx = copyCanvas.getContext('2d');
-
-                copyCtx.drawImage(twinBackgroundImage, 0, 0);
+                copyCtx.drawImage(overlayImage, 0, 0);
+                
                 console.log(copyCanvas.toDataURL());
+                
                 const base64Image = copyCanvas.toDataURL();
-                setBackgroundImage(base64Image);
-                saveBackgroundImage(base64Image, base64Image.replace('data:image/', '').split(';')[0]);
+                setBackgroundImage(base64Image, { top : overlayImage.dataset.top, left : overlayImage.dataset.left });
+                //saveBackgroundImage(base64Image, base64Image.replace('data:image/', '').split(';')[0]);
 
-                nodesHolder.insertBefore(document.querySelector('.backgroundImage'), document.querySelector('.node'));
                 backgroundImageOverlay.dataset.active = "false";
                 toolBox.querySelector('li[data-selected="true"]').dataset.selected = "false";
                 selectedTool = undefined;
