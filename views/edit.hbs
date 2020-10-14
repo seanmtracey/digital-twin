@@ -556,8 +556,14 @@
                 overlayImage.classList.add('overlayImage');
                 overlayImage.addEventListener('load', function(){
                     
-                    overlayImage.dataset.left = (window.innerWidth / 2) - (overlayImage.width / 2);
-                    overlayImage.dataset.top = (window.innerHeight / 2) - (overlayImage.height / 2);
+                    if(position){
+                        overlayImage.dataset.left = position.left;
+                        overlayImage.dataset.top = position.top;
+                    } else {
+                        overlayImage.dataset.left = (window.innerWidth / 2) - (overlayImage.width / 2);
+                        overlayImage.dataset.top = (window.innerHeight / 2) - (overlayImage.height / 2);
+                    }
+
                     
                     overlayImage.style.width = overlayImage.width + "px";
                     overlayImage.style.height = overlayImage.height + "px";
@@ -682,6 +688,11 @@
                     selectedTool = this.dataset.toolname;
 
                     if(selectedTool === 'image'){
+                        
+                        if(twinBackgroundImage){
+                            setOverlayImage(twinBackgroundImage.src, {left: twinBackgroundImage.dataset.left, top: twinBackgroundImage.dataset.top})
+                        }
+
                         backgroundImageOverlay.dataset.active = "true";
                         configurationPanel.hide();
                     } else {
