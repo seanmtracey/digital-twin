@@ -10,10 +10,6 @@ body[data-movingnode="true"] .node, body[data-movingnode="true"] .backgroundImag
     cursor: move !important;
 }
 
-body[data-movingnode="true"] .backgroundImage{
-    z-index: 50;
-}
-
 main{
     padding-top: 0;
     overscroll-behavior: none;
