@@ -589,6 +589,7 @@
             const twinNameSetting = document.querySelector('#twinNameSetting');
             const twinBrokerSetting = document.querySelector('#twinBrokerSetting');
             const twinBackgroundImageSrc = {{#if twinData.backgroundImage}}"{{twinData.backgroundImage.url}}"{{else}}undefined{{/if}};
+            const twinBackgroundImagePosition = {{#if twinData.backgroundImage}}{top: {{twinData.backgroundImage.position.top}}, left: {{twinData.backgroundImage.position.left}} } {{else}}undefined{{/if}};
             let twinBackgroundImage;
             const backgroundImageOverlay = document.querySelector('#backgroundImageOverlay');
             const backgroundImageSaveBtn = backgroundImageOverlay.querySelector('button[data-action="save"]');
@@ -789,7 +790,7 @@
 
             if(twinBackgroundImageSrc){
                 console.log("Background image exists!");
-                setBackgroundImage(`/twins/image/get/${twinBackgroundImageSrc}`);
+                setBackgroundImage(`/twins/image/get/${twinBackgroundImageSrc}`, twinBackgroundImagePosition);
             }
 
             twinNameSetting.addEventListener('keydown', function(e){ if( e.keyCode === 13 ){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); this.blur(); } });
