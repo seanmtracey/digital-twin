@@ -181,9 +181,60 @@
 
 			})();
 
+			function setBackgroundImage(src, position){
+
+                console.log(src);
+
+                return new Promise( function(resolve){
+
+                    var existingBackgroundImage = nodesHolder.querySelector('.backgroundImage');
+
+                    if(existingBackgroundImage){
+                        existingBackgroundImage.parentNode.removeChild(existingBackgroundImage);
+                        const existingOverlayImage = backgroundImageOverlay.querySelector('img');
+
+                        existingOverlayImage.parentNode.removeChild(existingOverlayImage);
+
+                    }
+
+                    const backgroundImage = new Image();
+
+                    backgroundImage.classList.add('backgroundImage');
+
+                    backgroundImage.addEventListener('load', function(){
+                        console.log('Image Loaded');
+
+                        if(position){
+                            backgroundImage.dataset.left = position.left;
+                            backgroundImage.dataset.top = position.top;
+                        } else {
+                            backgroundImage.dataset.left = (window.innerWidth / 2) - (backgroundImage.width / 2);
+                            backgroundImage.dataset.top = (window.innerHeight / 2) - (backgroundImage.height / 2);
+                        }
+
+                        backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
+                        backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
+
+						backgroundImage.setAttribute('draggable', 'false');
+
+                        nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
+
+                        twinBackgroundImage = backgroundImage;
+                        resolve();
+                    }, false);
+
+                    backgroundImage.src = src;
+                
+                } );
+
+            }
+
 			const twinUUID = "{{twinData.UUID}}";
 			const twinLastModifiedTime = {{{twinData.modified}}};
 			const nodesHolder = document.querySelector('#nodes');
+			const twinBackgroundImageSrc = {{#if twinData.backgroundImage}}"{{twinData.backgroundImage.url}}"{{else}}undefined{{/if}};
+            const twinBackgroundImagePosition = {{#if twinData.backgroundImage}}{top: {{twinData.backgroundImage.position.top}}, left: {{twinData.backgroundImage.position.left}} } {{else}}undefined{{/if}};
+            let twinBackgroundImage;
 			const subsribedToTopics = [];
 			const websocketProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 			// Reconstruct pre-existing nodes
@@ -199,6 +250,11 @@
 
 				nodesHolder.appendChild(recreatedNode);
 			});
+
+			if(twinBackgroundImageSrc){
+                console.log("Background image exists!");
+                setBackgroundImage(`/twins/image/get/${twinBackgroundImageSrc}`, twinBackgroundImagePosition);
+            }
 			
 			let timeOfLastWebSocketConnectionAttempt = new Date() / 1000 | 0;
 			let ws;
@@ -355,7 +411,7 @@
 				;
 
 			}, 15000);
-
+			
 		}());
 
 	</script>

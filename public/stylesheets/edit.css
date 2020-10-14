@@ -6,8 +6,12 @@ body{
     overflow: hidden;
 }
 
-body[data-movingnode="true"] .node{
+body[data-movingnode="true"] .node, body[data-movingnode="true"] .backgroundImage{
     cursor: move !important;
+}
+
+body[data-movingnode="true"] .backgroundImage{
+    z-index: 50;
 }
 
 main{
@@ -30,6 +34,10 @@ main{
     width: 0%;
     height: 0%;
     cursor: crosshair;
+}
+
+img.backgroundImage, img.overlayImage{
+    position: fixed;
 }
 
 #nodes .node{
@@ -214,7 +222,7 @@ main{
 }
 
 #toolBox{
-    width: 100px;
+    width: 130px;
     height: 30px;
     background: white;
     position: fixed;
@@ -263,6 +271,14 @@ main{
 
 #toolBox #selectionTool{
     background-image: url('/images/selectionTool.png');
+}
+
+#toolBox #moveTool{
+    background-image: url('/images/moveTool.png');
+}
+
+#toolBox #imageTool{
+    background-image: url('/images/imageTool.png');
 }
 
 #colorSelect{
@@ -326,4 +342,83 @@ main{
     padding: 0.3em 0.5em;
     box-sizing: border-box;
     margin-left: auto;
+}
+
+#backgroundImageOverlay{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.75);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+#backgroundImageOverlay[data-active="false"]{
+    display: none;
+}
+
+#backgroundImageOverlay #backgroundImageOverlayActions{
+    position: absolute;
+    bottom: 1em;
+    display: flex;
+    align-self: center;
+}
+
+#backgroundImageOverlay #backgroundImageOverlayActions button{
+    background: transparent;
+    font-size: 1em;
+    padding: 0.5em 1.5em;
+    margin: 0.5em;
+    border-radius: 3px;
+    color: white;
+    font-weight: 600;
+    outline: 0;
+    cursor: pointer;
+    box-shadow: 0 1px 1px black;
+}
+
+#backgroundImageOverlay #backgroundImageOverlayActions button[data-action="save"]:hover{
+    border: 1px solid #06d806;
+    background-color: green;
+}
+
+#backgroundImageOverlay #backgroundImageOverlayActions button[data-action="cancel"]:hover{
+    border: 1px solid red;
+    background-color: #8e0101;
+}
+
+#backgroundImageOverlay #imageDropInstructions{
+    width: 400px;
+    height: 300px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2em;
+    box-sizing: border-box;
+    border: 8px dashed white;
+    border-radius: 3px;
+    font-weight: 800;
+    box-shadow: 0 1px 1px black;
+    text-shadow: 0 1px 1px black;
+    background: rgba(255,255,255,0.3);
+    overflow: hidden;
+    align-self: center;
+    justify-self: center;
+}
+
+#backgroundImageOverlay[data-imageplaced="true"] #imageDropInstructions{
+    display: none;
+}
+
+#backgroundImageOverlay #imagePositionAndSizer{
+
+}
+
+#backgroundImageOverlay[data-imageplaced="false"] #imagePositionAndSizer{
+    display: none;
 }

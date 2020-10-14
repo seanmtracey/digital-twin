@@ -1,4 +1,4 @@
-<main>	
+<main>
 
 	<canvas id="creationCanvas"></canvas>
 
@@ -17,11 +17,11 @@
             <input type="text" name="topic" placeholder="MQTT topic to subscribe and react to..." />
 
             <label>Rules</label>
-            
+
             <div id="nodeRules">
-                
+
                 <ol id="storedRules">
-                
+
                     <!--<li class="rule">
                         <div class="ruleDetails">
                             <input type="text" name="rule_name" placeholder="Rule Name"/>
@@ -36,9 +36,9 @@
                         </div>
                         <div class="deleteRuleButton"></div>
                     </li>-->
-                
+
                 </ol>
-                
+
                 <button id="newRule">Add new rule</button>
             </div>
 
@@ -51,12 +51,30 @@
         <li data-selected="true" data-toolname="square" id="squareCreationTool"></li>
         <li data-selected="false" data-toolname="ellipse" id="ellipseCreationTool"></li>
         <li data-selected="false" data-toolname="select" id="selectionTool"></li>
+        <li data-selected="false" data-toolname="image" id="imageTool"></li>
 
     </ul>
 
     <div id="colorSelect">
         <input type="color" id="head" name="head" value="#f5f5f5">
         <p> <strong> #F5F5F5 </strong> </p>
+    </div>
+
+    <div id="backgroundImageOverlay" data-active="false" data-imageplaced="false">
+
+        <div id="imageDropInstructions">
+            <p>Drag and drop an image onto the browser to set it as the background for the twin</p>
+        </div>
+
+        <div id="imagePositionAndSizer">
+            <img src="">
+        </div>
+
+        <div id="backgroundImageOverlayActions">
+            <button data-action="cancel">Cancel</button>
+            <button data-action="save">Save</button>
+        </div>
+
     </div>
 
     <div id="twinDetails">
@@ -74,7 +92,7 @@
             'use strict';
 
             const configurationPanel = (function(){
-                
+
                 const configurationPanelElement = document.querySelector('#configurePanel');
                 let currentNodeBeingConfigured = undefined;
 
@@ -85,7 +103,7 @@
                 function createRule(name, conditionProperty = "", conditionValue = "", actionValue = ""){
 
                     const ruleFragment = document.createDocumentFragment();
-                    
+
                     const newRule = document.createElement('li');
                     const ruleDetailsContainer = document.createElement('div');
                     const ruleConditionContainer = document.createElement('div');
@@ -108,7 +126,7 @@
                     ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="color" id="head" name="head" value="${actionValue}" class="userInput">`
 
                     deleteRuleButton.addEventListener('click', function(){
-                        
+
                         storedRules.removeChild(this.parentNode);
 
                     }, false);
@@ -131,7 +149,7 @@
                     e.stopImmediatePropagation();
 
                     const newRule = createRule();
-                    
+
                     storedRules.appendChild(newRule);
 
                 }, false);
@@ -143,7 +161,7 @@
                     storedRules.innerHTML = "";
 
                     configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic;
-                    
+
                     if(currentNodeBeingConfigured.dataset.rules){
 
                         const rules = JSON.parse(currentNodeBeingConfigured.dataset.rules);
@@ -157,13 +175,17 @@
 
                     }
 
-                    configurationPanelElement.dataset.active = "true";                    
+                    configurationPanelElement.dataset.active = "true";
 
                 }
 
                 function hideConfigurationPanel(saveChanges = true){
 
                     console.log('save changes?', saveChanges);
+
+                    if(!currentNodeBeingConfigured){
+                        return;
+                    }
 
                     if(true /*saveChanges*/){
 
@@ -177,7 +199,7 @@
 
                             return {
                                 name : storedRule.querySelector('input[name="rule_name"]').value,
-                                property : property/*.replace(/\./g, ':')*/,
+                                property : property,
                                 value : value,
                                 action : action
                             };
@@ -187,14 +209,14 @@
                         currentNodeBeingConfigured.dataset.rules = JSON.stringify(rules);
 
                     }
-                    
+
                     currentNodeBeingConfigured = undefined;
                     configurationPanelElement.dataset.active = "false";
 
                     Array.from(storedRules.querySelectorAll('.rule')).forEach(storedRule => {
                         storedRule.parentNode.removeChild(storedRule);
                     });
-                    
+
                     Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
                         node.dataset.selected = "false";
                     });
@@ -217,10 +239,11 @@
 
             }());
 
-            function bindCreationHandlersToNode(node){
-                
+            // This function needs a better name
+            function bindCreationHandlersToNode(node, backgroundImage = false){
+
                 function finishMoveOfNodeAndSetPosition(){
-                    
+
                     MOVING = false;
                     nodeToMove.dataset.top = nodeToMove.style.top.replace('px', '');
                     nodeToMove.dataset.left = nodeToMove.style.left.replace('px', '');
@@ -229,7 +252,7 @@
                     nodeToMove = undefined;
 
                     document.body.dataset.movingnode = "false";
-                
+
                 }
 
                 function handleDownEvent(e){
@@ -265,9 +288,9 @@
 
                     if(CREATING){
                         endCreationHandler(e);
-                    } else if(!MOVING){
+                    } else if(!MOVING && e.target.classList.contains('node')){
                         configurationPanel.show(e.target);
-                        
+
                         Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
                             node.dataset.selected = "false";
                         });
@@ -283,15 +306,20 @@
                 node.addEventListener('mousedown', handleDownEvent, false);
                 node.addEventListener('mousemove', inProgressCreationHandler, false);
                 node.addEventListener('mouseup', handleUpEvent, false);
-                
+
                 node.addEventListener("touchstart", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; handleDownEvent(e); }, false);
                 node.addEventListener("touchmove", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; inProgressCreationHandler(e); }, false);
                 node.addEventListener("touchend", function(e){ e.clientX = e.changedTouches[0].clientX; e.clientY = e.changedTouches[0].clientY; handleUpEvent(e); }, false);
 
             }
 
+            // This function needs a better name
             function startCreationHandler(e){
                 console.log('MOUSEDOWN');
+
+                if(!selectedTool){
+                    return;
+                }
 
                 if(selectedTool !== "select"){
 
@@ -302,11 +330,12 @@
                     };
 
                 }
-                
+
             }
 
+            // This function needs a better name
             function inProgressCreationHandler(e){
-                
+
                 if(CREATING){
 
                     const selectionWidth = e.clientX - startCoords.x;
@@ -321,7 +350,7 @@
                         creationCtx.closePath();
 
                     } else if(selectedTool === "ellipse"){
-                        
+
                         creationCtx.clearRect(0,0, creationCanvas.width, creationCanvas.height);
 
                         const adjustedX = e.clientX * window.devicePixelRatio;
@@ -368,14 +397,15 @@
 
             }
 
+            // This function needs a better name
             function endCreationHandler(e){
 
                 console.log('MOUSEUP');
-                
+
                 if(CREATING){
 
                     creationCtx.clearRect(0, 0, creationCanvas.width, creationCanvas.height);
-                    
+
                     const elementWidth = e.clientX - startCoords.x;
                     const elementHeight = e.clientY - startCoords.y;
 
@@ -393,9 +423,9 @@
                     bindCreationHandlersToNode(node);
 
                     nodesHolder.appendChild(node);
-                
+
                 } else if(MOVING){
-                    
+
                     finishMoveOfNodeAndSetPosition();
 
                 }
@@ -435,6 +465,118 @@
 
             }
 
+            function saveBackgroundImage(src, type, position){
+
+                fetch(`${window.location.origin}/twins/image/set/${twinUUID}`, {
+                        method : "POST",
+                        headers : {
+                            "Content-Type" : "application/json"
+                        },
+                        credentials : 'same-origin',
+                        body : JSON.stringify( { data : { backgroundImage : src, type : type.replace('image/', ''), position : position } } )
+                    })
+                    .then(res => {
+                        if(!res.ok){
+                            throw res;
+                        } else {
+                            return res.json()
+                        }
+                    })
+                    .then(data => {
+                        console.log(data);
+                    })
+                    .catch(err => {
+
+                        console.log(`Error saving Digital Twin updates:`, err);
+
+                    })
+                ;
+
+            }
+
+            function setBackgroundImage(src, position){
+
+                console.log(src);
+
+                return new Promise( function(resolve){
+
+                    var existingBackgroundImage = nodesHolder.querySelector('.backgroundImage');
+
+                    if(existingBackgroundImage){
+                        existingBackgroundImage.parentNode.removeChild(existingBackgroundImage);
+                        const existingOverlayImage = backgroundImageOverlay.querySelector('img');
+
+                        existingOverlayImage.parentNode.removeChild(existingOverlayImage);
+
+                    }
+
+                    const backgroundImage = new Image();
+
+                    backgroundImage.classList.add('backgroundImage');
+
+                    backgroundImage.addEventListener('load', function(){
+                        console.log('Image Loaded');
+
+                        if(position){
+                            backgroundImage.dataset.left = position.left;
+                            backgroundImage.dataset.top = position.top;
+                        } else {
+                            backgroundImage.dataset.left = (window.innerWidth / 2) - (backgroundImage.width / 2);
+                            backgroundImage.dataset.top = (window.innerHeight / 2) - (backgroundImage.height / 2);
+                        }
+
+                        backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
+                        backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
+                        backgroundImage.setAttribute('draggable', 'false');
+                        
+                        nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
+
+                        twinBackgroundImage = backgroundImage;
+                        resolve();
+                    }, false);
+
+                    backgroundImage.src = src;
+                
+                } );
+
+            }
+
+            function setOverlayImage(src, position){
+                
+                const existingOverlayImage = backgroundImageOverlay.querySelector('img');
+
+                if(existingOverlayImage){
+                    existingOverlayImage.parentNode.removeChild(existingOverlayImage);
+                }
+
+                const overlayImage = new Image();
+                overlayImage.classList.add('overlayImage');
+                overlayImage.addEventListener('load', function(){
+                    
+                    if(position){
+                        overlayImage.dataset.left = position.left;
+                        overlayImage.dataset.top = position.top;
+                    } else {
+                        overlayImage.dataset.left = (window.innerWidth / 2) - (overlayImage.width / 2);
+                        overlayImage.dataset.top = (window.innerHeight / 2) - (overlayImage.height / 2);
+                    }
+
+                    
+                    overlayImage.style.width = overlayImage.width + "px";
+                    overlayImage.style.height = overlayImage.height + "px";
+                    overlayImage.style.left = overlayImage.dataset.left + "px";
+                    overlayImage.style.top = overlayImage.dataset.top + "px";
+
+                    bindCreationHandlersToNode(overlayImage, true);
+
+                    backgroundImageOverlay.appendChild(overlayImage);
+
+                }, false);
+
+                overlayImage.src = src;
+
+            }
+
             const twinUUID = "{{twinData.UUID}}";
             const nodesHolder = document.querySelector('#nodes');
             const toolBox = document.querySelector('#toolBox');
@@ -445,6 +587,12 @@
             const creationCtx = creationCanvas.getContext('2d');
             const twinNameSetting = document.querySelector('#twinNameSetting');
             const twinBrokerSetting = document.querySelector('#twinBrokerSetting');
+            const twinBackgroundImageSrc = {{#if twinData.backgroundImage}}"{{twinData.backgroundImage.url}}"{{else}}undefined{{/if}};
+            const twinBackgroundImagePosition = {{#if twinData.backgroundImage}}{top: {{twinData.backgroundImage.position.top}}, left: {{twinData.backgroundImage.position.left}} } {{else}}undefined{{/if}};
+            let twinBackgroundImage;
+            const backgroundImageOverlay = document.querySelector('#backgroundImageOverlay');
+            const backgroundImageSaveBtn = backgroundImageOverlay.querySelector('button[data-action="save"]');
+            const backgroundImageCancelBtn = backgroundImageOverlay.querySelector('button[data-action="cancel"]');
 
             creationCanvas.width = window.innerWidth * window.devicePixelRatio;
             creationCanvas.height = window.innerHeight * window.devicePixelRatio;
@@ -455,21 +603,72 @@
             let CREATING = false;
             let startCoords = undefined;
             let selectedTool = toolBox.querySelector('li[data-selected="true"]').dataset.toolname;
-            
+
             let MOVING = false;
             let originalMousePosition;
             let nodeToMove;
+
+            const validImageFileTypes = ['image/jpeg', 'image/png'];
 
             creationCanvas.addEventListener('mousedown', startCreationHandler, false);
             creationCanvas.addEventListener("touchstart", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; startCreationHandler(e); }, false);
 
             creationCanvas.addEventListener('mousemove', inProgressCreationHandler, false);
             creationCanvas.addEventListener("touchmove", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; inProgressCreationHandler(e); }, false);
+            backgroundImageOverlay.addEventListener('mousemove', inProgressCreationHandler, false);
+            backgroundImageOverlay.addEventListener("touchmove", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; inProgressCreationHandler(e); }, false);
             toolBox.addEventListener('mousemove', inProgressCreationHandler, false);
-            
+
             creationCanvas.addEventListener('mouseup', endCreationHandler, false);
             creationCanvas.addEventListener("touchend", function(e){ e.clientX = e.changedTouches[0].clientX; e.clientY = e.changedTouches[0].clientY; endCreationHandler(e); }, false);
+            backgroundImageOverlay.addEventListener('mouseup', endCreationHandler, false);
+            backgroundImageOverlay.addEventListener("touchend", function(e){ e.clientX = e.changedTouches[0].clientX; e.clientY = e.changedTouches[0].clientY; endCreationHandler(e); }, false);
             toolBox.addEventListener('mouseup', endCreationHandler, false);
+
+            function handleDragEnter(e){
+                e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+                console.log('dragenter event triggered');
+            }
+
+            function handleDragLeave(e){
+                e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+                console.log('dragleave event triggered');
+            }
+
+            function handleDragOver(e){
+                e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+                console.log('dragover event triggered');
+            }
+
+            function handleDrop(e){
+                e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+                console.log('drop event triggered', e);
+                let dt = e.dataTransfer
+                let file = dt.files[0];
+
+                console.log(dt, file);
+
+                if(validImageFileTypes.indexOf(file.type) > -1){
+                    console.log('Valid image file');
+
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file)
+                    //reader.onloadend = function() {}
+                    reader.addEventListener('loadend', function(){
+                        console.log(reader.result);
+
+                        backgroundImageOverlay.dataset.imageplaced = "true";
+                        setOverlayImage(reader.result);
+
+                    }, false);
+                }
+
+            }
+
+            backgroundImageOverlay.addEventListener('dragenter', handleDragEnter, false);
+            backgroundImageOverlay.addEventListener('dragleave', handleDragLeave, false);
+            backgroundImageOverlay.addEventListener('dragover', handleDragOver, false);
+            backgroundImageOverlay.addEventListener('drop', handleDrop, false);
 
             Array.from(toolBox.querySelectorAll('li')).map(tool => {
 
@@ -484,6 +683,18 @@
                     this.dataset.selected = "true";
                     selectedTool = this.dataset.toolname;
 
+                    if(selectedTool === 'image'){
+                        
+                        if(twinBackgroundImage){
+                            setOverlayImage(twinBackgroundImage.src, {left: twinBackgroundImage.dataset.left, top: twinBackgroundImage.dataset.top})
+                        }
+
+                        backgroundImageOverlay.dataset.active = "true";
+                        configurationPanel.hide();
+                    } else {
+                        backgroundImageOverlay.dataset.active = "false";
+                    }
+
                 }, false);
 
             }, false);
@@ -495,7 +706,7 @@
 
                 // x, y, width, height, type = selectedTool
                 const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules);
-                
+
                 bindCreationHandlersToNode(recreatedNode);
 
                 nodesHolder.appendChild(recreatedNode);
@@ -509,16 +720,22 @@
             };
 
             const NodeMutationObserver = new MutationObserver(function(mutations) {
- 
+
                 console.log(mutations);
+                const nodeAddedWasImage = mutations[0].addedNodes[0]?.classList.contains('backgroundImage');
+                console.log('HERE:', nodeAddedWasImage);
 
                 if(!MOVING){
-                    twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
+                    
+                    if(!nodeAddedWasImage && nodeAddedWasImage !== undefined){
+                        twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
+                    }
+
                 }
- 
+
             });
 
-            NodeMutationObserver.observe(nodesHolder, nodeMutationObsererOptions);       
+            NodeMutationObserver.observe(nodesHolder, nodeMutationObsererOptions);
 
             colorSelector.addEventListener('change', function(e){
 
@@ -527,6 +744,53 @@
                 colorSelectorOutput.textContent = this.value.toUpperCase();
 
             }, false);
+
+            backgroundImageSaveBtn.addEventListener('click', function(){
+
+                console.log("SAVE IMAGE");
+                const overlayImage = backgroundImageOverlay.querySelector('img');
+                const copyCanvas = document.createElement('canvas');
+                copyCanvas.width = overlayImage.width;
+                copyCanvas.height = overlayImage.height;
+
+                const copyCtx = copyCanvas.getContext('2d');
+                copyCtx.drawImage(overlayImage, 0, 0);
+                
+                console.log(copyCanvas.toDataURL());
+                
+                const base64Image = copyCanvas.toDataURL();
+                
+                const backgroundPosition = { top : Number(overlayImage.dataset.top), left : Number(overlayImage.dataset.left) };
+
+                setBackgroundImage(base64Image, backgroundPosition)
+                    .then(function(){
+
+                        saveBackgroundImage(base64Image, base64Image.replace('data:image/', '').split(';')[0], backgroundPosition);
+
+                        backgroundImageOverlay.dataset.active = "false";
+                        toolBox.querySelector('li[data-selected="true"]').dataset.selected = "false";
+                        selectedTool = undefined;
+
+                    })
+                ;
+
+
+
+            }, false);
+
+            backgroundImageCancelBtn.addEventListener('click', function(){
+
+                console.log("CANCEL SAVE IMAGE");
+                backgroundImageOverlay.dataset.active = "false";
+                toolBox.querySelector('li[data-selected="true"]').dataset.selected = "false";
+                selectedTool = undefined;
+
+            }, false);
+
+            if(twinBackgroundImageSrc){
+                console.log("Background image exists!");
+                setBackgroundImage(`/twins/image/get/${twinBackgroundImageSrc}`, twinBackgroundImagePosition);
+            }
 
             twinNameSetting.addEventListener('keydown', function(e){ if( e.keyCode === 13 ){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); this.blur(); } });
             twinBrokerSetting.addEventListener('keydown', function(e){ if( e.keyCode === 13 ){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); this.blur(); } });
@@ -538,14 +802,14 @@
                 console.log(e);
                 // If the backspace key is pressed, and a node is selected, but the none of the input
                 // fields in the configuration panel are being edited, delete the selected node.
-                
+
                 const selectedNode = nodesHolder.querySelector('.node[data-selected="true"]');
 
                 if(e.keyCode === 8 && e.ctrlKey === true && selectedNode !== null){
                     selectedNode.parentNode.removeChild(selectedNode);
                     configurationPanel.hide();
                 }
-                
+
             });
 
             window.addEventListener('resize', (e) => {
