@@ -82,7 +82,7 @@ router.post(`/update/:UUID(${UUIDRegex})`, (req, res) => {
 router.post(`/image/set/:UUID(${UUIDRegex})`, (req, res) => {
 
 
-    debug('IMAGEPLZ:', req.body.data.backgroundImage);
+    debug('IMAGEPLZ:', req.body.data);
 
     const base64ImageDescriptorPattern = /(data:image)\/(jpeg|png);base64,/gm;
 
@@ -103,11 +103,8 @@ router.post(`/image/set/:UUID(${UUIDRegex})`, (req, res) => {
 
         const imageData = {
             url : objectKey,
-            position : {
-                x : 0,
-                y : 0,
-            }
-        }
+            position : req.body.data.position
+        };
 
         return twins.update(req.params.UUID, { backgroundImage : imageData }, res.locals.w3id_userid )
             .then(function(){

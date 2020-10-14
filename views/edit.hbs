@@ -465,7 +465,7 @@
 
             }
 
-            function saveBackgroundImage(src, type){
+            function saveBackgroundImage(src, type, position){
                 
                 {{!-- debugger; --}}
 
@@ -475,7 +475,7 @@
                             "Content-Type" : "application/json"
                         },
                         credentials : 'same-origin',
-                        body : JSON.stringify( { data : { backgroundImage : src, type : type.replace('image/', '') } } )
+                        body : JSON.stringify( { data : { backgroundImage : src, type : type.replace('image/', ''), position : position } } )
                     })
                     .then(res => {
                         if(!res.ok){
@@ -529,10 +529,6 @@
 
                         backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
                         backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
-
-                        {{!-- const overlayBackgroundImage = backgroundImage.cloneNode(); --}}
-                        {{!-- bindCreationHandlersToNode(overlayBackgroundImage, true); --}}
-                        {{!-- backgroundImageOverlay.appendChild(overlayBackgroundImage); --}}
 
                         nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
 
@@ -662,8 +658,6 @@
                         console.log(reader.result);
 
                         backgroundImageOverlay.dataset.imageplaced = "true";
-                        {{!-- setBackgroundImage(reader.result); --}}
-                        //saveBackgroundImage(reader.result, file.type);
                         setOverlayImage(reader.result);
 
                     }, false);
@@ -765,10 +759,13 @@
                 console.log(copyCanvas.toDataURL());
                 
                 const base64Image = copyCanvas.toDataURL();
-                setBackgroundImage(base64Image, { top : overlayImage.dataset.top, left : overlayImage.dataset.left })
+                
+                const backgroundPosition = { top : Number(overlayImage.dataset.top), left : Number(overlayImage.dataset.left) };
+
+                setBackgroundImage(base64Image, backgroundPosition)
                     .then(function(){
 
-                        saveBackgroundImage(base64Image, base64Image.replace('data:image/', '').split(';')[0]);
+                        saveBackgroundImage(base64Image, base64Image.replace('data:image/', '').split(';')[0], backgroundPosition);
 
                         backgroundImageOverlay.dataset.active = "false";
                         toolBox.querySelector('li[data-selected="true"]').dataset.selected = "false";
