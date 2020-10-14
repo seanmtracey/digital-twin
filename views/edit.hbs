@@ -435,7 +435,7 @@
             }
 
             function updateTwinSettings(){
-                debugger;
+                {{!-- debugger; --}}
                 const twinName = twinNameSetting.textContent;
                 const twinBroker = twinBrokerSetting.textContent;
 
@@ -467,7 +467,7 @@
 
             function saveBackgroundImage(src, type){
                 
-                debugger;
+                {{!-- debugger; --}}
 
                 fetch(`${window.location.origin}/twins/image/set/${twinUUID}`, {
                         method : "POST",
@@ -500,47 +500,49 @@
 
                 console.log(src);
 
-                debugger;
+                return new Promise( function(resolve){
 
-                var existingBackgroundImage = nodesHolder.querySelector('.backgroundImage');
+                    var existingBackgroundImage = nodesHolder.querySelector('.backgroundImage');
 
-                if(existingBackgroundImage){
-                    existingBackgroundImage.parentNode.removeChild(existingBackgroundImage);
-                    const existingOverlayImage = backgroundImageOverlay.querySelector('img');
+                    if(existingBackgroundImage){
+                        existingBackgroundImage.parentNode.removeChild(existingBackgroundImage);
+                        const existingOverlayImage = backgroundImageOverlay.querySelector('img');
 
-                    existingOverlayImage.parentNode.removeChild(existingOverlayImage);
+                        existingOverlayImage.parentNode.removeChild(existingOverlayImage);
 
-                }
-
-                const backgroundImage = new Image();
-
-                backgroundImage.classList.add('backgroundImage');
-
-                backgroundImage.addEventListener('load', function(){
-                    console.log('Image Loaded');
-
-                    if(position){
-                        backgroundImage.dataset.left = position.left;
-                        backgroundImage.dataset.top = position.top;
-                    } else {
-                        backgroundImage.dataset.left = (window.innerWidth / 2) - (backgroundImage.width / 2);
-                        backgroundImage.dataset.top = (window.innerHeight / 2) - (backgroundImage.height / 2);
                     }
 
-                    backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
-                    backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
+                    const backgroundImage = new Image();
 
-                    {{!-- const overlayBackgroundImage = backgroundImage.cloneNode(); --}}
-                    {{!-- bindCreationHandlersToNode(overlayBackgroundImage, true); --}}
-                    {{!-- backgroundImageOverlay.appendChild(overlayBackgroundImage); --}}
+                    backgroundImage.classList.add('backgroundImage');
 
-                    nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
+                    backgroundImage.addEventListener('load', function(){
+                        console.log('Image Loaded');
 
-                    twinBackgroundImage = backgroundImage;
+                        if(position){
+                            backgroundImage.dataset.left = position.left;
+                            backgroundImage.dataset.top = position.top;
+                        } else {
+                            backgroundImage.dataset.left = (window.innerWidth / 2) - (backgroundImage.width / 2);
+                            backgroundImage.dataset.top = (window.innerHeight / 2) - (backgroundImage.height / 2);
+                        }
 
-                }, false);
+                        backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
+                        backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
 
-                backgroundImage.src = src;
+                        {{!-- const overlayBackgroundImage = backgroundImage.cloneNode(); --}}
+                        {{!-- bindCreationHandlersToNode(overlayBackgroundImage, true); --}}
+                        {{!-- backgroundImageOverlay.appendChild(overlayBackgroundImage); --}}
+
+                        nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
+
+                        twinBackgroundImage = backgroundImage;
+                        resolve();
+                    }, false);
+
+                    backgroundImage.src = src;
+                
+                } );
 
             }
 
@@ -731,7 +733,7 @@
 
                 if(!MOVING){
                     
-                    if(!nodeAddedWasImage){
+                    if(!nodeAddedWasImage && nodeAddedWasImage !== undefined){
                         twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
                     }
 
@@ -763,12 +765,17 @@
                 console.log(copyCanvas.toDataURL());
                 
                 const base64Image = copyCanvas.toDataURL();
-                setBackgroundImage(base64Image, { top : overlayImage.dataset.top, left : overlayImage.dataset.left });
-                //saveBackgroundImage(base64Image, base64Image.replace('data:image/', '').split(';')[0]);
+                setBackgroundImage(base64Image, { top : overlayImage.dataset.top, left : overlayImage.dataset.left })
+                    .then(function(){
 
-                backgroundImageOverlay.dataset.active = "false";
-                toolBox.querySelector('li[data-selected="true"]').dataset.selected = "false";
-                selectedTool = undefined;
+                        saveBackgroundImage(base64Image, base64Image.replace('data:image/', '').split(';')[0]);
+
+                        backgroundImageOverlay.dataset.active = "false";
+                        toolBox.querySelector('li[data-selected="true"]').dataset.selected = "false";
+                        selectedTool = undefined;
+
+                    })
+                ;
 
 
 
