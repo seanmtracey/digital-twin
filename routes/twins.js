@@ -144,29 +144,18 @@ router.post(`/image/set/:UUID(${UUIDRegex})`, (req, res) => {
 
 });
 
-router.get(`/image/get/:KEY(${UUIDRegex}).(jpeg|jpg|png)`, (req, res) => {
+router.get(`/image/get/:KEY(${UUIDRegex}).:EXTENSION(jpeg|jpg|png)`, (req, res) => {
 
-    twins.get(req.params.UUID)
-        .then(twin => {
+    const backgroundImageKey = req.params.KEY;
 
-            const backgroundImageKey = twin.backgroundImage.url;
+    debug('KEY:', backgroundImageKey, 'EXT:', req.params.EXTENSION);
 
-            if(!backgroundImageKey){
-                res.status(404);
-                res.end();
-            } else {
-
-                return storage.get(backgroundImageKey, process.env.COS_BACKGROUND_IMAGE_BUCKET)
-                    .then(result => {
-                        return {
-                            contentType : backgroundImageKey.split('.')[1],
-                            data : result.Body
-                        }
-                    })
-                ;
-
+    storage.get(`${backgroundImageKey}.${req.params.EXTENSION}`, process.env.COS_BACKGROUND_IMAGE_BUCKET)
+        .then(result => {
+            return {
+                contentType : backgroundImageKey.split('.')[1],
+                data : result.Body
             }
-
         })
         .then(result => {
             
