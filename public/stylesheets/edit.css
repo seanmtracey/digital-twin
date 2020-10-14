@@ -378,6 +378,7 @@ img.backgroundImage, img.overlayImage{
     outline: 0;
     cursor: pointer;
     box-shadow: 0 1px 1px black;
+    border: 1px solid white;
 }
 
 #backgroundImageOverlay #backgroundImageOverlayActions button[data-action="save"]:hover{
