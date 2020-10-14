@@ -81,6 +81,9 @@ router.post(`/update/:UUID(${UUIDRegex})`, (req, res) => {
 
 router.post(`/image/set/:UUID(${UUIDRegex})`, (req, res) => {
 
+
+    debug('IMAGEPLZ:', req.body.data.backgroundImage);
+
     const base64ImageDescriptorPattern = /(data:image)\/(jpeg|png);base64,/gm;
 
     const image = Buffer.from(req.body.data.backgroundImage.replace(base64ImageDescriptorPattern, ''), 'base64');
@@ -98,7 +101,15 @@ router.post(`/image/set/:UUID(${UUIDRegex})`, (req, res) => {
 
     } else {
 
-        return twins.update(req.params.UUID, { backgroundImage : objectKey }, res.locals.w3id_userid )
+        const imageData = {
+            url : objectKey,
+            position : {
+                x : 0,
+                y : 0,
+            }
+        }
+
+        return twins.update(req.params.UUID, { backgroundImage : imageData }, res.locals.w3id_userid )
             .then(function(){
 
                 storage.put(objectKey, image, process.env.COS_BACKGROUND_IMAGE_BUCKET)
@@ -136,12 +147,12 @@ router.post(`/image/set/:UUID(${UUIDRegex})`, (req, res) => {
 
 });
 
-router.get(`/image/get/:KEY(${UUIDRegex})`, (req, res) => {
+router.get(`/image/get/:KEY(${UUIDRegex}).(jpeg|jpg|png)`, (req, res) => {
 
     twins.get(req.params.UUID)
         .then(twin => {
 
-            const backgroundImageKey = twin.backgroundImage;
+            const backgroundImageKey = twin.backgroundImage.url;
 
             if(!backgroundImageKey){
                 res.status(404);
@@ -162,7 +173,7 @@ router.get(`/image/get/:KEY(${UUIDRegex})`, (req, res) => {
         })
         .then(result => {
             
-            debug("result", result);
+            debug("Image Result:", result);
 
             res.set('Content-Type', `image/${result.contentType}`);
             res.send(result.data);

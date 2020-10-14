@@ -435,7 +435,7 @@
             }
 
             function updateTwinSettings(){
-
+                debugger;
                 const twinName = twinNameSetting.textContent;
                 const twinBroker = twinBrokerSetting.textContent;
 
@@ -466,6 +466,8 @@
             }
 
             function saveBackgroundImage(src, type){
+                
+                debugger;
 
                 fetch(`${window.location.origin}/twins/image/set/${twinUUID}`, {
                         method : "POST",
@@ -498,6 +500,16 @@
 
                 console.log(src);
 
+                var existingBackgroundImage = nodesHolder.querySelector('.backgroundImage');
+
+                if(existingBackgroundImage){
+                    existingBackgroundImage.parentNode.removeChild(existingBackgroundImage);
+                    const existingOverlayImage = backgroundImageOverlay.querySelector('img');
+
+                    existingOverlayImage.parentNode.removeChild(existingOverlayImage);
+
+                }
+
                 const backgroundImage = new Image();
 
                 backgroundImage.classList.add('backgroundImage');
@@ -513,13 +525,16 @@
                         backgroundImage.dataset.top = (window.innerHeight / 2) - (backgroundImage.height / 2);
                     }
 
-                    bindCreationHandlersToNode(backgroundImage, true);
                     backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
                     backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
+                    const overlayBackgroundImage = backgroundImage.cloneNode();
 
-                    //nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
+                    bindCreationHandlersToNode(overlayBackgroundImage, true);
 
-                    backgroundImageOverlay.appendChild(backgroundImage);
+                    nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
+
+                    backgroundImageOverlay.appendChild(overlayBackgroundImage);
+                    twinBackgroundImage = backgroundImage;
 
                 }, false);
 
@@ -537,6 +552,8 @@
             const creationCtx = creationCanvas.getContext('2d');
             const twinNameSetting = document.querySelector('#twinNameSetting');
             const twinBrokerSetting = document.querySelector('#twinBrokerSetting');
+            const twinBackgroundImageSrc = {{#if twinData.backgroundImage}}"{{twinData.backgroundImage.url}}"{{else}}undefined{{/if}};
+            let twinBackgroundImage;
             const backgroundImageOverlay = document.querySelector('#backgroundImageOverlay');
             const backgroundImageSaveBtn = backgroundImageOverlay.querySelector('button[data-action="save"]');
             const backgroundImageCancelBtn = backgroundImageOverlay.querySelector('button[data-action="cancel"]');
@@ -606,7 +623,7 @@
 
                         backgroundImageOverlay.dataset.imageplaced = "true";
                         setBackgroundImage(reader.result);
-                        // saveBackgroundImage(reader.result, file.type);
+                        //saveBackgroundImage(reader.result, file.type);
 
                     }, false);
                 }
@@ -686,6 +703,25 @@
 
                 console.log("SAVE IMAGE");
 
+                const copyCanvas = document.createElement('canvas');
+                copyCanvas.width = twinBackgroundImage.width;
+                copyCanvas.height = twinBackgroundImage.height;
+
+                const copyCtx = copyCanvas.getContext('2d');
+
+                copyCtx.drawImage(twinBackgroundImage, 0, 0);
+                console.log(copyCanvas.toDataURL());
+                const base64Image = copyCanvas.toDataURL();
+                setBackgroundImage(base64Image);
+                saveBackgroundImage(base64Image, base64Image.replace('data:image/', '').split(';')[0]);
+
+                nodesHolder.insertBefore(document.querySelector('.backgroundImage'), document.querySelector('.node'));
+                backgroundImageOverlay.dataset.active = "false";
+                toolBox.querySelector('li[data-selected="true"]').dataset.selected = "false";
+                selectedTool = undefined;
+
+
+
             }, false);
 
             backgroundImageCancelBtn.addEventListener('click', function(){
@@ -696,6 +732,11 @@
                 selectedTool = undefined;
 
             }, false);
+
+            if(twinBackgroundImageSrc){
+                console.log("Background image exists!");
+                setBackgroundImage(`/twins/image/get/${twinBackgroundImageSrc}`);
+            }
 
             twinNameSetting.addEventListener('keydown', function(e){ if( e.keyCode === 13 ){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); this.blur(); } });
             twinBrokerSetting.addEventListener('keydown', function(e){ if( e.keyCode === 13 ){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); this.blur(); } });
