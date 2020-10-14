@@ -722,12 +722,16 @@
             const NodeMutationObserver = new MutationObserver(function(mutations) {
 
                 console.log(mutations);
-                const nodeAddedWasImage = mutations[0].addedNodes[0]?.classList.contains('backgroundImage');
+                let nodeAddedWasImage = mutations[0].addedNodes[0]?.classList.contains('backgroundImage');
                 console.log('HERE:', nodeAddedWasImage);
+
+                if(nodeAddedWasImage === undefined){
+                    nodeAddedWasImage = false;
+                }
 
                 if(!MOVING){
                     
-                    if(!nodeAddedWasImage && nodeAddedWasImage !== undefined){
+                    if(!nodeAddedWasImage){
                         twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
                     }
 
