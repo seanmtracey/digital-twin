@@ -435,7 +435,7 @@
             }
 
             function updateTwinSettings(){
-                {{!-- debugger; --}}
+
                 const twinName = twinNameSetting.textContent;
                 const twinBroker = twinBrokerSetting.textContent;
 
@@ -527,7 +527,8 @@
 
                         backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
                         backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
-
+                        backgroundImage.setAttribute('draggable', 'false');
+                        
                         nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
 
                         twinBackgroundImage = backgroundImage;

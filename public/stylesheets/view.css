@@ -7,6 +7,11 @@ main{
     cursor: crosshair;
 }
 
+img.backgroundImage{
+    position: fixed;
+    user-select: none;
+}
+
 #nodes{
     position: fixed;
     top: 0;

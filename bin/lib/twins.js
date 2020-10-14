@@ -55,6 +55,8 @@ function updateAnExistingTwinWithAGivenID(UUID, data, user){
                     result[key] = data[key];
                 });
 
+                result.modified = Date.now() / 1000 | 0;
+                
                 return database.update(result);
 
             }
