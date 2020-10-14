@@ -36,7 +36,7 @@ main{
     cursor: crosshair;
 }
 
-img.backgroundImage{
+img.backgroundImage, img.overlayImage{
     position: fixed;
 }
 

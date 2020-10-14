@@ -496,7 +496,7 @@
 
             }
 
-            function setBackgroundImage(src, position, size){
+            function setBackgroundImage(src, position){
 
                 console.log(src);
 
@@ -527,18 +527,48 @@
 
                     backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
                     backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
-                    const overlayBackgroundImage = backgroundImage.cloneNode();
 
-                    bindCreationHandlersToNode(overlayBackgroundImage, true);
+                    {{!-- const overlayBackgroundImage = backgroundImage.cloneNode(); --}}
+                    {{!-- bindCreationHandlersToNode(overlayBackgroundImage, true); --}}
+                    {{!-- backgroundImageOverlay.appendChild(overlayBackgroundImage); --}}
 
                     nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
 
-                    backgroundImageOverlay.appendChild(overlayBackgroundImage);
                     twinBackgroundImage = backgroundImage;
 
                 }, false);
 
                 backgroundImage.src = src;
+
+            }
+
+            function setOverlayImage(src, position){
+                
+                const existingOverlayImage = backgroundImageOverlay.querySelector('img');
+
+                if(existingOverlayImage){
+                    existingOverlayImage.parentNode.removeChild(existingOverlayImage);
+                }
+
+                const overlayImage = new Image();
+                overlayImage.classList.add('overlayImage');
+                overlayImage.addEventListener('load', function(){
+                    
+                    overlayImage.dataset.left = (window.innerWidth / 2) - (overlayImage.width / 2);
+                    overlayImage.dataset.top = (window.innerHeight / 2) - (overlayImage.height / 2);
+                    
+                    overlayImage.style.width = overlayImage.width + "px";
+                    overlayImage.style.height = overlayImage.height + "px";
+                    overlayImage.style.left = overlayImage.dataset.left + "px";
+                    overlayImage.style.top = overlayImage.dataset.top + "px";
+
+                    bindCreationHandlersToNode(overlayImage, true);
+
+                    backgroundImageOverlay.appendChild(overlayImage);
+
+                }, false);
+
+                overlayImage.src = src;
 
             }
 
@@ -622,8 +652,9 @@
                         console.log(reader.result);
 
                         backgroundImageOverlay.dataset.imageplaced = "true";
-                        setBackgroundImage(reader.result);
+                        {{!-- setBackgroundImage(reader.result); --}}
                         //saveBackgroundImage(reader.result, file.type);
+                        setOverlayImage(reader.result);
 
                     }, false);
                 }
