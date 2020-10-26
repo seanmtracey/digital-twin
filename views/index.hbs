@@ -3,7 +3,7 @@
     <header>
         <h2>Digital Twins</h2>
     </header>
-	
+
     <ul id="twins">
         {{#each twins}}
 
@@ -25,7 +25,7 @@
             </li>
 
         {{/each}}
-        
+
         <!--<li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
             <div class="viewOptions">
                 <a href="/view">View</a>
@@ -54,6 +54,7 @@
 
                 <div id="brokerConfig" class="side-by-side">
                     <input type="text" name="twinbroker" placeholder="MQTT Broker Host" />
+                    <input type="text" name="port" placeholder="Port" />
                     <button id="testBrokerConnection" type="button" data-testing="false">Test</button>
                     <div id="status"></div>
                 </div>
@@ -96,6 +97,7 @@
         const statusIndicator = brokerConfig.querySelector('#status');
 
         const websocketProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        let ws;
 
         createTwinForm.addEventListener('submit', function(e){
 
@@ -139,21 +141,22 @@
         }, false);
 
         closeCreateDialogBtn.addEventListener('click', function(e){
-            
+
             createTwinDialog.dataset.visible = "false";
             createTwinForm.reset();
 
         }, false);
 
         testBrokerConnection.addEventListener('click', function(e){
-            console.log(e);
 
             if(this.dataset.testing === "false"){
 
                 this.dataset.testing = "true";
 
-                const brokerHost = brokerConfig.querySelector('input').value;
-                let ws;
+                const brokerHostInput = brokerConfig.querySelector('input[name="twinbroker"]').value;
+                const brokerAddress = brokerHostInput.startsWith('mqtt://') ? brokerHostInput : `mqtt://${brokerHostInput}`;
+                const brokerPortInput = brokerConfig.querySelector('input[name="port"]').value;
+                const brokerPort = brokerPortInput === "" ? '1883' : brokerPortInput;
 
                 function connectToWebSocketServer(){
 
@@ -167,8 +170,8 @@
                             type : 'connect',
                             data : {
                                 connectionDetails : {
-                                    broker : `${brokerHost}`,
-                                    port : 1883
+                                    broker : brokerAddress,
+                                    port : brokerPort
                                 }
                             }
                         }));
@@ -187,15 +190,18 @@
                         }
 
                         testBrokerConnection.dataset.testing = "false";
-                        ws.close();
+
+                        if(ws.readyState === 1){
+                            ws.close();
+                        }
 
                     });
 
                 }
 
                 connectToWebSocketServer();
-                
-                console.log(brokerHost);
+
+                console.log(brokerHostInput, brokerAddress, brokerPortInput, brokerPort);
 
             }
 

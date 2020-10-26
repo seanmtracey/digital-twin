@@ -187,6 +187,11 @@ ul#twins li.item .details{
     width: 100%;
 }
 
+#createTwinDialog div.wrapper form #brokerConfig input[name="port"]{
+    max-width: 50px;
+    margin-left: 0.5em;
+}
+
 #createTwinDialog div.wrapper form #brokerConfig #testBrokerConnection{
     margin-left: 1em;
 }
