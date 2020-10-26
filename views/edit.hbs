@@ -80,6 +80,7 @@
     <div id="twinDetails">
         <span>Twin name:</span> <h3 id="twinNameSetting" >{{twinData.name}}</h3>
         <span>Twin Broker: </span> <h3 id="twinBrokerSetting">{{twinData.broker}}</h3>
+        <div class="brokerStatus"></div>
         <button id="editTwin">Configure</button>
         <a href="/view/{{twinData.UUID}}" target="_blank">View Twin</a>
     </div>
@@ -95,7 +96,7 @@
                     <input type="text" name="twinbroker" value="{{twinData.broker}}" placeholder="MQTT Broker Host" />
                     <input type="text" name="port" value="{{twinData.port}}" placeholder="Port" />
                     <button id="testBrokerConnection" type="button" data-testing="false">Test</button>
-                    <div id="status"></div>
+                    <div class="brokerStatus"></div>
                 </div>
 
                 <input type="submit" value="Save Settings" />
@@ -638,6 +639,14 @@
                 return connectToWebSocketServer();
             }
 
+            function updateBrokerStatus(status){
+
+                statusIndicators.forEach(indicator => {
+                    indicator.dataset.status = status;
+                });
+
+            }
+
             const twinUUID = "{{twinData.UUID}}";
             const nodesHolder = document.querySelector('#nodes');
             const toolBox = document.querySelector('#toolBox');
@@ -661,7 +670,13 @@
             const editTwinForm = editTwinDialog.querySelector('form');
             const brokerConfig = editTwinDialog.querySelector('#brokerConfig');
             const testBrokerConnectionBtn = brokerConfig.querySelector('#testBrokerConnection');
-            const statusIndicator = brokerConfig.querySelector('#status');
+
+            const initialBrokerHostInput = brokerConfig.querySelector('input[name="twinbroker"]').value;
+            const initialBrokerAddress = initialBrokerHostInput.startsWith('mqtt://') ? initialBrokerHostInput : `mqtt://${initialBrokerHostInput}`;
+            const initialBrokerPortInput = brokerConfig.querySelector('input[name="port"]').value;
+            const initialBrokerPort = initialBrokerPortInput === undefined ? '1883' : initialBrokerPortInput;
+
+            const statusIndicators = Array.from(document.body.querySelectorAll('.brokerStatus'));
 
             creationCanvas.width = window.innerWidth * window.devicePixelRatio;
             creationCanvas.height = window.innerHeight * window.devicePixelRatio;
@@ -929,15 +944,17 @@
                     const brokerPortInput = brokerConfig.querySelector('input[name="port"]').value;
                     const brokerPort = brokerPortInput === "" ? '1883' : brokerPortInput;
 
-                    statusIndicator.dataset.status = "connecting";
+                    //statusIndicator.dataset.status = "connecting";
+
+                    updateBrokerStatus("connecting");
 
                     testBrokerConnection(brokerAddress, brokerPort)
                         .then(wasSuccessful => {
                             this.dataset.testing = "false";
                             if(wasSuccessful){
-                                statusIndicator.dataset.status = "success";
+                                updateBrokerStatus("success");
                             } else {
-                                statusIndicator.dataset.status = "fail";
+                                updateBrokerStatus("fail");
                             }
                         })
                         .catch(err => {
@@ -950,6 +967,21 @@
                 }
 
             }, false);
+
+            updateBrokerStatus("connecting");
+
+            testBrokerConnection(initialBrokerAddress, initialBrokerPort)
+                .then(wasSuccessful => {
+                    if(wasSuccessful){
+                        updateBrokerStatus("success");
+                    } else {
+                        updateBrokerStatus("fail");
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+            ;
 
             window.addEventListener('resize', (e) => {
                 creationCanvas.width = window.innerWidth * window.devicePixelRatio;

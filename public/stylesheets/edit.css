@@ -325,7 +325,7 @@ img.backgroundImage, img.overlayImage{
 }
 
 #twinDetails h3:last-of-type{
-    margin-right: 1em;
+    margin-right: 0em;
 }
 
 #twinDetails #editTwin{
@@ -450,7 +450,7 @@ img.backgroundImage, img.overlayImage{
     cursor: not-allowed;
 }
 
-#editTwinDialog div.wrapper form #brokerConfig #status{
+.brokerStatus{
     width: 15px;
     height: 15px;
     background: #c5c5c5;
@@ -460,7 +460,7 @@ img.backgroundImage, img.overlayImage{
     box-sizing: border-box;
 }
 
-#editTwinDialog div.wrapper form #brokerConfig #status[data-status="connecting"]{
+.brokerStatus[data-status="connecting"]{
     background: #fb9700;
     border: 1px solid #af7217;
     animation-duration: 0.5s;
@@ -469,12 +469,12 @@ img.backgroundImage, img.overlayImage{
     animation-timing-function: ease-in-out;
 }
 
-#editTwinDialog div.wrapper form #brokerConfig #status[data-status="success"]{
+.brokerStatus[data-status="success"]{
     background: #35de35;
     border: 1px solid #10a510;
 }
 
-#editTwinDialog div.wrapper form #brokerConfig #status[data-status="fail"]{
+.brokerStatus[data-status="fail"]{
     background: #f33e3e;
     border: 1px solid #881e1e;
 }
