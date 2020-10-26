@@ -21,9 +21,15 @@ function bindEventsForClient(socket){
 				if(!payload.data.connectionDetails){
 					debug(`MQTT connection details were not passed.`, payload.data);
 				} else {
+					
+					const storedBrokerAddress = payload.data.connectionDetails.broker;
+					const storedBrokerPort = payload.data.connectionDetails.port;
 
-					mqttClient = mqtt.connect(payload.data.connectionDetails.broker, {
-						port : Number(payload.data.connectionDetails.port) || 1883,
+					const brokerAddress = storedBrokerAddress.startsWith('mqtt://') ? storedBrokerAddress : `mqtt://${storedBrokerAddress}`;
+					const brokerPort = storedBrokerPort === "" ? '1883' : storedBrokerPort;
+
+					mqttClient = mqtt.connect(brokerAddress, {
+						port : Number(brokerPort) || 1883,
 						connectTimeout : 5 * 1000,
 						username : payload.data.connectionDetails.username,
 						password : payload.data.connectionDetails.password,
@@ -51,7 +57,7 @@ function bindEventsForClient(socket){
 								type : 'connectionStatus',
 								data : err
 							}));
-							
+
 						}
 
 					}

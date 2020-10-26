@@ -104,6 +104,11 @@
             e.preventDefault();
             e.stopImmediatePropagation();
 
+            const brokerHostInput = brokerConfig.querySelector('input[name="twinbroker"]').value;
+            const brokerAddress = brokerHostInput.startsWith('mqtt://') ? brokerHostInput : `mqtt://${brokerHostInput}`;
+            const brokerPortInput = brokerConfig.querySelector('input[name="port"]').value;
+            const brokerPort = brokerPortInput === undefined ? '1883' : brokerPortInput;
+
             fetch(`/twins/create`, {
                     method : "POST",
                     headers : {
@@ -111,7 +116,8 @@
                     },
                     body : JSON.stringify({
                         name : this[0].value,
-                        broker : this[1].value
+                        broker : brokerAddress,
+                        port : brokerPort
                     })
                 })
                 .then(response => {
