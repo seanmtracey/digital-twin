@@ -21,13 +21,21 @@ function bindEventsForClient(socket){
 				if(!payload.data.connectionDetails){
 					debug(`MQTT connection details were not passed.`, payload.data);
 				} else {
+					
+					const storedBrokerAddress = payload.data.connectionDetails.broker;
+					const storedBrokerPort = payload.data.connectionDetails.port;
 
-					mqttClient = mqtt.connect(payload.data.connectionDetails.broker, {
-						port : payload.data.connectionDetails.port || 1883,
-						connectTimeout : 15 * 1000,
+					const brokerAddress = storedBrokerAddress.startsWith('mqtt://') ? storedBrokerAddress : `mqtt://${storedBrokerAddress}`;
+					const brokerPort = storedBrokerPort === "" ? '1883' : storedBrokerPort;
+
+					mqttClient = mqtt.connect(brokerAddress, {
+						port : Number(brokerPort) || 1883,
+						connectTimeout : 5 * 1000,
 						username : payload.data.connectionDetails.username,
 						password : payload.data.connectionDetails.password,
-						clientId : payload.data.connectionDetails.clientId
+						clientId : payload.data.connectionDetails.clientId,
+						rejectUnauthorized: false,
+						reconnectPeriod : 0
 					});
 					
 					mqttClient.on('connect', function () {
@@ -38,14 +46,30 @@ function bindEventsForClient(socket){
 							data : 'connected'
 						}) );
 					});
+					
+					function handleDisconnect(err){
+						debug('MQTT Broker Disconnected:', err);
+						
+						if(socket.readyState === 1){
 
-					mqttClient.on('err', err => {
-						debug('MQTT Broker error:', err);
-					})
+							socket.send( JSON.stringify({
+								status : 'err',
+								type : 'connectionStatus',
+								data : err
+							}));
+
+						}
+
+					}
+
+					mqttClient.on('close', handleDisconnect);
+					mqttClient.on('offline', handleDisconnect);
+					mqttClient.on('error', handleDisconnect);
 
 				}
 
 			}
+
 		}
 
 		if(payload.type === "subscribe"){
@@ -85,7 +109,7 @@ function bindEventsForClient(socket){
 
 					}
 
-				})
+				});
 
 			}
 

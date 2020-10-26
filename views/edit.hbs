@@ -78,9 +78,30 @@
     </div>
 
     <div id="twinDetails">
-        <span>Twin name:</span> <h3 id="twinNameSetting" contenteditable="true">{{twinData.name}}</h3>
-        <span>Twin Broker: </span> <h3 id="twinBrokerSetting" contenteditable="true">{{twinData.broker}}</h3>
+        <span>Twin name:</span> <h3 id="twinNameSetting" >{{twinData.name}}</h3>
+        <span>Twin Broker: </span> <h3 id="twinBrokerSetting">{{twinData.broker}}</h3>
+        <div class="brokerStatus"></div>
+        <button id="editTwin">Configure</button>
         <a href="/view/{{twinData.UUID}}" target="_blank">View Twin</a>
+    </div>
+
+    <div id="editTwinDialog" class="modal" data-visible="false">
+        <div class="wrapper">
+            <div id="closeCreationDialog" class="closeDialogBtn"></div>
+            <h3>Edit Digital Twin Settings</h3>
+            <form>
+                <input type="text" name="twinname" value="{{twinData.name}}" placeholder="Enter Digital Twin name" />
+
+                <div id="brokerConfig" class="side-by-side">
+                    <input type="text" name="twinbroker" value="{{twinData.broker}}" placeholder="MQTT Broker Host" />
+                    <input type="text" name="port" value="{{twinData.port}}" placeholder="Port" />
+                    <button id="testBrokerConnection" type="button" data-testing="false">Test</button>
+                    <div class="brokerStatus"></div>
+                </div>
+
+                <input type="submit" value="Save Settings" />
+            </form>
+        </div>
     </div>
 
     <script src="/scripts/utilities.js"></script>
@@ -434,18 +455,15 @@
 
             }
 
-            function updateTwinSettings(){
+            function updateTwinSettings(name, broker, port){
 
-                const twinName = twinNameSetting.textContent;
-                const twinBroker = twinBrokerSetting.textContent;
-
-                fetch(`${window.location.origin}/twins/update/${twinUUID}`, {
+                return fetch(`${window.location.origin}/twins/update/${twinUUID}`, {
                         method : 'POST',
                         headers : {
                             'Content-Type' : 'application/json'
                         },
                         credentials : 'same-origin',
-                        body: JSON.stringify( { data : { name : twinName, broker: twinBroker } })
+                        body: JSON.stringify( { data : { name : name, broker: broker, port : port } })
                     })
                     .then(res => {
                         if(res.ok){
@@ -454,12 +472,7 @@
                             throw res;
                         }
                     })
-                    .then(result => {
-                        console.log('Updated twin settings:', result);
-                    })
-                    .catch(err => {
-                        console.log('Could not update Twin settings. Err:', err);
-                    })
+                ;
 
                 console.log(twinName, twinBroker);
 
@@ -577,6 +590,63 @@
 
             }
 
+            function testBrokerConnection(host, port){
+
+                const brokerAddress = host.startsWith('mqtt://') ? host : `mqtt://${host}`;
+                const brokerPort = port === "" ? '1883' : port;
+
+                function connectToWebSocketServer(){
+
+                    return new Promise( ( resolve, reject ) => {
+
+                        ws = new WebSocket(`${websocketProtocol}://${window.location.host}`);
+
+                        ws.addEventListener('open', function(e){
+                            console.log(`Websocket connection opened`, e);
+                            ws.send(JSON.stringify({
+                                type : 'connect',
+                                data : {
+                                    connectionDetails : {
+                                        broker : brokerAddress,
+                                        port : brokerPort
+                                    }
+                                }
+                            }));
+
+                        });
+
+                        ws.addEventListener('message', function(e){
+                            console.log(e);
+
+                            const data = JSON.parse(e.data);
+
+                            if(data.status === "ok"){
+                                resolve(true);
+                            } else if(data.status === "err"){
+                                resolve(false);
+                            }
+
+                            if(ws.readyState === 1){
+                                ws.close();
+                            }
+
+                        });
+
+                    });
+
+                }
+
+                return connectToWebSocketServer();
+            }
+
+            function updateBrokerStatus(status){
+
+                statusIndicators.forEach(indicator => {
+                    indicator.dataset.status = status;
+                });
+
+            }
+
             const twinUUID = "{{twinData.UUID}}";
             const nodesHolder = document.querySelector('#nodes');
             const toolBox = document.querySelector('#toolBox');
@@ -593,6 +663,20 @@
             const backgroundImageOverlay = document.querySelector('#backgroundImageOverlay');
             const backgroundImageSaveBtn = backgroundImageOverlay.querySelector('button[data-action="save"]');
             const backgroundImageCancelBtn = backgroundImageOverlay.querySelector('button[data-action="cancel"]');
+
+            const editTwinBtn = document.querySelector("#editTwin");
+            const editTwinDialog = document.querySelector('#editTwinDialog');
+            const closeCreateDialogBtn = editTwinDialog.querySelector('.closeDialogBtn');
+            const editTwinForm = editTwinDialog.querySelector('form');
+            const brokerConfig = editTwinDialog.querySelector('#brokerConfig');
+            const testBrokerConnectionBtn = brokerConfig.querySelector('#testBrokerConnection');
+
+            const initialBrokerHostInput = brokerConfig.querySelector('input[name="twinbroker"]').value;
+            const initialBrokerAddress = initialBrokerHostInput.startsWith('mqtt://') ? initialBrokerHostInput : `mqtt://${initialBrokerHostInput}`;
+            const initialBrokerPortInput = brokerConfig.querySelector('input[name="port"]').value;
+            const initialBrokerPort = initialBrokerPortInput === undefined ? '1883' : initialBrokerPortInput;
+
+            const statusIndicators = Array.from(document.body.querySelectorAll('.brokerStatus'));
 
             creationCanvas.width = window.innerWidth * window.devicePixelRatio;
             creationCanvas.height = window.innerHeight * window.devicePixelRatio;
@@ -796,12 +880,6 @@
                 setBackgroundImage(`/twins/image/get/${twinBackgroundImageSrc}`, twinBackgroundImagePosition);
             }
 
-            twinNameSetting.addEventListener('keydown', function(e){ if( e.keyCode === 13 ){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); this.blur(); } });
-            twinBrokerSetting.addEventListener('keydown', function(e){ if( e.keyCode === 13 ){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); this.blur(); } });
-
-            twinNameSetting.addEventListener('blur', updateTwinSettings, false);
-            twinBrokerSetting.addEventListener('blur', updateTwinSettings, false);
-
             window.addEventListener('keydown', (e) => {
                 console.log(e);
                 // If the backspace key is pressed, and a node is selected, but the none of the input
@@ -815,6 +893,95 @@
                 }
 
             });
+
+            const websocketProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            let ws;
+
+            editTwinForm.addEventListener('submit', function(e){
+
+                e.preventDefault();
+                e.stopImmediatePropagation();
+
+                const twinName = editTwinForm.querySelector('input[name="twinname"]').value;
+                const brokerHostInput = brokerConfig.querySelector('input[name="twinbroker"]').value;
+                const brokerAddress = brokerHostInput.startsWith('mqtt://') ? brokerHostInput : `mqtt://${brokerHostInput}`;
+                const brokerPortInput = brokerConfig.querySelector('input[name="port"]').value;
+                const brokerPort = brokerPortInput === undefined ? '1883' : brokerPortInput;
+
+                updateTwinSettings(twinName, brokerAddress, brokerPort) 
+                    .then(result => {
+                        console.log('Updated twin settings:', result);
+                        editTwinDialog.dataset.visible = "false";
+                        window.location = window.location;
+                    })
+                    .catch(err => {
+                        console.log('Could not update Twin settings. Err:', err);
+                    })
+                ;
+
+            }, false);
+
+            editTwinBtn.addEventListener('click', function(e){
+                e.preventDefault();
+                editTwinDialog.dataset.visible = "true";
+
+            }, false);
+
+            closeCreateDialogBtn.addEventListener('click', function(e){
+
+                editTwinDialog.dataset.visible = "false";
+
+            }, false);
+
+            testBrokerConnectionBtn.addEventListener('click', function(e){
+
+                if(this.dataset.testing === "false"){
+
+                    this.dataset.testing = "true";
+
+                    const brokerHostInput = brokerConfig.querySelector('input[name="twinbroker"]').value;
+                    const brokerAddress = brokerHostInput.startsWith('mqtt://') ? brokerHostInput : `mqtt://${brokerHostInput}`;
+                    const brokerPortInput = brokerConfig.querySelector('input[name="port"]').value;
+                    const brokerPort = brokerPortInput === "" ? '1883' : brokerPortInput;
+
+                    //statusIndicator.dataset.status = "connecting";
+
+                    updateBrokerStatus("connecting");
+
+                    testBrokerConnection(brokerAddress, brokerPort)
+                        .then(wasSuccessful => {
+                            this.dataset.testing = "false";
+                            if(wasSuccessful){
+                                updateBrokerStatus("success");
+                            } else {
+                                updateBrokerStatus("fail");
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        })
+                    ;
+
+                    console.log(brokerHostInput, brokerAddress, brokerPortInput, brokerPort);
+
+                }
+
+            }, false);
+
+            updateBrokerStatus("connecting");
+
+            testBrokerConnection(initialBrokerAddress, initialBrokerPort)
+                .then(wasSuccessful => {
+                    if(wasSuccessful){
+                        updateBrokerStatus("success");
+                    } else {
+                        updateBrokerStatus("fail");
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+            ;
 
             window.addEventListener('resize', (e) => {
                 creationCanvas.width = window.innerWidth * window.devicePixelRatio;

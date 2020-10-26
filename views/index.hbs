@@ -3,7 +3,7 @@
     <header>
         <h2>Digital Twins</h2>
     </header>
-	
+
     <ul id="twins">
         {{#each twins}}
 
@@ -25,7 +25,7 @@
             </li>
 
         {{/each}}
-        
+
         <!--<li class="item" style="background-image: url('/images/placeholder-twin.jpg')">
             <div class="viewOptions">
                 <a href="/view">View</a>
@@ -51,7 +51,14 @@
             <h3>Create new Digital Twin</h3>
             <form>
                 <input type="text" name="twinname" placeholder="Enter Digital Twin name" />
-                <input type="text" name="twinbroker" placeholder="Enter MQTT broker address for twin" />
+
+                <div id="brokerConfig" class="side-by-side">
+                    <input type="text" name="twinbroker" placeholder="MQTT Broker Host" />
+                    <input type="text" name="port" placeholder="Port" />
+                    <button id="testBrokerConnection" type="button" data-testing="false">Test</button>
+                    <div id="status"></div>
+                </div>
+
                 <input type="submit" value="Create Twin" />
             </form>
         </div>
@@ -85,11 +92,22 @@
         const createTwinDialog = document.querySelector('#createTwinDialog');
         const closeCreateDialogBtn = createTwinDialog.querySelector('.closeDialogBtn');
         const createTwinForm = createTwinDialog.querySelector('form');
+        const brokerConfig = createTwinDialog.querySelector('#brokerConfig');
+        const testBrokerConnection = brokerConfig.querySelector('#testBrokerConnection');
+        const statusIndicator = brokerConfig.querySelector('#status');
+
+        const websocketProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        let ws;
 
         createTwinForm.addEventListener('submit', function(e){
 
             e.preventDefault();
             e.stopImmediatePropagation();
+
+            const brokerHostInput = brokerConfig.querySelector('input[name="twinbroker"]').value;
+            const brokerAddress = brokerHostInput.startsWith('mqtt://') ? brokerHostInput : `mqtt://${brokerHostInput}`;
+            const brokerPortInput = brokerConfig.querySelector('input[name="port"]').value;
+            const brokerPort = brokerPortInput === undefined ? '1883' : brokerPortInput;
 
             fetch(`/twins/create`, {
                     method : "POST",
@@ -98,7 +116,8 @@
                     },
                     body : JSON.stringify({
                         name : this[0].value,
-                        broker : this[1].value
+                        broker : brokerAddress,
+                        port : brokerPort
                     })
                 })
                 .then(response => {
@@ -128,9 +147,69 @@
         }, false);
 
         closeCreateDialogBtn.addEventListener('click', function(e){
-            
+
             createTwinDialog.dataset.visible = "false";
             createTwinForm.reset();
+
+        }, false);
+
+        testBrokerConnection.addEventListener('click', function(e){
+
+            if(this.dataset.testing === "false"){
+
+                this.dataset.testing = "true";
+
+                const brokerHostInput = brokerConfig.querySelector('input[name="twinbroker"]').value;
+                const brokerAddress = brokerHostInput.startsWith('mqtt://') ? brokerHostInput : `mqtt://${brokerHostInput}`;
+                const brokerPortInput = brokerConfig.querySelector('input[name="port"]').value;
+                const brokerPort = brokerPortInput === "" ? '1883' : brokerPortInput;
+
+                function connectToWebSocketServer(){
+
+                    ws = new WebSocket(`${websocketProtocol}://${window.location.host}`);
+
+                    statusIndicator.dataset.status = "connecting";
+
+                    ws.addEventListener('open', function(e){
+                        console.log(`Websocket connection opened`, e);
+                        ws.send(JSON.stringify({
+                            type : 'connect',
+                            data : {
+                                connectionDetails : {
+                                    broker : brokerAddress,
+                                    port : brokerPort
+                                }
+                            }
+                        }));
+
+                    });
+
+                    ws.addEventListener('message', function(e){
+                        console.log(e);
+
+                        const data = JSON.parse(e.data);
+
+                        if(data.status === "ok"){
+                            statusIndicator.dataset.status = "success";
+                        } else if(data.status === "err"){
+                            statusIndicator.dataset.status = "fail";
+                        }
+
+                        testBrokerConnection.dataset.testing = "false";
+
+                        if(ws.readyState === 1){
+                            ws.close();
+                        }
+
+                    });
+
+                }
+
+                connectToWebSocketServer();
+
+                console.log(brokerHostInput, brokerAddress, brokerPortInput, brokerPort);
+
+            }
 
         }, false);
 

@@ -71,3 +71,69 @@ main header h2{
 #configurePanel #closePanelBtn:hover{
     background-color: #9e9e9e;
 }
+
+.side-by-side{
+    display: flex;
+    align-items: center;
+}
+
+.modal{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #b1b1b1e6;
+    z-index: 20;
+}
+
+.modal div.wrapper{
+    border: 1px solid #b9b8b8;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 3px;
+    position: relative;
+    background: white;
+    padding: 1.5em;
+    border: 1px solid rgb(0 0 0 / 0.5);
+    box-shadow: 0 2px 3px rgb(0 0 0 / 0.4);
+    padding-bottom: 0.5em;
+}
+
+.modal div.wrapper form{
+    display: flex;
+    flex-direction: column;
+    margin: 1em 0;
+}
+
+.modal div.wrapper form input[type="text"]{
+    font-size: 1em;
+    border: 0px solid transparent;
+    border-bottom: 1px solid black;
+    padding: 0 0 0.4em;
+    margin-bottom: 1em;
+    outline: transparent;
+}
+
+.modal div.wrapper form input[type="submit"]{
+    width: 100%;
+    max-width: 150px;
+}
+
+.modal button[type="button"], .modal input[type="submit"] {
+    padding: 0.5em 1em;
+    background: #000000;
+    color: white;
+    text-decoration: none;
+    border-radius: 3px;
+    border: 1px solid #ffffff;
+    text-shadow: 0 1px 1px black;
+    box-shadow: 0 2px 3px #7d7d7d;
+    min-width: 20%;
+    text-align: center;
+    cursor: pointer;
+    max-width: 150px;
+}

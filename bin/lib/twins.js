@@ -3,7 +3,7 @@ const uuid = require('uuid').v4;
 const database = require(`${__dirname}/database`);
 const sanitizeDocument = require(`${__dirname}/sanitize_documents`);
 
-const twinsWhitelistProperties = ['owner', 'nodes', 'settings', 'UUID', 'name', 'created', 'broker', 'modified', 'backgroundImage'];
+const twinsWhitelistProperties = ['owner', 'nodes', 'settings', 'UUID', 'name', 'created', 'broker', 'modified', 'backgroundImage', 'port'];
 
 function getAnExistingTwinWithAnID(UUID){
 
@@ -102,9 +102,11 @@ function createANewTwin(data){
         name : data.name,
         owner : data.owner,
         broker : data.broker,
+        port : data.port || 1883,
         nodes : data.nodes || [],
         settings : data.settings || [],
-        created: Date.now() / 1000 | 0
+        created: Date.now() / 1000 | 0,
+        modified: Date.now() / 1000 | 0
     };
 
     return database.write(newTwin)
