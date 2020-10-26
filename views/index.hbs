@@ -91,8 +91,11 @@
         const createTwinDialog = document.querySelector('#createTwinDialog');
         const closeCreateDialogBtn = createTwinDialog.querySelector('.closeDialogBtn');
         const createTwinForm = createTwinDialog.querySelector('form');
-        const testBrokerConnection = createTwinDialog.querySelector('#testBrokerConnection');
-        const statusIndicator = createTwinDialog.querySelector('#status');
+        const brokerConfig = createTwinDialog.querySelector('#brokerConfig');
+        const testBrokerConnection = brokerConfig.querySelector('#testBrokerConnection');
+        const statusIndicator = brokerConfig.querySelector('#status');
+
+        const websocketProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 
         createTwinForm.addEventListener('submit', function(e){
 
@@ -149,16 +152,50 @@
 
                 this.dataset.testing = "true";
 
-                statusIndicator.dataset.status = "connecting";
+                const brokerHost = brokerConfig.querySelector('input').value;
+                let ws;
 
-                setTimeout(function(){
-                    statusIndicator.dataset.status = "success";
-                }, 3000);
+                function connectToWebSocketServer(){
 
-                setTimeout(function(){
-                    statusIndicator.dataset.status = "fail";
-                    testBrokerConnection.dataset.testing = "false";
-                }, 5000);
+                    ws = new WebSocket(`${websocketProtocol}://${window.location.host}`);
+
+                    statusIndicator.dataset.status = "connecting";
+
+                    ws.addEventListener('open', function(e){
+                        console.log(`Websocket connection opened`, e);
+                        ws.send(JSON.stringify({
+                            type : 'connect',
+                            data : {
+                                connectionDetails : {
+                                    broker : `${brokerHost}`,
+                                    port : 1883
+                                }
+                            }
+                        }));
+
+                    });
+
+                    ws.addEventListener('message', function(e){
+                        console.log(e);
+
+                        const data = JSON.parse(e.data);
+
+                        if(data.status === "ok"){
+                            statusIndicator.dataset.status = "success";
+                        } else if(data.status === "err"){
+                            statusIndicator.dataset.status = "fail";
+                        }
+
+                        testBrokerConnection.dataset.testing = "false";
+                        ws.close();
+
+                    });
+
+                }
+
+                connectToWebSocketServer();
+                
+                console.log(brokerHost);
 
             }
 

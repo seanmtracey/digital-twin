@@ -55,14 +55,6 @@ function bindEventsForClient(socket){
 			}
 		}
 
-		if(payload.type === "disconnect"){
-			
-			mqttClient.end(true, function(){
-				console.log(`Succesfully disconnected from broker ${ mqttClient.options.href }`);
-			});
-
-		}
-
 		if(payload.type === "subscribe"){
 
 			if(!mqttClient){
