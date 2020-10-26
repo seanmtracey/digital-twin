@@ -12,7 +12,7 @@
                     <a href="/view/{{UUID}}" target="_blank">View</a>
                     <a href="/edit/{{UUID}}" target="_blank">Edit</a>
                 </div>
-                <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
+                <a class="subOptionsToggle" data-open="false"></a>
                 <ul class="subOptions" data-visible="false">
                     <li data-action="edit">Edit Settings</li>
                     <li data-action="duplicate">Duplicate Twin</li>
@@ -75,7 +75,8 @@
         Array.from( document.querySelectorAll('#twins .item .subOptionsToggle') ).forEach(subOptionsToggle => {
 
             subOptionsToggle.addEventListener('click', function(e){
-
+                
+                this.dataset.open = this.dataset.open === "true" ? "false" : "true"
                 const options = this.parentNode.querySelector('.subOptions');
 
                 if(options.dataset.visible === "false"){
@@ -210,6 +211,25 @@
                 console.log(brokerHostInput, brokerAddress, brokerPortInput, brokerPort);
 
             }
+
+        }, false);
+
+        document.body.addEventListener('click', function(e){
+
+            console.log(e.target);
+
+            if(!e.target.parentNode.classList.contains('subOptions') && !e.target.classList.contains('subOptionsToggle')){
+
+                Array.from( document.querySelectorAll('.subOptions') ).forEach(subOption => {
+                    subOption.dataset.visible = "false";
+                });
+
+                Array.from( document.querySelectorAll('.subOptionsToggle') ).forEach(subOptionToggle => {
+                    subOptionToggle.dataset.open = "false";
+                });
+
+            }
+
 
         }, false);
 
