@@ -84,21 +84,21 @@
         <a href="/view/{{twinData.UUID}}" target="_blank">View Twin</a>
     </div>
 
-    <div id="editTwinDialog" class="modal" data-visible="true">
+    <div id="editTwinDialog" class="modal" data-visible="false">
         <div class="wrapper">
             <div id="closeCreationDialog" class="closeDialogBtn"></div>
             <h3>Edit Digital Twin Settings</h3>
             <form>
-                <input type="text" name="twinname" placeholder="Enter Digital Twin name" />
+                <input type="text" name="twinname" value="{{twinData.name}}" placeholder="Enter Digital Twin name" />
 
                 <div id="brokerConfig" class="side-by-side">
-                    <input type="text" name="twinbroker" placeholder="MQTT Broker Host" />
-                    <input type="text" name="port" placeholder="Port" />
+                    <input type="text" name="twinbroker" value="{{twinData.broker}}" placeholder="MQTT Broker Host" />
+                    <input type="text" name="port" value="{{twinData.port}}" placeholder="Port" />
                     <button id="testBrokerConnection" type="button" data-testing="false">Test</button>
                     <div id="status"></div>
                 </div>
 
-                <input type="submit" value="Create Twin" />
+                <input type="submit" value="Save Settings" />
             </form>
         </div>
     </div>
@@ -454,18 +454,15 @@
 
             }
 
-            function updateTwinSettings(){
+            function updateTwinSettings(name, broker, port){
 
-                const twinName = twinNameSetting.textContent;
-                const twinBroker = twinBrokerSetting.textContent;
-
-                fetch(`${window.location.origin}/twins/update/${twinUUID}`, {
+                return fetch(`${window.location.origin}/twins/update/${twinUUID}`, {
                         method : 'POST',
                         headers : {
                             'Content-Type' : 'application/json'
                         },
                         credentials : 'same-origin',
-                        body: JSON.stringify( { data : { name : twinName, broker: twinBroker } })
+                        body: JSON.stringify( { data : { name : name, broker: broker, port : port } })
                     })
                     .then(res => {
                         if(res.ok){
@@ -474,12 +471,7 @@
                             throw res;
                         }
                     })
-                    .then(result => {
-                        console.log('Updated twin settings:', result);
-                    })
-                    .catch(err => {
-                        console.log('Could not update Twin settings. Err:', err);
-                    })
+                ;
 
                 console.log(twinName, twinBroker);
 
@@ -895,19 +887,27 @@
                 e.preventDefault();
                 e.stopImmediatePropagation();
 
+                const twinName = editTwinForm.querySelector('input[name="twinname"]').value;
                 const brokerHostInput = brokerConfig.querySelector('input[name="twinbroker"]').value;
                 const brokerAddress = brokerHostInput.startsWith('mqtt://') ? brokerHostInput : `mqtt://${brokerHostInput}`;
                 const brokerPortInput = brokerConfig.querySelector('input[name="port"]').value;
                 const brokerPort = brokerPortInput === undefined ? '1883' : brokerPortInput;
 
-                console.log(brokerHostInput, brokerAddress, brokerPortInput, brokerPort);
+                updateTwinSettings(twinName, brokerAddress, brokerPort) 
+                    .then(result => {
+                        console.log('Updated twin settings:', result);
+                        editTwinDialog.dataset.visible = "false";
+                        window.location = window.location;
+                    })
+                    .catch(err => {
+                        console.log('Could not update Twin settings. Err:', err);
+                    })
+                ;
 
             }, false);
 
             editTwinBtn.addEventListener('click', function(e){
                 e.preventDefault();
-
-                editTwinForm.reset();
                 editTwinDialog.dataset.visible = "true";
 
             }, false);
@@ -915,7 +915,6 @@
             closeCreateDialogBtn.addEventListener('click', function(e){
 
                 editTwinDialog.dataset.visible = "false";
-                editTwinForm.reset();
 
             }, false);
 
@@ -951,7 +950,6 @@
                 }
 
             }, false);
-
 
             window.addEventListener('resize', (e) => {
                 creationCanvas.width = window.innerWidth * window.devicePixelRatio;

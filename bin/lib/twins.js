@@ -3,7 +3,7 @@ const uuid = require('uuid').v4;
 const database = require(`${__dirname}/database`);
 const sanitizeDocument = require(`${__dirname}/sanitize_documents`);
 
-const twinsWhitelistProperties = ['owner', 'nodes', 'settings', 'UUID', 'name', 'created', 'broker', 'modified', 'backgroundImage'];
+const twinsWhitelistProperties = ['owner', 'nodes', 'settings', 'UUID', 'name', 'created', 'broker', 'modified', 'backgroundImage', 'port'];
 
 function getAnExistingTwinWithAnID(UUID){
 
