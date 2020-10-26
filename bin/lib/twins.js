@@ -102,9 +102,11 @@ function createANewTwin(data){
         name : data.name,
         owner : data.owner,
         broker : data.broker,
+        port : data.port || 1883,
         nodes : data.nodes || [],
         settings : data.settings || [],
-        created: Date.now() / 1000 | 0
+        created: Date.now() / 1000 | 0,
+        modified: Date.now() / 1000 | 0
     };
 
     return database.write(newTwin)

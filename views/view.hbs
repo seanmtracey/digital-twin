@@ -275,7 +275,7 @@
 						data : {
 							connectionDetails : {
 								broker : `{{{twinData.broker}}}`,
-								port : 1883
+								port : {{#if twinData.port}} {{twinData.port}} {{else}} 1883 {{/if}}
 							}
 						}
 					}));
