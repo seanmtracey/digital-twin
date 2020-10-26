@@ -24,7 +24,7 @@ function bindEventsForClient(socket){
 
 					mqttClient = mqtt.connect(payload.data.connectionDetails.broker, {
 						port : payload.data.connectionDetails.port || 1883,
-						connectTimeout : 15 * 1000,
+						connectTimeout : 5 * 1000,
 						username : payload.data.connectionDetails.username,
 						password : payload.data.connectionDetails.password,
 						clientId : payload.data.connectionDetails.clientId
@@ -41,11 +41,26 @@ function bindEventsForClient(socket){
 
 					mqttClient.on('err', err => {
 						debug('MQTT Broker error:', err);
+						
+						socket.send( JSON.stringify({
+							status : 'err',
+							type : 'connectionStatus',
+							data : err
+						}));
+
 					})
 
 				}
 
 			}
+		}
+
+		if(payload.type === "disconnect"){
+			
+			mqttClient.end(true, function(){
+				console.log(`Succesfully disconnected from broker ${ mqttClient.options.href }`);
+			});
+
 		}
 
 		if(payload.type === "subscribe"){

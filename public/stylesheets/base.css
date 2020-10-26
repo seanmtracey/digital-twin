@@ -71,3 +71,8 @@ main header h2{
 #configurePanel #closePanelBtn:hover{
     background-color: #9e9e9e;
 }
+
+.side-by-side{
+    display: flex;
+    align-items: center;
+}

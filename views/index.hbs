@@ -51,7 +51,13 @@
             <h3>Create new Digital Twin</h3>
             <form>
                 <input type="text" name="twinname" placeholder="Enter Digital Twin name" />
-                <input type="text" name="twinbroker" placeholder="Enter MQTT broker address for twin" />
+
+                <div id="brokerConfig" class="side-by-side">
+                    <input type="text" name="twinbroker" placeholder="MQTT Broker Host" />
+                    <button id="testBrokerConnection" type="button" data-testing="false">Test</button>
+                    <div id="status"></div>
+                </div>
+
                 <input type="submit" value="Create Twin" />
             </form>
         </div>
@@ -85,6 +91,8 @@
         const createTwinDialog = document.querySelector('#createTwinDialog');
         const closeCreateDialogBtn = createTwinDialog.querySelector('.closeDialogBtn');
         const createTwinForm = createTwinDialog.querySelector('form');
+        const testBrokerConnection = createTwinDialog.querySelector('#testBrokerConnection');
+        const statusIndicator = createTwinDialog.querySelector('#status');
 
         createTwinForm.addEventListener('submit', function(e){
 
@@ -131,6 +139,28 @@
             
             createTwinDialog.dataset.visible = "false";
             createTwinForm.reset();
+
+        }, false);
+
+        testBrokerConnection.addEventListener('click', function(e){
+            console.log(e);
+
+            if(this.dataset.testing === "false"){
+
+                this.dataset.testing = "true";
+
+                statusIndicator.dataset.status = "connecting";
+
+                setTimeout(function(){
+                    statusIndicator.dataset.status = "success";
+                }, 3000);
+
+                setTimeout(function(){
+                    statusIndicator.dataset.status = "fail";
+                    testBrokerConnection.dataset.testing = "false";
+                }, 5000);
+
+            }
 
         }, false);
 

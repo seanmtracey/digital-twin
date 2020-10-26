@@ -90,7 +90,7 @@ ul#twins li.item .viewOptions:hover{
     opacity: 1;
 }
 
-ul#twins li.item .viewOptions a, form input[type="submit"] {
+ul#twins li.item .viewOptions a, form input[type="submit"], button[type="button"] {
     padding: 0.5em 1em;
     background: #000000;
     color: white;
@@ -101,6 +101,8 @@ ul#twins li.item .viewOptions a, form input[type="submit"] {
     box-shadow: 0 2px 3px #7d7d7d;
     min-width: 20%;
     text-align: center;
+    cursor: pointer;
+    max-width: 150px;
 }
 
 ul#twins li.item .viewOptions a:hover{
@@ -139,19 +141,21 @@ ul#twins li.item .details{
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.9);
+    background: #b1b1b1e6;
     z-index: 20;
 }
 
 #createTwinDialog div.wrapper{
-    padding: 1em;
     border: 1px solid #b9b8b8;
     width: 100%;
     max-width: 300px;
     border-radius: 3px;
     position: relative;
     background: white;
-    box-shadow: 0 2px 3px #00000014;
+    padding: 1.5em;
+    border: 1px solid rgb(0 0 0 / 0.5);
+    box-shadow: 0 2px 3px rgb(0 0 0 / 0.4);
+    padding-bottom: 0.5em;
 }
 
 #createTwinDialog div.wrapper form{
@@ -173,6 +177,71 @@ ul#twins li.item .details{
     width: 100%;
     max-width: 150px;
 }
+
+#createTwinDialog div.wrapper form #brokerConfig{
+    margin-bottom: 1em;
+}
+
+#createTwinDialog div.wrapper form #brokerConfig input{
+    margin-bottom: 0;
+    width: 100%;
+}
+
+#createTwinDialog div.wrapper form #brokerConfig #testBrokerConnection{
+    margin-left: 1em;
+}
+
+#createTwinDialog div.wrapper form #brokerConfig #testBrokerConnection[data-testing="true"]{
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
+#createTwinDialog div.wrapper form #brokerConfig #status{
+    width: 15px;
+    height: 15px;
+    background: #c5c5c5;
+    border-radius: 100%;
+    display: table;
+    margin-left: 0.5em;
+}
+
+#createTwinDialog div.wrapper form #brokerConfig #status[data-status="connecting"]{
+    background: #fb9700;
+    animation-duration: 0.5s;
+    animation-name: pulse;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+#createTwinDialog div.wrapper form #brokerConfig #status[data-status="success"]{
+    background: #35de35;
+}
+
+#createTwinDialog div.wrapper form #brokerConfig #status[data-status="fail"]{
+    background: #f33e3e;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    33% {
+        transform: scale(0.75); 
+        opacity: 0.75;
+    }
+    
+    66% {
+        transform: scale(1.25); 
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 
 @media all and (max-width: 768px){
     ul#twins li.item {
