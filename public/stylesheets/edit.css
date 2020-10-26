@@ -478,3 +478,24 @@ img.backgroundImage, img.overlayImage{
     background: #f33e3e;
     border: 1px solid #881e1e;
 }
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    33% {
+        transform: scale(0.75); 
+        opacity: 0.75;
+    }
+    
+    66% {
+        transform: scale(1.25); 
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
