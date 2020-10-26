@@ -78,9 +78,29 @@
     </div>
 
     <div id="twinDetails">
-        <span>Twin name:</span> <h3 id="twinNameSetting" contenteditable="true">{{twinData.name}}</h3>
-        <span>Twin Broker: </span> <h3 id="twinBrokerSetting" contenteditable="true">{{twinData.broker}}</h3>
+        <span>Twin name:</span> <h3 id="twinNameSetting" >{{twinData.name}}</h3>
+        <span>Twin Broker: </span> <h3 id="twinBrokerSetting">{{twinData.broker}}</h3>
+        <button id="configureTwin">Configure</button>
         <a href="/view/{{twinData.UUID}}" target="_blank">View Twin</a>
+    </div>
+
+    <div id="editTwinDialog" class="modal" data-visible="true">
+        <div class="wrapper">
+            <div id="closeCreationDialog" class="closeDialogBtn"></div>
+            <h3>Edit Digital Twin Settings</h3>
+            <form>
+                <input type="text" name="twinname" placeholder="Enter Digital Twin name" />
+
+                <div id="brokerConfig" class="side-by-side">
+                    <input type="text" name="twinbroker" placeholder="MQTT Broker Host" />
+                    <input type="text" name="port" placeholder="Port" />
+                    <button id="testBrokerConnection" type="button" data-testing="false">Test</button>
+                    <div id="status"></div>
+                </div>
+
+                <input type="submit" value="Create Twin" />
+            </form>
+        </div>
     </div>
 
     <script src="/scripts/utilities.js"></script>
@@ -795,12 +815,6 @@
                 console.log("Background image exists!");
                 setBackgroundImage(`/twins/image/get/${twinBackgroundImageSrc}`, twinBackgroundImagePosition);
             }
-
-            twinNameSetting.addEventListener('keydown', function(e){ if( e.keyCode === 13 ){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); this.blur(); } });
-            twinBrokerSetting.addEventListener('keydown', function(e){ if( e.keyCode === 13 ){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); this.blur(); } });
-
-            twinNameSetting.addEventListener('blur', updateTwinSettings, false);
-            twinBrokerSetting.addEventListener('blur', updateTwinSettings, false);
 
             window.addEventListener('keydown', (e) => {
                 console.log(e);

@@ -319,16 +319,20 @@ img.backgroundImage, img.overlayImage{
 #twinDetails h3{
     font-size: 1em;
     margin-right: 1.5em;
-    border-bottom: 1px solid white;
+    /* border-bottom: 1px solid white; */
     outline: 0;
     min-width: 2em;
 }
 
-#twinDetails h3:focus{
-    font-weight: 400;
+#twinDetails h3:last-of-type{
+    margin-right: 1em;
 }
 
-#twinDetails a {
+#twinDetails #configureTwin{
+    margin-left: 0;
+}
+
+#twinDetails a, #twinDetails button {
     font-size: 0.8em;
     color: #ffffff;
     font-weight: 800;
@@ -338,6 +342,8 @@ img.backgroundImage, img.overlayImage{
     padding: 0.3em 0.5em;
     box-sizing: border-box;
     margin-left: auto;
+    background: transparent;
+    cursor: pointer;
 }
 
 #backgroundImageOverlay{
@@ -418,4 +424,57 @@ img.backgroundImage, img.overlayImage{
 
 #backgroundImageOverlay[data-imageplaced="false"] #imagePositionAndSizer{
     display: none;
+}
+
+
+#editTwinDialog div.wrapper form #brokerConfig{
+    margin-bottom: 1em;
+}
+
+#editTwinDialog div.wrapper form #brokerConfig input{
+    margin-bottom: 0;
+    width: 100%;
+}
+
+#editTwinDialog div.wrapper form #brokerConfig input[name="port"]{
+    max-width: 50px;
+    margin-left: 0.5em;
+}
+
+#editTwinDialog div.wrapper form #brokerConfig #testBrokerConnection{
+    margin-left: 1em;
+}
+
+#editTwinDialog div.wrapper form #brokerConfig #testBrokerConnection[data-testing="true"]{
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
+#editTwinDialog div.wrapper form #brokerConfig #status{
+    width: 15px;
+    height: 15px;
+    background: #c5c5c5;
+    border-radius: 100%;
+    display: table;
+    margin-left: 0.5em;
+    box-sizing: border-box;
+}
+
+#editTwinDialog div.wrapper form #brokerConfig #status[data-status="connecting"]{
+    background: #fb9700;
+    border: 1px solid #af7217;
+    animation-duration: 0.5s;
+    animation-name: pulse;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+#editTwinDialog div.wrapper form #brokerConfig #status[data-status="success"]{
+    background: #35de35;
+    border: 1px solid #10a510;
+}
+
+#editTwinDialog div.wrapper form #brokerConfig #status[data-status="fail"]{
+    background: #f33e3e;
+    border: 1px solid #881e1e;
 }
