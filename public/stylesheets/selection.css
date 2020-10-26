@@ -203,10 +203,12 @@ ul#twins li.item .details{
     border-radius: 100%;
     display: table;
     margin-left: 0.5em;
+    box-sizing: border-box;
 }
 
 #createTwinDialog div.wrapper form #brokerConfig #status[data-status="connecting"]{
     background: #fb9700;
+    border: 1px solid #af7217;
     animation-duration: 0.5s;
     animation-name: pulse;
     animation-iteration-count: infinite;
@@ -215,10 +217,12 @@ ul#twins li.item .details{
 
 #createTwinDialog div.wrapper form #brokerConfig #status[data-status="success"]{
     background: #35de35;
+    border: 1px solid #10a510;
 }
 
 #createTwinDialog div.wrapper form #brokerConfig #status[data-status="fail"]{
     background: #f33e3e;
+    border: 1px solid #881e1e;
 }
 
 @keyframes pulse {
