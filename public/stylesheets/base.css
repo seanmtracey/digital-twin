@@ -100,7 +100,6 @@ main header h2{
     padding: 1.5em;
     border: 1px solid rgb(0 0 0 / 0.5);
     box-shadow: 0 2px 3px rgb(0 0 0 / 0.4);
-    padding-bottom: 0.5em;
 }
 
 .modal div.wrapper form{
@@ -123,7 +122,11 @@ main header h2{
     max-width: 150px;
 }
 
-.modal button[type="button"], .modal input[type="submit"] {
+.modal div.wrapper p{
+    padding: 1.5em 0;
+}
+
+.modal button, .modal button[type="button"], .modal input[type="submit"] {
     padding: 0.5em 1em;
     background: #000000;
     color: white;
@@ -136,4 +139,12 @@ main header h2{
     text-align: center;
     cursor: pointer;
     max-width: 150px;
+}
+
+.modal .side-by-side button{
+    margin-left: 1em;
+}
+
+.align-end{
+    justify-content: flex-end;
 }
