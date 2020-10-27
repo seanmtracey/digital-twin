@@ -117,11 +117,6 @@ main header h2{
     outline: transparent;
 }
 
-.modal div.wrapper form input[type="submit"]{
-    width: 100%;
-    max-width: 150px;
-}
-
 .modal div.wrapper p{
     padding: 1.5em 0;
 }
@@ -141,7 +136,7 @@ main header h2{
     max-width: 150px;
 }
 
-.modal .side-by-side button{
+.modal .side-by-side button, .modal .side-by-side input[type="submit"]{
     margin-left: 1em;
 }
 

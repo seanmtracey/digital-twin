@@ -78,6 +78,25 @@
         </div>
     </div>
 
+    <div id="duplicateTwinDialog" class="modal" data-visible="false" data-uuid="">
+        <div class="wrapper">
+            <div id="closeCreationDialog" class="closeDialogBtn"></div>
+            <h3>Duplicate a Digital Twin</h3>
+            
+            <form>
+                <input type="text" name="twinname" placeholder="Enter a new name for your duplicate" />
+
+                <div class="side-by-side align-end">
+                    <button class="cancel" type="button">Cancel</button>
+                    <input type="submit" value="Duplicate" />
+                </div>
+
+            </form>
+
+
+        </div>
+    </div>
+
 </main>
 
 <script>
@@ -86,8 +105,34 @@
 
         'use strict';
 
-        function duplicateTwin(twinUUID){
-            console.log('duplicate:', twinUUID);
+        function duplicateTwin(twinUUID, newName){
+            console.log('duplicate:', twinUUID, newName);
+
+            if(!twinUUID){
+                return Promise.reject('No Twin UUID was passed to function');
+            }
+
+            if(!newName){
+                return Promise.reject('No new nam for twin was passed to function');
+            }
+
+            return fetch(`/twins/duplicate/${twinUUID}`, {
+                    method : "POST",
+                    credentials : "include",
+                    headers : {
+                        "Content-Type" : "application/json"
+                    },
+                    body : JSON.stringify( { name : newName } )
+                })
+                .then(function(res){
+                    if(res.ok){
+                        return res.json();
+                    } else {
+                        throw res;
+                    }
+                })
+            ;
+
         }
 
         function deleteTwin(twinUUID){
@@ -97,7 +142,10 @@
                 return Promise.reject('No Twin UUID was passed to function');
             }
 
-            return fetch(`/twins/delete/${twinUUID}`, {method : "POST"})
+            return fetch(`/twins/delete/${twinUUID}`, {
+                    method : "POST",
+                    credentials : "include"
+                })
                 .then(function(res){
                     if(res.ok){
                         return res.json();
@@ -123,6 +171,12 @@
         const closeDeleteDialogBtn = deleteTwinDialog.querySelector('.closeDialogBtn');
         const cancelDeletionBtn = deleteTwinDialog.querySelector('button.cancel');
         const deleteTwinAction = deleteTwinDialog.querySelector('button#deleteTwin');
+
+        // Duplicate Twin Model
+        const duplicateTwinDialog = document.querySelector('#duplicateTwinDialog.modal');
+        const closeDuplicateDialogBtn = duplicateTwinDialog.querySelector('.closeDialogBtn');
+        const cancelDuplicateBtn = duplicateTwinDialog.querySelector('button.cancel');
+        const duplicateTwinForm = duplicateTwinDialog.querySelector('form');
 
         const websocketProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
         let ws;
@@ -198,6 +252,31 @@
                 })
                 .catch(err => {
                     console.log('Delete twin err:', err);
+                })
+            ;
+
+        }, false);
+
+        closeDuplicateDialogBtn.addEventListener('click', function(e){
+            duplicateTwinDialog.dataset.visible = "false";
+        }, false);
+
+        cancelDuplicateBtn.addEventListener('click', function(){
+            duplicateTwinDialog.dataset.uuid = "";
+            duplicateTwinDialog.dataset.visible = "false";
+        }, false); 
+
+        duplicateTwinForm.addEventListener('submit', function(e){
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            duplicateTwin(duplicateTwinDialog.dataset.uuid, this[0].value)
+                .then(function(){
+                    window.location = window.location;
+                })
+                .catch(err => {
+                    console.log('duplicate twin err:', err);
                 })
             ;
 
@@ -290,7 +369,8 @@
 
                     const action = this.dataset.action;
                     if(action === "duplicate"){
-                        // duplicateTwin(this.dataset.uuid);
+                        duplicateTwinDialog.dataset.uuid = this.dataset.uuid;
+                        duplicateTwinDialog.dataset.visible = "true";
                     } else if(action === "delete"){
                         deleteTwinDialog.dataset.uuid = this.dataset.uuid;
                         deleteTwinDialog.dataset.visible = "true";
@@ -303,8 +383,6 @@
         });
 
         document.body.addEventListener('click', function(e){
-
-            console.log(e.target);
 
             if(!e.target.parentNode.classList.contains('subOptions') && !e.target.classList.contains('subOptionsToggle')){
 

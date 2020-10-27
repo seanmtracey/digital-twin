@@ -11,9 +11,6 @@ const UUIDRegex = `[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}`
 
 router.post(`/create`, (req, res) => {
 
-    debug(req.body);
-    debug(res.locals);
-
     if(req.body.name){
 
         twins.create({ name : req.body.name, owner: res.locals.w3id_userid, broker : req.body.broker, port : req.body.port })
@@ -80,9 +77,6 @@ router.post(`/update/:UUID(${UUIDRegex})`, (req, res) => {
 });
 
 router.post(`/image/set/:UUID(${UUIDRegex})`, (req, res) => {
-
-
-    debug('IMAGEPLZ:', req.body.data);
 
     const base64ImageDescriptorPattern = /(data:image)\/(jpeg|png);base64,/gm;
 
@@ -179,7 +173,10 @@ router.get(`/image/get/:KEY(${UUIDRegex}).:EXTENSION(jpeg|jpg|png)`, (req, res) 
 
 router.post(`/duplicate/:UUID(${UUIDRegex})`, (req, res) => {
 
-    twins.duplicate(req.params.UUID, req.body.data, res.locals.w3id_userid)
+    debug(req.body);
+    debug(res.locals);
+
+    twins.duplicate(req.params.UUID, req.body, res.locals.w3id_userid)
         .then(result => {
             
             debug(result);

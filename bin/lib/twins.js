@@ -68,11 +68,11 @@ function updateAnExistingTwinWithAGivenID(UUID, data, user){
         })
     ;
 
-    //return Promise.resolve();
-
 }
 
 function duplicateAnExistingTwinWithAGivenID(UUID, data, user){
+
+    debug(UUID, data, user);
 
     return getAnExistingTwinWithAnID(UUID)
         .then(twin => {
