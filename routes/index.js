@@ -16,6 +16,14 @@ router.get('/', function(req, res, next) {
 				
 				return twin.owner === res.locals.w3id_userid;
 
+			}).sort( (a, b) => {
+
+				if(a.name > b.name){
+					return 1
+				} else {
+					return -1;
+				}
+
 			});
 
 			res.render('index', { 
