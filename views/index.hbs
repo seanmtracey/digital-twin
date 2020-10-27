@@ -12,11 +12,10 @@
                     <a href="/view/{{UUID}}" target="_blank">View</a>
                     <a href="/edit/{{UUID}}" target="_blank">Edit</a>
                 </div>
-                <a class="subOptionsToggle"><img src="images/sub-menu-icon.png"></a>
+                <a class="subOptionsToggle" data-open="false"></a>
                 <ul class="subOptions" data-visible="false">
-                    <li data-action="edit">Edit Settings</li>
-                    <li data-action="duplicate">Duplicate Twin</li>
-                    <li data-action="delete">Delete Twin</li>
+                    <li data-action="duplicate" data-uuid="{{UUID}}">Duplicate Twin</li>
+                    <li data-action="delete" data-uuid="{{UUID}}">Delete Twin</li>
                 </ul>
                 <div class="details">
                     <h3>{{name}}</h3>
@@ -45,7 +44,7 @@
         <li class="item" id="createNew" data-active="false"> </li>
     </ul>
 
-    <div id="createTwinDialog" data-visible="false">
+    <div id="createTwinDialog" class="modal" data-visible="false">
         <div class="wrapper">
             <div id="closeCreationDialog" class="closeDialogBtn"></div>
             <h3>Create new Digital Twin</h3>
@@ -64,6 +63,40 @@
         </div>
     </div>
 
+    <div id="deleteTwinDialog" class="modal" data-visible="false" data-uuid="">
+        <div class="wrapper">
+            <div id="closeCreationDialog" class="closeDialogBtn"></div>
+            <h3>Delete a Digital Twin</h3>
+            
+            <p>This action <strong>can not be undone</strong>. Are you sure you wish to delete this twin?</p>
+
+            <div class="side-by-side align-end">
+                <button class="cancel">Cancel</button>
+                <button id="deleteTwin">Delete</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="duplicateTwinDialog" class="modal" data-visible="false" data-uuid="">
+        <div class="wrapper">
+            <div id="closeCreationDialog" class="closeDialogBtn"></div>
+            <h3>Duplicate a Digital Twin</h3>
+            
+            <form>
+                <input type="text" name="twinname" placeholder="Enter a new name for your duplicate" />
+
+                <div class="side-by-side align-end">
+                    <button class="cancel" type="button">Cancel</button>
+                    <input type="submit" value="Duplicate" />
+                </div>
+
+            </form>
+
+
+        </div>
+    </div>
+
 </main>
 
 <script>
@@ -72,22 +105,59 @@
 
         'use strict';
 
-        Array.from( document.querySelectorAll('#twins .item .subOptionsToggle') ).forEach(subOptionsToggle => {
+        function duplicateTwin(twinUUID, newName){
+            console.log('duplicate:', twinUUID, newName);
 
-            subOptionsToggle.addEventListener('click', function(e){
+            if(!twinUUID){
+                return Promise.reject('No Twin UUID was passed to function');
+            }
 
-                const options = this.parentNode.querySelector('.subOptions');
+            if(!newName){
+                return Promise.reject('No new nam for twin was passed to function');
+            }
 
-                if(options.dataset.visible === "false"){
-                    options.dataset.visible = "true";
-                } else {
-                    options.dataset.visible = "false";
-                }
+            return fetch(`/twins/duplicate/${twinUUID}`, {
+                    method : "POST",
+                    credentials : "include",
+                    headers : {
+                        "Content-Type" : "application/json"
+                    },
+                    body : JSON.stringify( { name : newName } )
+                })
+                .then(function(res){
+                    if(res.ok){
+                        return res.json();
+                    } else {
+                        throw res;
+                    }
+                })
+            ;
 
-            }, false);
+        }
 
-        });
+        function deleteTwin(twinUUID){
+            console.log('delete:', twinUUID);
 
+            if(!twinUUID){
+                return Promise.reject('No Twin UUID was passed to function');
+            }
+
+            return fetch(`/twins/delete/${twinUUID}`, {
+                    method : "POST",
+                    credentials : "include"
+                })
+                .then(function(res){
+                    if(res.ok){
+                        return res.json();
+                    } else {
+                        throw res;
+                    }
+                })
+            ;
+
+        }
+
+        // Create Twin Modal
         const createTwinBtn = document.querySelector("#createNew");
         const createTwinDialog = document.querySelector('#createTwinDialog');
         const closeCreateDialogBtn = createTwinDialog.querySelector('.closeDialogBtn');
@@ -95,6 +165,18 @@
         const brokerConfig = createTwinDialog.querySelector('#brokerConfig');
         const testBrokerConnection = brokerConfig.querySelector('#testBrokerConnection');
         const statusIndicator = brokerConfig.querySelector('#status');
+
+        // Delete Twin Model
+        const deleteTwinDialog = document.querySelector('#deleteTwinDialog.modal');
+        const closeDeleteDialogBtn = deleteTwinDialog.querySelector('.closeDialogBtn');
+        const cancelDeletionBtn = deleteTwinDialog.querySelector('button.cancel');
+        const deleteTwinAction = deleteTwinDialog.querySelector('button#deleteTwin');
+
+        // Duplicate Twin Model
+        const duplicateTwinDialog = document.querySelector('#duplicateTwinDialog.modal');
+        const closeDuplicateDialogBtn = duplicateTwinDialog.querySelector('.closeDialogBtn');
+        const cancelDuplicateBtn = duplicateTwinDialog.querySelector('button.cancel');
+        const duplicateTwinForm = duplicateTwinDialog.querySelector('form');
 
         const websocketProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
         let ws;
@@ -153,6 +235,53 @@
 
         }, false);
 
+        closeDeleteDialogBtn.addEventListener('click', function(e){
+            deleteTwinDialog.dataset.visible = "false";
+        }, false);
+
+        cancelDeletionBtn.addEventListener('click', function(){
+            deleteTwinDialog.dataset.uuid = "";
+            deleteTwinDialog.dataset.visible = "false";
+        }, false); 
+
+        deleteTwinAction.addEventListener('click', function(){
+            
+            deleteTwin(deleteTwinDialog.dataset.uuid)
+                .then(function(){
+                    window.location = window.location;
+                })
+                .catch(err => {
+                    console.log('Delete twin err:', err);
+                })
+            ;
+
+        }, false);
+
+        closeDuplicateDialogBtn.addEventListener('click', function(e){
+            duplicateTwinDialog.dataset.visible = "false";
+        }, false);
+
+        cancelDuplicateBtn.addEventListener('click', function(){
+            duplicateTwinDialog.dataset.uuid = "";
+            duplicateTwinDialog.dataset.visible = "false";
+        }, false); 
+
+        duplicateTwinForm.addEventListener('submit', function(e){
+
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            duplicateTwin(duplicateTwinDialog.dataset.uuid, this[0].value)
+                .then(function(){
+                    window.location = window.location;
+                })
+                .catch(err => {
+                    console.log('duplicate twin err:', err);
+                })
+            ;
+
+        }, false);
+
         testBrokerConnection.addEventListener('click', function(e){
 
             if(this.dataset.testing === "false"){
@@ -208,6 +337,62 @@
                 connectToWebSocketServer();
 
                 console.log(brokerHostInput, brokerAddress, brokerPortInput, brokerPort);
+
+            }
+
+        }, false);
+
+        Array.from( document.querySelectorAll('#twins .item .subOptionsToggle') ).forEach(subOptionsToggle => {
+
+            subOptionsToggle.addEventListener('click', function(e){
+                
+                this.dataset.open = this.dataset.open === "true" ? "false" : "true"
+                const options = this.parentNode.querySelector('.subOptions');
+
+                if(options.dataset.visible === "false"){
+                    options.dataset.visible = "true";
+                } else {
+                    options.dataset.visible = "false";
+                }
+
+            }, false);
+
+        });
+
+        Array.from(document.querySelectorAll('#twins .item .subOptions')).forEach(subOptions => {
+
+            const options = Array.from(subOptions.querySelectorAll('li'));
+
+            options.forEach(option => {
+
+                option.addEventListener('click', function(){
+
+                    const action = this.dataset.action;
+                    if(action === "duplicate"){
+                        duplicateTwinDialog.dataset.uuid = this.dataset.uuid;
+                        duplicateTwinDialog.dataset.visible = "true";
+                    } else if(action === "delete"){
+                        deleteTwinDialog.dataset.uuid = this.dataset.uuid;
+                        deleteTwinDialog.dataset.visible = "true";
+                    }
+
+                }, false);
+
+            });
+
+        });
+
+        document.body.addEventListener('click', function(e){
+
+            if(!e.target.parentNode.classList.contains('subOptions') && !e.target.classList.contains('subOptionsToggle')){
+
+                Array.from( document.querySelectorAll('.subOptions') ).forEach(subOption => {
+                    subOption.dataset.visible = "false";
+                });
+
+                Array.from( document.querySelectorAll('.subOptionsToggle') ).forEach(subOptionToggle => {
+                    subOptionToggle.dataset.open = "false";
+                });
 
             }
 

@@ -18,7 +18,7 @@ router.get(`/:UUID(${UUIDRegex})`, function(req, res, next) {
 			if(twin.owner === res.locals.w3id_userid){
 
 				res.render('edit', { 
-					title: 'Digital Twin Editor',
+					title: `Digital Twin Editor | ${twin.name}`,
 					stylesheet : "edit.css",
 					twinData : twin
 				});	
