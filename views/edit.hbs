@@ -16,6 +16,11 @@
             <label>Topic</label>
             <input type="text" name="topic" placeholder="MQTT topic to subscribe and react to..." />
 
+            <label>Transparent</label>
+            <div>
+                <input type="checkbox" name="transparent" /><span>Make transparent if inactive</span>
+            </div>
+
             <label>Rules</label>
 
             <div id="nodeRules">
@@ -182,6 +187,7 @@
                     storedRules.innerHTML = "";
 
                     configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic;
+                    configurationPanelElement.querySelector('input[name="transparent"]').checked = currentNodeBeingConfigured.dataset.transparent === "true" ? true : false;
 
                     if(currentNodeBeingConfigured.dataset.rules){
 
@@ -211,6 +217,8 @@
                     if(true /*saveChanges*/){
 
                         currentNodeBeingConfigured.dataset.topic = configurationPanelElement.querySelector('input[name="topic"]').value;
+                        currentNodeBeingConfigured.dataset.transparent = configurationPanelElement.querySelector('input[name="transparent"]').checked;
+
                         const rules = Array.from(storedRules.querySelectorAll('.rule')).map(storedRule => {
                             console.log(storedRule);
 
@@ -789,7 +797,7 @@
             existingNodes.forEach(savedNode => {
 
                 // x, y, width, height, type = selectedTool
-                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules);
+                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules, savedNode.transparent);
 
                 bindCreationHandlersToNode(recreatedNode);
 

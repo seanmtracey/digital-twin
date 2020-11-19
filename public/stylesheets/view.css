@@ -25,6 +25,11 @@ img.backgroundImage{
     position: fixed;
     cursor: pointer;
     box-sizing: border-box;
+    background-color: #e6e6e6;
+}
+
+#nodes .node[data-transparent="true"]{
+    background-color: transparent;
 }
 
 #nodes .node[data-selected="true"]{

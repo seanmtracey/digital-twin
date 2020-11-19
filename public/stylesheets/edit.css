@@ -41,6 +41,7 @@ img.backgroundImage, img.overlayImage{
     cursor: pointer;
     box-sizing: border-box;
     border: dashed rgba(0, 0, 0, 0.4);
+    background-color: #e6e6e6;
 }
 
 #nodes .node.ellipse{

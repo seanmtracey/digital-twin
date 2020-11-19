@@ -242,7 +242,7 @@
 
 			existingNodes.forEach(savedNode => {
 				// x, y, width, height, type, name, topic, rules
-				const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules );
+				const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules, savedNode.transparent );
 
 				recreatedNode.addEventListener('click', function(){
 					transcriptPanel.show(this);
