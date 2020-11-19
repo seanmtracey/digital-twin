@@ -109,6 +109,8 @@
         </div>
     </div>
 
+    <script src="/scripts/jquery.js"></script>
+    <script src="/scripts/spectrum.js"></script>
     <script src="/scripts/utilities.js"></script>
     <script src="/scripts/twin_nodes.js"></script>
     <script>
@@ -149,7 +151,19 @@
 
                     nameInput.value = name || "";
                     ruleConditionContainer.innerHTML = `<strong>IF</strong> <input type="text" class="userInput" name="property" placeholder="property" value="${conditionProperty}" /> &#61;&#61;&#61; <input type="text" class="userInput" name="value" placeholder="value" value="${conditionValue}"/><br/>`;
-                    ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="color" id="head" name="head" value="${actionValue}" class="userInput">`
+                    //ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="color" id="head" name="head" value="${actionValue}" class="userInput">`
+
+                    ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="text" id="head" name="head">`;
+
+                    const colorInput = ruleActionContainer.querySelector('input');
+                    colorInput.value = actionValue;
+
+                    $(colorInput).spectrum({
+                        showAlpha: true,
+                        color : actionValue
+                    });
+
+                    //debugger;
 
                     deleteRuleButton.addEventListener('click', function(){
 
@@ -224,7 +238,7 @@
 
                             const property = storedRule.querySelector('input[name="property"]').value;
                             const value = storedRule.querySelector('input[name="value"]').value;
-                            const action = storedRule.querySelector('input[type="color"]').value;
+                            const action = storedRule.querySelector('input[name="head"]').value;
 
                             return {
                                 name : storedRule.querySelector('input[name="rule_name"]').value,
