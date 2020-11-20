@@ -1,7 +1,7 @@
 const twinNodes = (function(){
     'use strict';
 
-    function createNode(x, y, width, height, type, name, topic, rules){
+    function createNode(x, y, width, height, type, name, topic, rules, transparent){
 
         width = width < 0 ? -width : width;
         height = height < 0 ? -height : height;
@@ -17,6 +17,7 @@ const twinNodes = (function(){
         div.dataset.name = name;
         div.dataset.topic = topic || '';
         div.dataset.rules = JSON.stringify(rules) || [];
+        div.dataset.transparent = transparent;
 
         div.classList.add('node');
 
@@ -24,7 +25,7 @@ const twinNodes = (function(){
             div.classList.add('ellipse');
         }
 
-        div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px; background-color: #e6e6e6;`);
+        div.setAttribute("style", `left: ${x}px; top: ${y}px; width: ${width}px; height: ${height}px;`);
 
         return div;
 
@@ -43,7 +44,8 @@ const twinNodes = (function(){
                 type : node.dataset.type,
                 name : node.dataset.name,
                 topic : node.dataset.topic,
-                rules : node.dataset.rules !== "" ? JSON.parse(node.dataset.rules) : []
+                rules : node.dataset.rules !== "" ? JSON.parse(node.dataset.rules) : [],
+                transparent : node.dataset.transparent === "" ? "false" : node.dataset.transparent
             };
 
         });

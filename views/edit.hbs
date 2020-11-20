@@ -16,6 +16,11 @@
             <label>Topic</label>
             <input type="text" name="topic" placeholder="MQTT topic to subscribe and react to..." />
 
+            <label>Transparent</label>
+            <div>
+                <input type="checkbox" name="transparent" /><span>Make transparent if inactive</span>
+            </div>
+
             <label>Rules</label>
 
             <div id="nodeRules">
@@ -104,6 +109,8 @@
         </div>
     </div>
 
+    <script src="/scripts/jquery.js"></script>
+    <script src="/scripts/spectrum.js"></script>
     <script src="/scripts/utilities.js"></script>
     <script src="/scripts/twin_nodes.js"></script>
     <script>
@@ -144,7 +151,19 @@
 
                     nameInput.value = name || "";
                     ruleConditionContainer.innerHTML = `<strong>IF</strong> <input type="text" class="userInput" name="property" placeholder="property" value="${conditionProperty}" /> &#61;&#61;&#61; <input type="text" class="userInput" name="value" placeholder="value" value="${conditionValue}"/><br/>`;
-                    ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="color" id="head" name="head" value="${actionValue}" class="userInput">`
+                    //ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="color" id="head" name="head" value="${actionValue}" class="userInput">`
+
+                    ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="text" id="head" name="head">`;
+
+                    const colorInput = ruleActionContainer.querySelector('input');
+                    colorInput.value = actionValue;
+
+                    $(colorInput).spectrum({
+                        showAlpha: true,
+                        color : actionValue
+                    });
+
+                    //debugger;
 
                     deleteRuleButton.addEventListener('click', function(){
 
@@ -182,6 +201,7 @@
                     storedRules.innerHTML = "";
 
                     configurationPanelElement.querySelector('input[name="topic"]').value = currentNodeBeingConfigured.dataset.topic;
+                    configurationPanelElement.querySelector('input[name="transparent"]').checked = currentNodeBeingConfigured.dataset.transparent === "true" ? true : false;
 
                     if(currentNodeBeingConfigured.dataset.rules){
 
@@ -211,12 +231,14 @@
                     if(true /*saveChanges*/){
 
                         currentNodeBeingConfigured.dataset.topic = configurationPanelElement.querySelector('input[name="topic"]').value;
+                        currentNodeBeingConfigured.dataset.transparent = configurationPanelElement.querySelector('input[name="transparent"]').checked;
+
                         const rules = Array.from(storedRules.querySelectorAll('.rule')).map(storedRule => {
                             console.log(storedRule);
 
                             const property = storedRule.querySelector('input[name="property"]').value;
                             const value = storedRule.querySelector('input[name="value"]').value;
-                            const action = storedRule.querySelector('input[type="color"]').value;
+                            const action = storedRule.querySelector('input[name="head"]').value;
 
                             return {
                                 name : storedRule.querySelector('input[name="rule_name"]').value,
@@ -789,7 +811,7 @@
             existingNodes.forEach(savedNode => {
 
                 // x, y, width, height, type = selectedTool
-                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules);
+                const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules, savedNode.transparent);
 
                 bindCreationHandlersToNode(recreatedNode);
 

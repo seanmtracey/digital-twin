@@ -28,12 +28,58 @@
 		<p>Connection Lost</p>
 	</div>
 
+	<script src="/scripts/color2color.js"></script>
 	<script src="/scripts/twin_nodes.js"></script>
 	<script>
 
 		(function(){
 
 			'use strict';
+
+			function __hsva2rgba(hsva) {
+				// Sourced from https://gist.github.com/tlindig/9392075
+				var r, g, b;
+				var h = hsva[0],
+					s = hsva[1] / 100,
+					v = hsva[2] / 100;
+
+				if(hsva.length === 3){
+					hsva.push(1);
+				}
+
+				if(s === 0) {
+					r = g = b = v;
+				} else {
+					var i = Math.floor(h / 60);
+					var f = h / 60 - i;
+					var p = v * (1 - s);
+					var q = v * (1 - f * s);
+					var t = v * (1 - s * (1 - f));
+
+					switch (i) {
+						case 0:
+						case 6:
+							r = v, g = t, b = p;
+							break;
+						case 1:
+							r = q, g = v, b = p;
+							break;
+						case 2:
+							r = p, g = v, b = t;
+							break;
+						case 3:
+							r = p, g = q, b = v;
+							break;
+						case 4:
+							r = t, g = p, b = v;
+							break;
+						case 5:
+							r = v, g = p, b = q;
+							break;
+					}
+				}
+				return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255), Math.round(hsva[3] * 1000) / 1000 ];
+			}
 
 			function evaluateRules(node, data){
 
@@ -44,7 +90,17 @@
 					rules.forEach(function(rule){
 
 						if(data[rule.property] === rule.value){
-							node.style.backgroundColor = rule.action;
+
+							console.log('Raw:', rule.action);
+
+							rule.action = rule.action.replace('hsv', '').replace('a', '').replace(/\(|\)|\%/g, '').split(', ').map(value => {return Number(value) });;
+
+							console.log('Parsed Action:', rule.action);
+
+							const rgba = __hsva2rgba(rule.action);
+							console.log('rgba:', rgba);
+
+							node.style.backgroundColor = `rgba(${rgba[0]}, ${rgba[1]}, ${rgba[2]}, ${rgba[3]})`;
 						}
 
 					});
@@ -242,7 +298,7 @@
 
 			existingNodes.forEach(savedNode => {
 				// x, y, width, height, type, name, topic, rules
-				const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules );
+				const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules, savedNode.transparent );
 
 				recreatedNode.addEventListener('click', function(){
 					transcriptPanel.show(this);
