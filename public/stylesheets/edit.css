@@ -218,6 +218,26 @@ img.backgroundImage, img.overlayImage{
     min-height: 1em;
 }
 
+#configurePanel #deleteBtnHolder{
+    position: absolute;
+    bottom: 1em;
+    width: 100%;
+    left: 0;
+    display: flex;
+    justify-content: center;
+}
+
+#configurePanel #deleteBtnHolder #deleteNodeButton{
+    display: block;
+    background: rgba(0,0,0,0.5);
+    padding: 1em;
+    border-radius: 3px;
+    outline: 0 solid transparent;
+    cursor: pointer;
+    border: 1px solid #8a2727;
+    color: red;
+}
+
 #toolBox{
     width: 130px;
     height: 30px;
