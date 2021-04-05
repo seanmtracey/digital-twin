@@ -31,52 +31,76 @@ const twinNodes = (function(){
 
     }
 
+    const updates = [];
+
+    function persistUpdatesToDatabase(){
+
+        if(updates.length > 0){
+
+            const updateRecord = updates.shift();
+
+            console.log(`Posting update to ${window.location.origin}/twins/update/${updateRecord.twinUUID}`);
+            fetch(`${window.location.origin}/twins/update/${updateRecord.twinUUID}`, {
+                    method : "POST",
+                    headers : {
+                        "Content-Type" : "application/json"
+                    },
+                    credentials : 'same-origin',
+                    body : JSON.stringify( { data : { nodes: updateRecord.nodeData } } )
+                })
+                .then(res => {
+                    if(!res.ok){
+                        throw res;
+                    } else {
+                        return res.json()
+                    }
+                })
+                .then(data => {
+                    console.log(data);
+                    if(updates.length > 0){
+                        persistUpdatesToDatabase();
+                    }
+                })
+                .catch(err => {
+    
+                    console.log(`Error saving Digital Twin updates:`, err);
+    
+                })
+            
+            ;
+
+        }
+
+
+    }
+
     function updateNodeRecords(nodes, twinUUID){
 
-        const nodeData = nodes.map(node => {
+        const info = {
+            nodeData : nodes.map(node => {
 
-            return {
-                left : node.dataset.left,
-                top : node.dataset.top,
-                width : node.dataset.width,
-                height : node.dataset.height,
-                selected : node.dataset.selected,
-                type : node.dataset.type,
-                name : node.dataset.name,
-                topic : node.dataset.topic,
-                rules : node.dataset.rules !== "" ? JSON.parse(node.dataset.rules) : [],
-                transparent : node.dataset.transparent === "" ? "false" : node.dataset.transparent
-            };
-
-        });
-
-        console.log('Node records to be updated:', nodeData);
-        console.log(`Posting update to ${window.location.origin}/twins/update/${twinUUID}`);
-        fetch(`${window.location.origin}/twins/update/${twinUUID}`, {
-                method : "POST",
-                headers : {
-                    "Content-Type" : "application/json"
-                },
-                credentials : 'same-origin',
-                body : JSON.stringify( { data : { nodes: nodeData } } )
-            })
-            .then(res => {
-                if(!res.ok){
-                    throw res;
-                } else {
-                    return res.json()
+                return {
+                    left : node.dataset.left,
+                    top : node.dataset.top,
+                    width : node.dataset.width,
+                    height : node.dataset.height,
+                    selected : node.dataset.selected,
+                    type : node.dataset.type,
+                    name : node.dataset.name,
+                    topic : node.dataset.topic,
+                    rules : node.dataset.rules !== "" ? JSON.parse(node.dataset.rules) : [],
+                    transparent : node.dataset.transparent === "" ? "false" : node.dataset.transparent
                 }
-            })
-            .then(data => {
-                console.log(data);
-            })
-            .catch(err => {
+    
+            }),
+            twinUUID : twinUUID
+        }
 
-                console.log(`Error saving Digital Twin updates:`, err);
+        updates.push(info);
 
-            })
-        
-        ;
+        console.log('Node records to be updated:', info);
+
+        persistUpdatesToDatabase();
 
     }
 
