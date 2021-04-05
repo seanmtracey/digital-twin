@@ -27,7 +27,7 @@ router.get('/', function(req, res, next) {
 			});
 
 			res.render('index', { 
-				title: 'Digital Twin Selector',
+				title: 'Twin Selector',
 				stylesheet : "selection.css",
 				twins : twins
 			});

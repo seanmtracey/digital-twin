@@ -15,7 +15,7 @@ router.get(`/:UUID(${UUIDRegex})`, function(req, res, next) {
 			twin.nodes = JSON.stringify(twin.nodes);
 
 			res.render('view', { 
-				title: `Digital Twin Viewer | ${twin.name}`,
+				title: `${twin.name} | View | Digital Twin`,
 				stylesheet : "view.css",
 				twinData : twin
 			});
