@@ -323,8 +323,13 @@
                     e.preventDefault();
                     e.stopImmediatePropagation();
 
-                    MOVING = true;
                     nodeToMove = e.target;
+
+                    if(nodeToMove.classList.contains('backgroundImage')){
+                        return;
+                    }
+
+                    MOVING = true;
                     document.body.dataset.movingnode = true;
 
                     originalMousePosition = {
@@ -581,6 +586,9 @@
                         backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
                         backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
                         backgroundImage.setAttribute('draggable', 'false');
+
+                        backgroundImage.addEventListener('mousedown', startCreationHandler, false);
+                        backgroundImage.addEventListener("touchstart", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; startCreationHandler(e); }, false);
                         
                         nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
 
@@ -843,7 +851,6 @@
 
                 console.log(mutations);
                 let nodeAddedWasImage = mutations[0].addedNodes[0]?.classList.contains('backgroundImage');
-                console.log('HERE:', nodeAddedWasImage);
 
                 if(nodeAddedWasImage === undefined){
                     nodeAddedWasImage = false;
