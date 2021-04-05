@@ -7,16 +7,12 @@ const twins = require(`${__dirname}/../bin/lib/twins`);
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
-	twins.list()
+	twins.listByUser(res.locals.w3id_userid)
 		.then(twins => {
 
 			debug("Stored Twins", JSON.stringify(twins));
 
-			twins = twins.filter( twin => {
-				
-				return twin.owner === res.locals.w3id_userid;
-
-			}).sort( (a, b) => {
+			twins = twins.sort( (a, b) => {
 
 				if(a.name > b.name){
 					return 1
