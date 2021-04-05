@@ -176,11 +176,50 @@ function getAListOfAllOfTheAvailableTwins(){
     ;
 }
 
+function getAListOfAllOfTheAvailableTwinsOwnedByAUser(user){
+    
+    if(!user){
+        return Promise.reject("No user was passed to get twins for.");
+    }
+
+    const scanParameters = {
+        "selector": {
+            "owner": {
+                "$eq": user
+            }
+        }
+    };
+
+    return database.scan(scanParameters)
+        .then(documents => {
+
+            if(documents.length > 0){
+                
+                const sanitizedDocuments = documents.map(uncleanDocument => {return sanitizeDocument(uncleanDocument, twinsWhitelistProperties)});
+
+                return Promise.all(sanitizedDocuments);
+
+            } else {
+                return [];
+            }   
+
+        })
+        .catch(err => {
+            debug("Database scan error:", err);
+            throw err;
+        })
+    ;
+
+
+
+}
+
 module.exports = {
     get : getAnExistingTwinWithAnID,
     update : updateAnExistingTwinWithAGivenID,
     duplicate : duplicateAnExistingTwinWithAGivenID,
     create : createANewTwin,
     delete : deleteAnExistingTwinWithAGivenID,
-    list : getAListOfAllOfTheAvailableTwins
+    list : getAListOfAllOfTheAvailableTwins,
+    listByUser : getAListOfAllOfTheAvailableTwinsOwnedByAUser
 };
