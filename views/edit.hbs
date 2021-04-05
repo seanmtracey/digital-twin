@@ -483,8 +483,6 @@
 
                     const node = twinNodes.create(positionX, positionY, elementWidth, elementHeight, selectedTool, utilities.uuid());
 
-                    bindCreationHandlersToNode(node);
-
                     nodesHolder.appendChild(node);
 
                 } else if(MOVING){
@@ -621,8 +619,6 @@
                     overlayImage.style.height = overlayImage.height + "px";
                     overlayImage.style.left = overlayImage.dataset.left + "px";
                     overlayImage.style.top = overlayImage.dataset.top + "px";
-
-                    bindCreationHandlersToNode(overlayImage, true);
 
                     backgroundImageOverlay.appendChild(overlayImage);
 
@@ -832,8 +828,6 @@
 
                 // x, y, width, height, type = selectedTool
                 const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules, savedNode.transparent);
-
-                bindCreationHandlersToNode(recreatedNode);
 
                 nodesHolder.appendChild(recreatedNode);
 
