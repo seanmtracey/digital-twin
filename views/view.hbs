@@ -83,11 +83,19 @@
 
 			function evaluateRules(node, data){
 
+				console.log('node:', node);
+				console.log('data:', data);
+
 				if(node.dataset.rules){
 
 					const rules = JSON.parse(node.dataset.rules);
+					console.log(rules);
+
+					data = JSON.parse(data.data);
 
 					rules.forEach(function(rule){
+
+						console.log(rule);	
 
 						if(data[rule.property] === rule.value){
 
@@ -381,7 +389,7 @@
 							Array.from(nodesHolder.querySelectorAll('.node')).forEach(node => {
 
 								if(node.dataset.topic === payload.data.topic){
-									evaluateRules(node, JSON.parse(payload.data.data) );
+									evaluateRules(node, payload.data );
 
 									let transcript;
 
