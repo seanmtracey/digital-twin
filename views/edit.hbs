@@ -49,6 +49,10 @@
 
         </form>
 
+        <div id="deleteBtnHolder">
+            <button id="deleteNodeButton">Delete Node</button>
+        </div>
+
     </div>
 
     <ul id="toolBox">
@@ -127,7 +131,23 @@
                 const rulesContainer = configurationPanelElement.querySelector('#nodeRules');
                 const storedRules = rulesContainer.querySelector('#storedRules');
                 const newRulesButton = configurationPanelElement.querySelector('#newRule');
+                const deleteNodeButton = configurationPanelElement.querySelector('#deleteNodeButton');
 
+                function deleteNodeFromTwin(){
+                    
+                    const selectedNode = nodesHolder.querySelector('.node[data-selected="true"]');
+                    selectedNode.parentNode.removeChild(selectedNode);
+
+                }
+
+                deleteNodeButton.addEventListener('click', function(){
+
+                    deleteNodeFromTwin();
+                    configurationPanel.hide();
+
+
+                }, false);
+                
                 function createRule(name, conditionProperty = "", conditionValue = "", actionValue = ""){
 
                     const ruleFragment = document.createDocumentFragment();
