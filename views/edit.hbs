@@ -853,7 +853,6 @@
             const NodeMutationObserver = new MutationObserver(function(mutations) {
 
                 console.log(mutations);
-
                 let nodeAddedWasImage = mutations[0].addedNodes[0]?.classList.contains('backgroundImage');
 
                 if(nodeAddedWasImage === undefined){
@@ -861,7 +860,11 @@
                 }
 
                 if(!MOVING){
-                    twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
+                    
+                    if(!nodeAddedWasImage){
+                        twinNodes.update( Array.from( nodesHolder.querySelectorAll('div.node') ), twinUUID );
+                    }
+
                 }
 
             });
