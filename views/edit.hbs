@@ -320,14 +320,20 @@
 
                 function handleDownEvent(e){
 
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
+                    const targetNode = e.target; 
 
-                    nodeToMove = e.target;
-
-                    if(nodeToMove.classList.contains('backgroundImage')){
+                    if(targetNode.nodeName === "INPUT"){
                         return;
                     }
+
+                    if(targetNode.classList.contains('backgroundImage')){
+                        return;
+                    }
+                    
+                    nodeToMove = targetNode;
+
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
 
                     MOVING = true;
                     document.body.dataset.movingnode = true;
