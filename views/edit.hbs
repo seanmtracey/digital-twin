@@ -392,6 +392,7 @@
                 if(selectedTool !== "select"){
 
                     CREATING = true;
+                    document.body.dataset.creatingnode = "true";
                     startCoords = {
                         x : e.clientX,
                         y : e.clientY
@@ -479,6 +480,7 @@
 
                     if(elementWidth === 0 || elementHeight === 0){
                         CREATING = false;
+                        document.body.dataset.creatingnode = "false";
                         startCoords = undefined;
                         return;
                     }
@@ -497,6 +499,7 @@
                 }
 
                 CREATING = false;
+                document.body.dataset.creatingnode = "false";
 
             }
 

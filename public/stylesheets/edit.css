@@ -6,8 +6,12 @@ body{
     overflow: hidden;
 }
 
-body[data-movingnode="true"] .node, body[data-movingnode="true"] .backgroundImage{
+body[data-movingnode="true"] .node, body[data-movingnode="true"]:not(.backgroundImage) {
     cursor: move !important;
+}
+
+body[data-creatingnode="true"] img.backgroundImage{
+    opacity: 0.3;
 }
 
 main{
