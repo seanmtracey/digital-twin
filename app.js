@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const w3id = require('w3id-middleware');
+let w3id;
 
 const app = express();
 
@@ -31,6 +31,7 @@ if(process.env.NODE_ENV === "development"){
     });
 
 } else {
+    w3id = require('w3id-middleware');
     app.use(w3id);
 }
 
