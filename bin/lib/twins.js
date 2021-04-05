@@ -23,7 +23,7 @@ function getAnExistingTwinWithAnID(UUID){
 
 }
 
-function updateAnExistingTwinWithAGivenID(UUID, data, user){
+function updateAnExistingTwinWithAGivenID(UUID, data, user, attempts = 0){
 
     if(!UUID){
         return Promise.reject('No UUID was passed');
@@ -64,7 +64,13 @@ function updateAnExistingTwinWithAGivenID(UUID, data, user){
         })
        .catch(err => {
             debug(err);
-            throw err;
+
+            if(attempts < 3){
+                return updateAnExistingTwinWithAGivenID(UUID, data, user, attempts += 1)
+            } else {
+                throw err;
+            }
+
         })
     ;
 
