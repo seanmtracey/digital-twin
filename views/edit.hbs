@@ -183,8 +183,6 @@
                         color : actionValue
                     });
 
-                    //debugger;
-
                     deleteRuleButton.addEventListener('click', function(){
 
                         storedRules.removeChild(this.parentNode);
@@ -320,11 +318,22 @@
 
                 function handleDownEvent(e){
 
+                    const targetNode = e.target; 
+
+                    if(targetNode.nodeName === "INPUT"){
+                        return;
+                    }
+
+                    if(targetNode.classList.contains('backgroundImage')){
+                        return;
+                    }
+                    
+                    nodeToMove = targetNode;
+
                     e.preventDefault();
                     e.stopImmediatePropagation();
 
                     MOVING = true;
-                    nodeToMove = e.target;
                     document.body.dataset.movingnode = true;
 
                     originalMousePosition = {
@@ -387,6 +396,7 @@
                 if(selectedTool !== "select"){
 
                     CREATING = true;
+                    document.body.dataset.creatingnode = "true";
                     startCoords = {
                         x : e.clientX,
                         y : e.clientY
@@ -474,6 +484,7 @@
 
                     if(elementWidth === 0 || elementHeight === 0){
                         CREATING = false;
+                        document.body.dataset.creatingnode = "false";
                         startCoords = undefined;
                         return;
                     }
@@ -482,8 +493,6 @@
                     const positionY = e.clientY < startCoords.y ? e.clientY : startCoords.y;
 
                     const node = twinNodes.create(positionX, positionY, elementWidth, elementHeight, selectedTool, utilities.uuid());
-
-                    bindCreationHandlersToNode(node);
 
                     nodesHolder.appendChild(node);
 
@@ -494,6 +503,7 @@
                 }
 
                 CREATING = false;
+                document.body.dataset.creatingnode = "false";
 
             }
 
@@ -583,6 +593,9 @@
                         backgroundImage.style.left = `${backgroundImage.dataset.left}px`;
                         backgroundImage.style.top = `${backgroundImage.dataset.top}px`;
                         backgroundImage.setAttribute('draggable', 'false');
+
+                        backgroundImage.addEventListener('mousedown', startCreationHandler, false);
+                        backgroundImage.addEventListener("touchstart", function(e){ e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; startCreationHandler(e); }, false);
                         
                         nodesHolder.insertBefore(backgroundImage, document.querySelector('.node'));
 
@@ -621,8 +634,6 @@
                     overlayImage.style.height = overlayImage.height + "px";
                     overlayImage.style.left = overlayImage.dataset.left + "px";
                     overlayImage.style.top = overlayImage.dataset.top + "px";
-
-                    bindCreationHandlersToNode(overlayImage, true);
 
                     backgroundImageOverlay.appendChild(overlayImage);
 
@@ -833,8 +844,6 @@
                 // x, y, width, height, type = selectedTool
                 const recreatedNode = twinNodes.create(savedNode.left, savedNode.top, savedNode.width, savedNode.height, savedNode.type, savedNode.name, savedNode.topic, savedNode.rules, savedNode.transparent);
 
-                bindCreationHandlersToNode(recreatedNode);
-
                 nodesHolder.appendChild(recreatedNode);
 
             });
@@ -849,7 +858,6 @@
 
                 console.log(mutations);
                 let nodeAddedWasImage = mutations[0].addedNodes[0]?.classList.contains('backgroundImage');
-                console.log('HERE:', nodeAddedWasImage);
 
                 if(nodeAddedWasImage === undefined){
                     nodeAddedWasImage = false;
@@ -1029,6 +1037,8 @@
                 creationCanvas.width = window.innerWidth * window.devicePixelRatio;
                 creationCanvas.height = window.innerHeight * window.devicePixelRatio;
             }, false);
+
+            bindCreationHandlersToNode(window);
 
         }());
 
