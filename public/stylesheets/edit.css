@@ -133,6 +133,14 @@ img.backgroundImage, img.overlayImage{
     margin-bottom: 1em;
 }
 
+#configurePanel form #nodeRules{
+    margin-top: 1em;
+}
+
+#configurePanel form #nodeRules ol#storedRules{
+    margin-top: 1em;
+}
+
 #configurePanel form #newRule{
     display: block;
     padding: 0.65em 1em;
