@@ -11,19 +11,29 @@
     <div id="configurePanel" data-active="false">
         <h2>Configure Node</h2>
         <div id="closePanelBtn"></div>
+        
+        <div id="deleteBtnHolder">
+            <button id="deleteNodeButton">Delete Node</button>
+        </div>
 
         <form>
-            <label>Topic</label>
-            <input type="text" name="topic" placeholder="MQTT topic to subscribe and react to..." />
 
-            <label>Transparent</label>
-            <div>
+            <div class="transparencyCheck">
                 <input type="checkbox" name="transparent" /><span>Make transparent if inactive</span>
             </div>
 
-            <label>Rules</label>
+            <input type="text" name="topic" placeholder="MQTT topic to subscribe and react to..." />
+            <label>Topic</label>
+
 
             <div id="nodeRules">
+
+                <div class="headingWithBtn">
+
+                    <h3>Rules</h3>
+                    <button id="newRule">Add new rule</button>
+
+                </div>
 
                 <ol id="storedRules">
 
@@ -44,14 +54,9 @@
 
                 </ol>
 
-                <button id="newRule">Add new rule</button>
             </div>
 
         </form>
-
-        <div id="deleteBtnHolder">
-            <button id="deleteNodeButton">Delete Node</button>
-        </div>
 
     </div>
 
@@ -168,9 +173,10 @@
                     nameInput.setAttribute('type', 'text');
                     nameInput.setAttribute('name', 'rule_name');
                     nameInput.setAttribute('placeholder', 'Rule Name');
+                    nameInput.classList.add('nameInput');
 
                     nameInput.value = name || "";
-                    ruleConditionContainer.innerHTML = `<strong>IF</strong> <input type="text" class="userInput" name="property" placeholder="property" value="${conditionProperty}" /> &#61;&#61;&#61; <input type="text" class="userInput" name="value" placeholder="value" value="${conditionValue}"/><br/>`;
+                    ruleConditionContainer.innerHTML = `<strong>IF</strong> <input type="text" class="userInput" name="property" placeholder="<property>" value="${conditionProperty}" /> <strong>EQUALS</strong> <input type="text" class="userInput" name="value" placeholder="<value>" value="${conditionValue}"/><br/>`;
                     //ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="color" id="head" name="head" value="${actionValue}" class="userInput">`
 
                     ruleActionContainer.innerHTML = `<strong>SET COLOR</strong> <input type="text" id="head" name="head">`;
