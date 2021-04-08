@@ -61,9 +61,9 @@ img.backgroundImage, img.overlayImage{
     position: fixed;
     left: 100%;
     top: 0;
-    width: 400px;
+    width: 450px;
     height: 100%;
-    background: #333;
+    background: #FFF;
     box-shadow: 0 -10px 10px rgba(0, 0, 0, 0.6);
     padding: 1em;
     box-sizing: border-box;
@@ -71,10 +71,11 @@ img.backgroundImage, img.overlayImage{
     transition: transform 0.25s ease-in-out;
     transform: translateX(10%);
     z-index: 10;
-    color: white;
+    color: black;
     border: 1px solid white;
     border-top: 0px;
     border-bottom: 0px;
+    cursor: initial;
 }
 
 #configurePanel[data-active="true"]{
@@ -113,28 +114,42 @@ img.backgroundImage, img.overlayImage{
 }
 
 #configurePanel form label{
-    font-weight: 800;
+    font-weight: 600;
     margin-bottom: 0.3em;
-    color: white;
+    color: black;
+    font-size: 0.8em;
+    margin-top: 0.3em;
+    margin-bottom: 1em;
 }
 
 #configurePanel form input{
-    margin-bottom: 1em;
     font-size: 1em;
     padding: 0.5em 0.3em;
-    border-radius: 3px;
-    border: 1px solid grey;
+    border: 0px solid transparent;
+    border-bottom: 1px solid black;
 }
 
-#configurePanel form #nodeRules #newRule{
+#configurePanel form .transparencyCheck{
+    margin-bottom: 1em;
+}
+
+#configurePanel form #nodeRules{
+    margin-top: 1em;
+}
+
+#configurePanel form #nodeRules ol#storedRules{
+    margin-top: 1em;
+}
+
+#configurePanel form #newRule{
     display: block;
-    border: 1px solid rgba(255,255,255,0.5);
-    background: rgba(0,0,0,0.5);
-    color: white;
-    padding: 1em;
-    border-radius: 3px;
+    padding: 0.65em 1em;
     outline: 0 solid transparent;
     cursor: pointer;
+    border: 1px solid #3f83b5;
+    color: #3f83b5;
+    background-color: transparent;
+    font-weight: 600;
 }
 
 #configurePanel form #nodeRules #storedRules {
@@ -143,7 +158,6 @@ img.backgroundImage, img.overlayImage{
     display: flex;
     flex-direction: column;
     margin-bottom: 1em;
-    list-style-type: none;
 }
 
 #configurePanel form #nodeRules #storedRules .rule{
@@ -156,6 +170,10 @@ img.backgroundImage, img.overlayImage{
 
 #configurePanel form #nodeRules #storedRules .rule input[type="text"]{
     font-size: 0.8em;
+}
+
+#configurePanel form #nodeRules #storedRules .rule .nameInput{
+    margin-bottom: 0.8em;
 }
 
 #configurePanel form #nodeRules #storedRules .rule .deleteRuleButton{
@@ -171,10 +189,6 @@ img.backgroundImage, img.overlayImage{
     flex: 0.8;
 }
 
-#configurePanel form #nodeRules #storedRules .rule .deleteRuleButton:hover{
-    background-color: #b52222;
-}
-
 #configurePanel form #nodeRules #storedRules .rule .ruleDetails{
     display: flex;
     flex-direction: column;
@@ -188,15 +202,16 @@ img.backgroundImage, img.overlayImage{
 }
 
 #configurePanel form #nodeRules #storedRules .rule .userInput{
-    background: rgba(0, 0, 0, 0.47);
-    color: white;
+    background-color: transparent;
+    color: black;
     border-width: 0 0 1px;
     border-radius: 0;
-    border-color: white;
+    border: 0px solid transparent;
+    border-bottom: 1px solid black;
     outline: transparent;
     margin-bottom: 0;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+    margin-left: 1em;
+    margin-right: 1em;
     width: 100%;
     min-width: 0;
 }
@@ -222,24 +237,36 @@ img.backgroundImage, img.overlayImage{
     min-height: 1em;
 }
 
-#configurePanel #deleteBtnHolder{
-    position: absolute;
-    bottom: 1em;
-    width: 100%;
-    left: 0;
+#configurePanel .headingWithPanel{
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+}
+
+#configurePanel #deleteBtnHolder{
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 0.5em;
+}
+
+#configurePanel .headingWithBtn{
+    display: flex;
+    justify-content: space-between;
 }
 
 #configurePanel #deleteBtnHolder #deleteNodeButton{
     display: block;
-    background: rgba(0,0,0,0.5);
-    padding: 1em;
-    border-radius: 3px;
+    padding: 0.65em 1em;
     outline: 0 solid transparent;
     cursor: pointer;
     border: 1px solid #8a2727;
     color: red;
+    background-color: transparent;
+    font-weight: 600;
+}
+
+#configurePanel #deleteBtnHolder #deleteNodeButton:hover{
+    background-color: red;
+    color: white;
 }
 
 #toolBox{
@@ -902,6 +929,7 @@ See http://bgrins.github.io/spectrum/themes/ for instructions.
     background: #eee;
     color: #333;
     vertical-align: middle;
+    margin-left: 1em;
 }
 .sp-replacer:hover, .sp-replacer.sp-active {
     border-color: #F0C49B;
