@@ -722,6 +722,7 @@
             const backgroundImageOverlay = document.querySelector('#backgroundImageOverlay');
             const backgroundImageSaveBtn = backgroundImageOverlay.querySelector('button[data-action="save"]');
             const backgroundImageCancelBtn = backgroundImageOverlay.querySelector('button[data-action="cancel"]');
+            let nodeClipboard;
 
             const editTwinBtn = document.querySelector("#editTwin");
             const editTwinDialog = document.querySelector('#editTwinDialog');
@@ -945,6 +946,21 @@
 
                 if(e.keyCode === 8 && e.ctrlKey === true && selectedNode !== null){
                     selectedNode.parentNode.removeChild(selectedNode);
+                    configurationPanel.hide();
+                }
+
+                if(e.keyCode === 67 && e.ctrlKey === true && selectedNode !== null){
+                    nodeClipboard = selectedNode.cloneNode(true);
+                }
+
+                if(e.keyCode === 86 && e.ctrlKey === true && selectedNode !== null){
+
+                    nodeClipboard.dataset.left = Number(nodeClipboard.dataset.left) + 10;
+                    nodeClipboard.dataset.top = Number(nodeClipboard.dataset.top) + 10;
+                    nodeClipboard.style.left = `${nodeClipboard.dataset.left}px`;
+                    nodeClipboard.style.top = `${nodeClipboard.dataset.top}px`;
+
+                    nodesHolder.appendChild(nodeClipboard.cloneNode(true));
                     configurationPanel.hide();
                 }
 
