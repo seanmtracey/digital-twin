@@ -1,0 +1,10 @@
+---
+applications:
+- name: digital-twin
+  memory: 256M
+  random-route: true
+  disk_quota: 512M
+  buildpack: nodejs_buildpack
+  command: npm run start
+  env:
+    env_type: production
